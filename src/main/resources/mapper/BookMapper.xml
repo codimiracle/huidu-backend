@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.codimiracle.application.platform.huidu.mapper.BookMapper">
+    <resultMap id="BaseResultMap" type="com.codimiracle.application.platform.huidu.entity.po.Book">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <result column="id" jdbcType="INTEGER" property="id"/>
+        <result column="title" jdbcType="VARCHAR" property="title"/>
+        <result column="description" jdbcType="VARCHAR" property="description"/>
+        <result column="cover" jdbcType="VARCHAR" property="cover"/>
+        <result column="teller" jdbcType="VARCHAR" property="teller"/>
+        <result column="metadata_id" jdbcType="INTEGER" property="metadataId"/>
+        <result column="category_id" jdbcType="INTEGER" property="categoryId"/>
+        <result column="publish_year" jdbcType="CHAR" property="publishYear"/>
+        <result column="type" jdbcType="VARCHAR" property="type"/>
+        <result column="episodes" jdbcType="INTEGER" property="episodes"/>
+        <result column="status" jdbcType="VARCHAR" property="status"/>
+        <result column="money" jdbcType="INTEGER" property="money"/>
+        <result column="commodity_id" jdbcType="INTEGER" property="commodityId"/>
+        <result column="deleted" jdbcType="BIT" property="deleted"/>
+    </resultMap>
+</mapper>

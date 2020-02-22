@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.codimiracle.application.platform.huidu.mapper.UserAccountMapper">
+    <resultMap id="BaseResultMap" type="com.codimiracle.application.platform.huidu.entity.po.UserAccount">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="user_id" jdbcType="INTEGER" property="userId"/>
+        <result column="balance" jdbcType="BIGINT" property="balance"/>
+        <result column="version" jdbcType="INTEGER" property="version"/>
+    </resultMap>
+</mapper>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.codimiracle.application.platform.huidu.mapper.UserMapper">
+    <resultMap id="BaseResultMap" type="com.codimiracle.application.platform.huidu.entity.po.User">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="username" jdbcType="CHAR" property="username"/>
+        <result column="password" jdbcType="CHAR" property="password"/>
+        <result column="nickname" jdbcType="VARCHAR" property="nickname"/>
+        <result column="avatar" jdbcType="VARCHAR" property="avatar"/>
+        <result column="account_expired" jdbcType="TIMESTAMP" property="accountExpired"/>
+        <result column="credentials_expired" jdbcType="TIMESTAMP" property="credentialsExpired"/>
+        <result column="account_locked" jdbcType="INTEGER" property="accountLocked"/>
+        <result column="enabled" jdbcType="INTEGER" property="enabled"/>
+        <result column="role_id" jdbcType="INTEGER" property="roleId"/>
+    </resultMap>
+    <select id="selectByUsername" resultMap="BaseResultMap">
+        SELECT id,
+               username,
+               password,
+               nickname,
+               avatar,
+               account_expired,
+               credentials_expired,
+               account_locked,
+               enabled,
+               role_id
+        FROM user LEFT JOIN user_role LEFT JOIN u
+    </select>
+</mapper>

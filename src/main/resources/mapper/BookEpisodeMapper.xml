@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.codimiracle.application.platform.huidu.mapper.BookEpisodeMapper">
+    <resultMap id="BaseResultMap" type="com.codimiracle.application.platform.huidu.entity.po.BookEpisode">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="title" jdbcType="VARCHAR" property="title"/>
+        <result column="commodity_id" jdbcType="INTEGER" property="commodityId"/>
+        <result column="content_type" jdbcType="VARCHAR" property="contentType"/>
+        <result column="content_source" jdbcType="VARCHAR" property="contentSource"/>
+        <result column="words" jdbcType="INTEGER" property="words"/>
+        <result column="status" jdbcType="VARCHAR" property="status"/>
+        <result column="book_id" jdbcType="INTEGER" property="bookId"/>
+        <result column="deleted" jdbcType="BIT" property="deleted"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+</mapper>

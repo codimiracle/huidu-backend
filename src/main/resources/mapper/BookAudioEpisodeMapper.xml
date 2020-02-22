@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.codimiracle.application.platform.huidu.mapper.BookAudioEpisodeMapper">
+    <resultMap id="BaseResultMap" type="com.codimiracle.application.platform.huidu.entity.po.BookAudioEpisode">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="title" jdbcType="VARCHAR" property="title"/>
+        <result column="episode_id" jdbcType="INTEGER" property="episodeId"/>
+        <result column="duration" jdbcType="VARCHAR" property="duration"/>
+        <result column="status" jdbcType="VARCHAR" property="status"/>
+        <result column="book_id" jdbcType="INTEGER" property="bookId"/>
+        <result column="commodity_id" jdbcType="INTEGER" property="commodityId"/>
+        <result column="stream_url" jdbcType="VARCHAR" property="streamUrl"/>
+        <result column="next_episode_id" jdbcType="INTEGER" property="nextEpisodeId"/>
+        <result column="deleted" jdbcType="BIT" property="deleted"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+</mapper>

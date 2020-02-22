@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.codimiracle.application.platform.huidu.mapper.ReferenceDataMapper">
+    <resultMap id="BaseResultMap" type="com.codimiracle.application.platform.huidu.entity.po.ReferenceData">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <id column="reference_id" jdbcType="CHAR" property="referenceId"/>
+        <result column="file_name" jdbcType="VARCHAR" property="fileName"/>
+        <result column="file_original_name" jdbcType="VARCHAR" property="fileOriginalName"/>
+        <result column="file_size" jdbcType="BIGINT" property="fileSize"/>
+        <result column="type" jdbcType="VARCHAR" property="type"/>
+        <result column="uploaded_date" jdbcType="TIMESTAMP" property="uploadedDate"/>
+        <result column="status" jdbcType="INTEGER" property="status"/>
+        <result column="file_path" jdbcType="LONGVARCHAR" property="filePath"/>
+    </resultMap>
+</mapper>

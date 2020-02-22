@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.codimiracle.application.platform.huidu.mapper.OrderMapper">
+    <resultMap id="BaseResultMap" type="com.codimiracle.application.platform.huidu.entity.po.Order">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <result column="order_number" jdbcType="CHAR" property="orderNumber"/>
+        <result column="owner_id" jdbcType="INTEGER" property="ownerId"/>
+        <result column="type" jdbcType="VARCHAR" property="type"/>
+        <result column="pay_type" jdbcType="VARCHAR" property="payType"/>
+        <result column="address_id" jdbcType="INTEGER" property="addressId"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="pay_time" jdbcType="TIMESTAMP" property="payTime"/>
+        <result column="deliver_time" jdbcType="TIMESTAMP" property="deliverTime"/>
+        <result column="closing_time" jdbcType="TIMESTAMP" property="closingTime"/>
+        <result column="total_money" jdbcType="VARCHAR" property="totalMoney"/>
+        <result column="shipment_money" jdbcType="VARCHAR" property="shipmentMoney"/>
+        <result column="status" jdbcType="VARCHAR" property="status"/>
+        <result column="logistics_information" jdbcType="VARCHAR" property="logisticsInformation"/>
+    </resultMap>
+</mapper>

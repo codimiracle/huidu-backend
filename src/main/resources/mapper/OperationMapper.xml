@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.codimiracle.application.platform.huidu.mapper.OperationMapper">
+    <resultMap id="BaseResultMap" type="com.codimiracle.application.platform.huidu.entity.po.Operation">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="type" jdbcType="VARCHAR" property="type"/>
+        <result column="describe" jdbcType="VARCHAR" property="describe"/>
+        <result column="target_type" jdbcType="VARCHAR" property="targetType"/>
+        <result column="target_id" jdbcType="INTEGER" property="targetId"/>
+        <result column="level" jdbcType="VARCHAR" property="level"/>
+        <result column="operator_id" jdbcType="INTEGER" property="operatorId"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+    </resultMap>
+</mapper>

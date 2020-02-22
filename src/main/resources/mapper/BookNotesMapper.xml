@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.codimiracle.application.platform.huidu.mapper.BookNotesMapper">
+    <resultMap id="BaseResultMap" type="com.codimiracle.application.platform.huidu.entity.po.BookNotes">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <result column="id" jdbcType="INTEGER" property="id"/>
+        <result column="book_id" jdbcType="INTEGER" property="bookId"/>
+        <result column="episode_id" jdbcType="INTEGER" property="episodeId"/>
+        <result column="ref" jdbcType="VARCHAR" property="ref"/>
+        <result column="content_type" jdbcType="VARCHAR" property="contentType"/>
+        <result column="content_source" jdbcType="VARCHAR" property="contentSource"/>
+        <result column="dommark_startdom" jdbcType="VARCHAR" property="dommarkStartdom"/>
+        <result column="dommark_startoffset" jdbcType="VARCHAR" property="dommarkStartoffset"/>
+        <result column="dommark_enddom" jdbcType="VARCHAR" property="dommarkEnddom"/>
+        <result column="dommark_endoffset" jdbcType="VARCHAR" property="dommarkEndoffset"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+</mapper>

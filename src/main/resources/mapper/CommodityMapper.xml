@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.codimiracle.application.platform.huidu.mapper.CommodityMapper">
+    <resultMap id="BaseResultMap" type="com.codimiracle.application.platform.huidu.entity.po.Commodity">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <result column="id" jdbcType="INTEGER" property="id"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="type" jdbcType="VARCHAR" property="type"/>
+        <result column="picture" jdbcType="VARCHAR" property="picture"/>
+        <result column="introduction" jdbcType="VARCHAR" property="introduction"/>
+        <result column="rate" jdbcType="VARCHAR" property="rate"/>
+        <result column="weight" jdbcType="DOUBLE" property="weight"/>
+        <result column="stock" jdbcType="VARCHAR" property="stock"/>
+        <result column="available_stock" jdbcType="VARCHAR" property="availableStock"/>
+        <result column="sales" jdbcType="VARCHAR" property="sales"/>
+        <result column="shipment" jdbcType="VARCHAR" property="shipment"/>
+        <result column="extra" jdbcType="VARCHAR" property="extra"/>
+        <result column="prices" jdbcType="VARCHAR" property="prices"/>
+        <result column="status" jdbcType="VARCHAR" property="status"/>
+    </resultMap>
+</mapper>
