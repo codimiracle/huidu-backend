@@ -1,10 +1,15 @@
 package com.codimiracle.application.platform.huidu.entity.po;
 
+import lombok.Data;
+
 import javax.persistence.Column;
+import javax.persistence.Id;
 import javax.persistence.Table;
 
+@Data
 @Table(name = "content_mention")
 public class ContentMention {
+    @Id
     @Column(name = "content_id")
     private Integer contentId;
 
@@ -14,28 +19,13 @@ public class ContentMention {
     /**
      * @return content_id
      */
-    public Integer getContentId() {
-        return contentId;
-    }
-
     /**
      * @param contentId
      */
-    public void setContentId(Integer contentId) {
-        this.contentId = contentId;
-    }
-
     /**
      * @return mention_user_id
      */
-    public Integer getMentionUserId() {
-        return mentionUserId;
-    }
-
     /**
      * @param mentionUserId
      */
-    public void setMentionUserId(Integer mentionUserId) {
-        this.mentionUserId = mentionUserId;
-    }
 }
