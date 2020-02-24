@@ -8,7 +8,63 @@
         <id column="id" jdbcType="INTEGER" property="id"/>
         <result column="name" jdbcType="VARCHAR" property="name"/>
         <result column="description" jdbcType="VARCHAR" property="description"/>
-        <result column="extra" jdbcType="VARCHAR" property="extra"/>
+        <result column="extra_url" jdbcType="VARCHAR" property="extraUrl"/>
+        <result column="extra_aside_title" jdbcType="VARCHAR" property="extraAsideTitle"/>
         <result column="deleted" jdbcType="BIT" property="deleted"/>
     </resultMap>
+    <resultMap id="IntegratedResultMap" type="com.codimiracle.application.platform.huidu.entity.vo.CategoryVO">
+        <id column="category_id" jdbcType="INTEGER" property="id"/>
+        <result column="category_name" jdbcType="VARCHAR" property="name"/>
+        <result column="category_description" jdbcType="VARCHAR" property="description"/>
+        <association property="extra"
+                     javaType="com.codimiracle.application.platform.huidu.entity.embedded.CategoryExtra">
+            <result column="cateogry_extra_url" jdbcType="VARCHAR" property="url"/>
+            <result column="category_extra_aside_title" jdbcType="VARCHAR" property="asideTitle"/>
+        </association>
+        <collection property="tags" ofType="com.codimiracle.application.platform.huidu.entity.vo.TagVO">
+            <result column="tag_name" jdbcType="VARCHAR" property="name"/>
+            <result column="tag_id" jdbcType="VARCHAR" property="id"/>
+            <result column="category_id" jdbcType="VARCHAR" property="category.id"/>
+            <result column="category_name" jdbcType="VARCHAR" property="category.name"/>
+            <result column="category_description" jdbcType="VARCHAR" property="category.description"/>
+        </collection>
+    </resultMap>
+    <update id="deleteByIdsLogically">
+        UPDATE category
+        SET deleted = 1
+        WHERE category.id IN
+        <foreach collection="list" item="item" open="(" close=")" separator=",">#{item}</foreach>
+    </update>
+    <delete id="deleteByIdLogically">
+        UPDATE category
+        SET deleted = 1
+        WHERE category.id = #{id}
+    </delete>
+    <select id="selectByIdIntegrally" resultMap="IntegratedResultMap">
+        SELECT c.id                category_id,
+               c.name              category_name,
+               c.description       category_description,
+               c.extra_url         category_extra_url,
+               c.extra_aside_title category_aside_title,
+               t.id                tag_id,
+               t.name              tag_name
+        FROM category c
+                 LEFT JOIN category_tags ct ON c.id = ct.category_id
+                 LEFT JOIN tag t ON ct.tag_id = t.id
+        WHERE c.deleted = 0
+          AND c.id = #{id}
+    </select>
+    <select id="selectAllIntegrally" resultMap="IntegratedResultMap">
+        SELECT c.id                category_id,
+               c.name              category_name,
+               c.description       category_description,
+               c.extra_url         category_extra_url,
+               c.extra_aside_title category_aside_title,
+               t.id                tag_id,
+               t.name              tag_name
+        FROM category c
+                 LEFT JOIN category_tags ct ON c.id = ct.category_id
+                 LEFT JOIN tag t ON ct.tag_id = t.id
+        WHERE c.deleted = 0
+    </select>
 </mapper>

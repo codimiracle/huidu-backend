@@ -8,10 +8,94 @@
         <result column="content_id" jdbcType="INTEGER" property="contentId"/>
         <result column="target_content_id" jdbcType="INTEGER" property="targetContentId"/>
         <result column="title" jdbcType="VARCHAR" property="title"/>
-        <result column="words" jdbcType="VARCHAR" property="words"/>
+        <result column="words" jdbcType="INTEGER" property="words"/>
         <result column="content_type" jdbcType="VARCHAR" property="contentType"/>
         <result column="content_source" jdbcType="VARCHAR" property="contentSource"/>
         <result column="status" jdbcType="VARCHAR" property="status"/>
-        <result column="reads" jdbcType="VARCHAR" property="reads"/>
+        <result column="reads" jdbcType="INTEGER" property="reads"/>
     </resultMap>
+    <resultMap id="IntegratedResultMap"
+               extends="com.codimiracle.application.platform.huidu.mapper.ContentMapper.IntegratedResultMap"
+               type="com.codimiracle.application.platform.huidu.entity.vo.ArticleVO">
+        <result column="content_id" jdbcType="INTEGER" property="contentId"/>
+        <result column="title" jdbcType="VARCHAR" property="title"/>
+        <result column="words" jdbcType="INTEGER" property="words"/>
+        <result column="status" jdbcType="VARCHAR" property="status"/>
+        <result column="reads" jdbcType="INTEGER" property="reads"/>
+        <association property="content"
+                     javaType="com.codimiracle.application.platform.huidu.entity.embedded.ContentSource">
+            <result column="content_type" jdbcType="VARCHAR" property="type"/>
+            <result column="content_source" jdbcType="VARCHAR" property="source"/>
+        </association>
+    </resultMap>
+    <select id="selectByIdIntegrally" resultMap="IntegratedResultMap">
+        SELECT c.id,
+               c.type,
+               c.owner_id,
+               c.comments,
+               c.rate,
+               c.likes,
+               c.reposts,
+               c.create_time,
+               c.update_time,
+               ca.content_id,
+               ca.target_content_id,
+               ca.title,
+               ca.words,
+               ca.content_type,
+               ca.content_source,
+               ca.status,
+               ca.`reads`,
+               u.id       AS owner_id,
+               u.username AS owner_username,
+               u.nickname AS owner_nickname,
+               u.avatar   AS owner_avatar
+        FROM content AS c
+                 LEFT JOIN content_article AS ca ON c.id = ca.content_id
+                 LEFT JOIN user AS u ON c.owner_id = u.id
+        WHERE c.deleted = 0
+          AND c.id = #{id};
+    </select>
+    <select id="selectAllIntegrally" resultMap="IntegratedResultMap">
+        SELECT c.id AS id,
+        c.type AS type,
+        c.owner_id AS owner_id,
+        c.comments AS comments,
+        c.rate AS rate,
+        c.likes AS likes,
+        c.reposts AS reposts,
+        c.create_time AS create_time,
+        c.update_time AS update_time,
+        ca.content_id AS content_id,
+        ca.target_content_id AS target_content_id,
+        ca.title AS title,
+        ca.words AS words,
+        ca.content_type AS content_type,
+        ca.content_source AS content_source,
+        ca.status AS status,
+        ca.`reads` AS `reads`,
+        u.id AS owner_id,
+        u.username AS owner_username,
+        u.nickname AS owner_nickname,
+        u.avatar AS owner_avatar
+        FROM content AS c
+        LEFT JOIN content_article AS ca ON c.id = ca.content_id
+        LEFT JOIN user AS u ON c.owner_id = u.id
+        WHERE c.deleted = 0
+        <if test="filter != null and filter.title != null">
+            AND ca.title LIKE CONCAT('%', #{filter.tilte[0]}, '%')
+        </if>
+        <if test="filter != null and filter.status != null">
+            AND ca.status IN
+            <foreach item="item" index="index" collection="filter.status"
+                     open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="sorter != null and sorter.field != null">
+            ORDER BY #{sorter.field}
+            <if test="sorter.order == 'descend'">DESC</if>
+        </if>
+
+    </select>
 </mapper>
