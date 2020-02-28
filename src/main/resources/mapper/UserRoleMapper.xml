@@ -7,6 +7,41 @@
         -->
         <id column="id" jdbcType="INTEGER" property="id"/>
         <result column="name" jdbcType="VARCHAR" property="name"/>
-        <result column="authorities" jdbcType="VARCHAR" property="authorities"/>
+        <result column="authorities" jdbcType="VARCHAR" property="authorities"
+                typeHandler="com.codimiracle.application.platform.huidu.typehandler.ListTypeHandler"/>
     </resultMap>
+    <resultMap id="IntegratedResultMap" type="com.codimiracle.application.platform.huidu.entity.vo.UserRoleVO">
+        <id column="user_role_id" jdbcType="INTEGER" property="id"/>
+        <result column="user_role_name" jdbcType="VARCHAR" property="name"/>
+        <result column="user_role_authorities" jdbcType="VARCHAR" property="authorities"
+                typeHandler="com.codimiracle.application.platform.huidu.typehandler.ListTypeHandler"/>
+    </resultMap>
+    <update id="deleteByIdsLogically">
+        UPDATE user_role SET deleted = 1 WHERE id IN
+        <foreach collection="list" item="item" open="(" separator="," close=")">#{item}</foreach>
+    </update>
+    <update id="deleteByIdLogically">
+        UPDATE user_role
+        SET deleted = 1
+        WHERE id = #{id}
+    </update>
+    <sql id="select_statement">
+        SELECT ur.id          user_role_id,
+               ur.name        user_role_name,
+               ur.authorities user_role_authorities
+        FROM user_role ur
+        WHERE deleted = 0
+    </sql>
+    <select id="selectByIdIntegrally" resultMap="IntegratedResultMap">
+        <include refid="select_statement"/>
+        AND ur.id = #{id}
+    </select>
+    <select id="selectAllIntegrally" resultMap="IntegratedResultMap">
+        <include refid="select_statement"/>
+        <if test="filter != null">
+            <if test="filter.name != null and filter.name.length gt 0">
+                AND ur.name LIKE concat('%', #{filter.name[0]}, '%')
+            </if>
+        </if>
+    </select>
 </mapper>
