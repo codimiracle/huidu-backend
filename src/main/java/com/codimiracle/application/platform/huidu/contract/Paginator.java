@@ -17,6 +17,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 分页器
@@ -38,7 +39,6 @@ public class Paginator {
 
         try {
             if (methodName.endsWith("Integrally")) {
-                //假定数据库表有 deleted 字段。
                 //获取实体的类
                 Class<?> mapperInterface = proceedingJoinPoint.getSignature().getDeclaringType();
                 ParameterizedType parameterizedType = (ParameterizedType) mapperInterface.getGenericInterfaces()[0];
@@ -47,11 +47,19 @@ public class Paginator {
                     try {
                         String validCountMapperMethodName = methodName.replaceAll("Integrally", "");
                         Method method = null;
-                        if (ReflectionUtils.findField(entityClass, "deleted") != null) {
+                        if (proceedingJoinPoint.getArgs().length >= 3) {
                             validCountMapperMethodName = "selectByCondition";
                             Condition condition = new Condition(entityClass);
                             Example.Criteria criteria = condition.createCriteria();
-                            criteria.andEqualTo("deleted", 0);
+                            Object first = proceedingJoinPoint.getArgs()[0];
+                            //针对 type 相关的查询
+                            if (Objects.nonNull(first) && first.getClass().getSimpleName().endsWith("Type")) {
+                                criteria.andEqualTo("type", first);
+                            }
+                            //处理逻辑删除
+                            if (ReflectionUtils.findField(entityClass, "deleted") != null) {
+                                criteria.andEqualTo("deleted", 0);
+                            }
                             method = ReflectionUtils.findMethod(mapperInterface, validCountMapperMethodName, Object.class);
                             method.invoke(proceedingJoinPoint.getTarget(), condition);
                         } else {
