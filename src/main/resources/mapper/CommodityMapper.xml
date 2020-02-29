@@ -19,5 +19,77 @@
         <result column="extra" jdbcType="VARCHAR" property="extra"/>
         <result column="prices" jdbcType="VARCHAR" property="prices"/>
         <result column="status" jdbcType="VARCHAR" property="status"/>
+        <result column="deleted" jdbcType="BIT" property="deleted"/>
     </resultMap>
+    <resultMap id="IntegratedResultMap" type="com.codimiracle.application.platform.huidu.entity.vo.CommodityVO">
+        <result column="commodity_id" jdbcType="INTEGER" property="id"/>
+        <result column="commodity_name" jdbcType="VARCHAR" property="name"/>
+        <result column="commodity_type" jdbcType="VARCHAR" property="type"/>
+        <result column="commodity_picture" jdbcType="VARCHAR" property="picture"/>
+        <result column="commodity_introduction" jdbcType="VARCHAR" property="introduction"/>
+        <result column="commodity_rate" jdbcType="VARCHAR" property="rate"/>
+        <result column="commodity_weight" jdbcType="DOUBLE" property="weight"/>
+        <result column="commodity_stock" jdbcType="VARCHAR" property="stock"/>
+        <result column="commodity_available_stock" jdbcType="VARCHAR" property="availableStock"/>
+        <result column="commodity_sales" jdbcType="VARCHAR" property="sales"/>
+        <result column="commodity_shipment" jdbcType="VARCHAR" property="shipment"/>
+        <result column="commodity_extra" jdbcType="VARCHAR" property="extra"/>
+        <result column="commodity_prices" jdbcType="VARCHAR" property="prices"/>
+        <result column="commodity_status" jdbcType="VARCHAR" property="status"/>
+    </resultMap>
+    <update id="deleteByIdLogically">
+        UPDATE commodity
+        SET deleted = 1
+        WHERE commodity.id = #{id}
+    </update>
+    <update id="deleteByIdsLogically">
+        UPDATE commodity
+        SET deleted = 1
+        WHERE commodity.id IN
+        <foreach collection="list" item="item" open="(" close=")" separator=",">#{item}</foreach>
+    </update>
+    <sql id="select_statement">
+        SELECT c.id commodity_id,
+        c.name commodity_name,
+        c.type commodity_type,
+        c.picture commodity_picture,
+        c.introduction commodity_introduction,
+        c.rate commodity_rate,
+        c.weight commodity_weight,
+        c.stock commodity_stock,
+        c.available_stock commodity_available_stock,
+        c.sales commodity_sales,
+        c.shipment commodity_shipment,
+        c.extra commodity_extra,
+        c.prices commodity_prices,
+        c.status commodity_status
+        FROM (SELECT * FROM commodity WHERE commodity.deleted = 0 <if test="page != null">LIMIT #{page.offset},
+        #{page.limit}</if>) c
+        WHERE c.deleted = 0
+    </sql>
+    <select id="selectByIdIntegrally" resultMap="IntegratedResultMap">
+        <include refid="select_statement"/>
+        AND c.id = #{id}
+    </select>
+    <select id="selectAllIntegrally" resultMap="IntegratedResultMap">
+        <include refid="select_statement"/>
+        <if test="filter != null">
+            <if test="filter.name != null and filter.name.length gt 0">
+                AND c.name LIKE concat('%', #{filter.name[0]}, '%')
+            </if>
+            <if test="filter.type != null and filter.type.length gt 0">
+                AND c.status IN
+                <foreach collection="filter.type" separator="," open="(" close=")" item="item">#{item}</foreach>
+            </if>
+            <if test="filter.status != null and filter.status.length gt 0">
+                AND c.status IN
+                <foreach collection="filter.status" separator="," open="(" close=")" item="item">#{item}</foreach>
+            </if>
+        </if>
+        <if test="sorter != null and sorter.field != null">
+            ORDER BY #{sorter.field}
+            <if test="sorter.order == 'descend'">DESC</if>
+        </if>
+
+    </select>
 </mapper>

@@ -31,6 +31,8 @@ public class UserRole {
      */
     private List<String> authorities;
 
+    private boolean deleted;
+
     public static UserRole from(UserRoleDTO userRoleDTO) {
         if (Objects.isNull(userRoleDTO)) {
             return null;

@@ -12,18 +12,139 @@
         <result column="account_locked" jdbcType="INTEGER" property="accountLocked"/>
         <result column="enabled" jdbcType="INTEGER" property="enabled"/>
         <result column="role_id" jdbcType="INTEGER" property="roleId"/>
+        <association property="role" foreignColumn="role_id"
+                     javaType="com.codimiracle.application.platform.huidu.entity.po.UserRole">
+            <id column="role_id" jdbcType="INTEGER" property="id"/>
+            <result column="name" jdbcType="VARCHAR" property="name"/>
+            <result column="authorities" jdbcType="VARCHAR" property="authorities"/>
+        </association>
+        <association property="extra" javaType="com.codimiracle.application.platform.huidu.entity.po.UserInfo">
+            <result column="user_id" jdbcType="INTEGER" property="userId"/>
+            <result column="gender" jdbcType="VARCHAR" property="gender"/>
+            <result column="age" jdbcType="INTEGER" property="age"/>
+            <result column="slogan" jdbcType="VARCHAR" property="slogan"/>
+            <result column="introduction" jdbcType="VARCHAR" property="introduction"/>
+            <result column="birthdate" jdbcType="TIMESTAMP" property="birthdate"/>
+            <result column="phone" jdbcType="VARCHAR" property="phone"/>
+            <result column="email" jdbcType="VARCHAR" property="email"/>
+            <result column="region" jdbcType="VARCHAR" property="region"/>
+        </association>
     </resultMap>
+    <resultMap id="IntegratedResultMap" type="com.codimiracle.application.platform.huidu.entity.vo.UserVO">
+        <id column="user_id" jdbcType="INTEGER" property="id"/>
+        <result column="user_username" jdbcType="CHAR" property="username"/>
+        <result column="user_nickname" jdbcType="VARCHAR" property="nickname"/>
+        <result column="user_avatar" jdbcType="VARCHAR" property="avatar"/>
+        <result column="user_account_expired" jdbcType="TIMESTAMP" property="accountExpired"/>
+        <result column="user_credentials_expired" jdbcType="TIMESTAMP" property="credentialsExpired"/>
+        <result column="user_account_locked" jdbcType="INTEGER" property="accountLocked"/>
+        <result column="user_enabled" jdbcType="INTEGER" property="enabled"/>
+        <association property="extra"
+                     resultMap="com.codimiracle.application.platform.huidu.mapper.UserInfoMapper.IntegratedResultMap"/>
+        <association property="role"
+                     resultMap="com.codimiracle.application.platform.huidu.mapper.UserRoleMapper.IntegratedResultMap"/>
+    </resultMap>
+    <resultMap id="ProtectedResultMap" type="com.codimiracle.application.platform.huidu.entity.vo.UserProtectedVO">
+        <id column="user_id" jdbcType="INTEGER" property="id"/>
+        <result column="user_username" jdbcType="CHAR" property="username"/>
+        <result column="user_nickname" jdbcType="VARCHAR" property="nickname"/>
+        <result column="user_avatar" jdbcType="VARCHAR" property="avatar"/>
+    </resultMap>
+    <update id="deleteByIdsLogically">
+        UPDATE user SET deleted = 1 WHERE id IN
+        <foreach collection="list" separator="," open="(" close=")" item="item">#{item}</foreach>
+    </update>
+    <update id="deleteByIdLogically">
+        UPDATE user
+        SET deleted = 1
+        WHERE id = #{id}
+    </update>
+    <sql id="select_statement">
+        SELECT u.id user_id,
+        u.username user_username,
+        '(protected)' user_password,
+        u.nickname user_nickname,
+        u.avatar user_avatar,
+        u.account_expired user_account_expired,
+        u.credentials_expired user_credentials_expired,
+        u.account_locked user_account_locked,
+        u.enabled user_enabled,
+        ui.user_id user_info_user_id,
+        ui.gender user_info_gender,
+        ui.age user_info_age,
+        ui.slogan user_info_slogan,
+        ui.introduction user_info_introduction,
+        ui.birthdate user_info_birthdate,
+        ui.phone user_info_phone,
+        ui.email user_info_email,
+        ui.region user_info_region,
+        ui.user_id user_info_user_id,
+        ui.gender user_info_gender,
+        ui.age user_info_age,
+        ui.slogan user_info_slogan,
+        ui.introduction user_info_introduction,
+        ui.birthdate user_info_birthdate,
+        ui.phone user_info_phone,
+        ui.email user_info_email,
+        ui.region user_info_region,
+        ur.id user_role_id,
+        ur.name user_role_name,
+        ur.authorities user_role_authorities
+        FROM (SELECT * FROM user WHERE user.deleted = 0 <if test="page != null">LIMIT #{page.offset}, #{page.limit}</if>)
+        u
+        LEFT JOIN user_info ui ON u.id = ui.user_id
+        LEFT JOIN user_role ur ON u.role_id = ur.id
+        WHERE 1=1
+    </sql>
+    <select id="selectByIdIntegrally" resultMap="IntegratedResultMap">
+        <include refid="select_statement"/>
+        AND u.id = #{id}
+    </select>
+    <select id="selectAllIntegrally" resultMap="IntegratedResultMap">
+        <include refid="select_statement"/>
+        <if test="filter != null">
+            <if test="filter.username != null and filter.username.length gt 0">
+                AND u.username LIKE concat('%', #{filter.username[0]}, '%')
+            </if>
+            <if test="filter.nickname != null and filter.nickname.length gt 0">
+                AND u.nickname LIKE concat('%', #{filter.nickname[0]}, '%')
+            </if>
+            <if test="filter.role != null and filter.role.length gt 0">
+                AND ur.name LIKE concat('%', #{filter.role[0]}, '%')
+            </if>
+        </if>
+
+        <if test="sorter != null and sorter.field != null">
+            ORDER BY #{sorter.field}
+            <if test="sorter.order == 'descend'">DESC</if>
+        </if>
+    </select>
+
     <select id="selectByUsername" resultMap="BaseResultMap">
-        SELECT id,
-               username,
-               password,
-               nickname,
-               avatar,
-               account_expired,
-               credentials_expired,
-               account_locked,
-               enabled,
-               role_id
-        FROM user LEFT JOIN user_role LEFT JOIN u
+        SELECT u.id,
+               u.username,
+               u.password,
+               u.nickname,
+               u.avatar,
+               u.account_expired,
+               u.credentials_expired,
+               u.account_locked,
+               u.enabled,
+               u.role_id,
+               ur.name,
+               ur.authorities,
+               ui.gender,
+               ui.age,
+               ui.slogan,
+               ui.introduction,
+               ui.birthdate,
+               ui.phone,
+               ui.email,
+               ui.region
+        FROM user u
+                 LEFT JOIN user_role ur ON u.role_id = ur.id
+                 LEFT JOIN user_info ui ON u.id = ui.user_id
+        WHERE u.deleted = 0
+          AND u.username = #{username}
     </select>
 </mapper>

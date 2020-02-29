@@ -9,6 +9,7 @@
         <result column="name" jdbcType="VARCHAR" property="name"/>
         <result column="authorities" jdbcType="VARCHAR" property="authorities"
                 typeHandler="com.codimiracle.application.platform.huidu.typehandler.ListTypeHandler"/>
+        <result column="deleted" jdbcType="BIT" property="deleted"/>
     </resultMap>
     <resultMap id="IntegratedResultMap" type="com.codimiracle.application.platform.huidu.entity.vo.UserRoleVO">
         <id column="user_role_id" jdbcType="INTEGER" property="id"/>
@@ -26,11 +27,12 @@
         WHERE id = #{id}
     </update>
     <sql id="select_statement">
-        SELECT ur.id          user_role_id,
-               ur.name        user_role_name,
-               ur.authorities user_role_authorities
-        FROM user_role ur
-        WHERE deleted = 0
+        SELECT ur.id user_role_id,
+        ur.name user_role_name,
+        ur.authorities user_role_authorities
+        FROM (SELECT * FROM user_role WHERE user_role.deleted = 0 <if test="page != null">LIMIT #{page.offset},
+        #{page.limit}</if>)ur
+        WHERE 1=1
     </sql>
     <select id="selectByIdIntegrally" resultMap="IntegratedResultMap">
         <include refid="select_statement"/>

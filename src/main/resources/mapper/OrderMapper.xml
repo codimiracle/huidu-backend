@@ -10,6 +10,11 @@
         <result column="type" jdbcType="VARCHAR" property="type"/>
         <result column="pay_type" jdbcType="VARCHAR" property="payType"/>
         <result column="address_id" jdbcType="INTEGER" property="addressId"/>
+        <result column="address_region" jdbcType="VARCHAR" property="addressRegion"/>
+        <result column="address_address" jdbcType="VARCHAR" property="addressAddress"/>
+        <result column="address_postcode" jdbcType="VARCHAR" property="addressPostcode"/>
+        <result column="address_receiver_name" jdbcType="VARCHAR" property="addressReceiverName"/>
+        <result column="address_receiver_phone" jdbcType="VARCHAR" property="addressReceiverPhone"/>
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
         <result column="pay_time" jdbcType="TIMESTAMP" property="payTime"/>
         <result column="deliver_time" jdbcType="TIMESTAMP" property="deliverTime"/>
@@ -17,6 +22,99 @@
         <result column="total_money" jdbcType="VARCHAR" property="totalMoney"/>
         <result column="shipment_money" jdbcType="VARCHAR" property="shipmentMoney"/>
         <result column="status" jdbcType="VARCHAR" property="status"/>
-        <result column="logistics_information" jdbcType="VARCHAR" property="logisticsInformation"/>
+        <result column="logistics_information_id" jdbcType="VARCHAR" property="logisticsInformationId"/>
     </resultMap>
+    <resultMap id="IntegratedResultMap" type="com.codimiracle.application.platform.huidu.entity.vo.OrderVO">
+        <result column="order_number" jdbcType="CHAR" property="orderNumber"/>
+        <result column="order_type" jdbcType="VARCHAR" property="type"/>
+        <result column="order_pay_type" jdbcType="VARCHAR" property="payType"/>
+        <result column="order_create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="order_pay_time" jdbcType="TIMESTAMP" property="payTime"/>
+        <result column="order_deliver_time" jdbcType="TIMESTAMP" property="deliverTime"/>
+        <result column="order_closing_time" jdbcType="TIMESTAMP" property="closingTime"/>
+        <result column="order_total_money" jdbcType="VARCHAR" property="totalMoney"/>
+        <result column="order_shipment_money" jdbcType="VARCHAR" property="shipmentMoney"/>
+        <result column="order_status" jdbcType="VARCHAR" property="status"/>
+        <association property="address"
+                     resultMap="com.codimiracle.application.platform.huidu.mapper.AddressMapper.IntegratedResultMap"/>
+        <association property="owner"
+                     resultMap="com.codimiracle.application.platform.huidu.mapper.UserMapper.ProtectedResultMap"/>
+        <association property="logisticsInformation"
+                     resultMap="com.codimiracle.application.platform.huidu.mapper.LogisticsInformationMapper.IntegratedResultMap"/>
+        <collection property="detailsList"
+                    resultMap="com.codimiracle.application.platform.huidu.mapper.OrderDetailsMapper.IntegratedResultMap">
+        </collection>
+    </resultMap>
+    <sql id="select_statement">
+        SELECT o.order_number,
+        o.owner_id user_id,
+        u.username user_username,
+        u.nickname user_nickname,
+        u.avatar user_avatar,
+        o.type order_type,
+        o.pay_type order_pay_type,
+        o.create_time order_create_time,
+        o.pay_time order_pay_time,
+        o.deliver_time order_deliver_time,
+        o.closing_time order_closing_time,
+        o.total_money order_total_money,
+        o.shipment_money order_shipment_money,
+        o.status order_status,
+        o.logistics_information_id,
+        li.express_number logistics_information_express_number,
+        li.express_company logistics_information_express_company,
+        pp.id passing_point_id,
+        pp.name passing_point_name,
+        pp.update_time passing_point_update_time,
+        pp.status passing_point_status,
+        o.address_id address_id,
+        o.address_region,
+        o.address_address,
+        o.address_receiver_name,
+        o.address_receiver_phone,
+        o.address_postcode,
+        od.id order_details_id,
+        od.quantity order_details_quantity,
+        od.prices order_details_prices,
+        od.order_number order_details_order_number,
+        od.commodity_id,
+        od.commodity_name,
+        od.commodity_picture,
+        od.commodity_introduction,
+        od.commodity_weight,
+        od.commodity_type,
+        od.commodity_prices
+        FROM (SELECT * FROM `order` <if test="page != null">LIMIT #{page.offset}, #{page.limit}</if>) o
+        LEFT JOIN order_details od ON o.order_number = od.order_number
+        LEFT JOIN user u ON o.owner_id = u.id
+        LEFT JOIN logistics_information li ON o.logistics_information_id = li.id
+        LEFT JOIN passing_point pp ON o.logistics_information_id = pp.logistics_infomation_id
+    </sql>
+    <select id="selectByOrderNumberIntegrally" resultMap="IntegratedResultMap">
+        <include refid="select_statement"/>
+        WHERE o.order_number = #{orderNumber}
+    </select>
+    <select id="selectAllIntegrally" resultMap="IntegratedResultMap">
+        <include refid="select_statement"/>
+        <if test="filter != null">
+            <if test="filter.orderNumber != null and filter.orderNumber.length gt 0">
+                AND o.order_number = #{filter.orderNumber[0]}
+            </if>
+            <if test="filter.owner != null and filter.owner.length gt 0">
+                AND u.nickname LIKE concat('%', #{filter.owner}, '%')
+            </if>
+            <if test="filter.type != null and filter.type.length gt 0">
+                AND o.type IN
+                <foreach collection="filter.type" open="(" separator="," close=")" item="item">#{item}</foreach>
+            </if>
+            <if test="filter.status != null and filter.status.length gt 0">
+                AND o.status IN
+                <foreach collection="filter.status" open="(" separator="," close=")" item="item">#{item}</foreach>
+            </if>
+        </if>
+        <if test="sorter != null and sorter.field == 'total_money'">
+            ORDER BY total_money
+            <if test="sorter.order == 'descend'">DESC</if>
+        </if>
+    </select>
 </mapper>
