@@ -33,7 +33,7 @@ public class ApiBackendCollectionController {
         category.setTags(TagUtil.mutateToPersistent(tagService, Arrays.asList(collectionDTO.getTags())));
         BeanUtils.copyProperties(collectionDTO, category);
         categoryService.save(category);
-        return RestfulUtil.entity(categoryService.findByIdIntegrally(CategoryType.Collection, category.getId()));
+        return RestfulUtil.entity(categoryService.findByIdIntegrally(category.getId()));
     }
 
     @DeleteMapping("/{id}")
@@ -55,15 +55,24 @@ public class ApiBackendCollectionController {
         BeanUtils.copyProperties(collectionDTO, category);
         category.setTags(TagUtil.mutateToPersistent(tagService, Arrays.asList(collectionDTO.getTags())));
         categoryService.update(category);
-        return RestfulUtil.entity(categoryService.findByIdIntegrally(CategoryType.Collection, id));
+        return RestfulUtil.entity(categoryService.findByIdIntegrally(id));
     }
 
     @GetMapping("/{id}")
     public ApiResponse entity(@PathVariable String id) {
-        CategoryVO categoryVO = categoryService.findByIdIntegrally(CategoryType.Collection, id);
+        CategoryVO categoryVO = categoryService.findByIdIntegrally(id);
         return RestfulUtil.success(categoryVO);
     }
 
+    @GetMapping("/suggestion")
+    public ApiResponse suggestion(@RequestParam("keyword") String keyword) {
+        Filter filter = new Filter();
+        filter.put("name", new String[]{keyword});
+        Page page = new Page();
+        page.setPage(1);
+        page.setLimit(10);
+        return collection(filter, null, page);
+    }
     @GetMapping
     public ApiResponse collection(@RequestParam("filter") Filter filter, @RequestParam("sorter") Sorter sorter, @ModelAttribute Page page) {
         PageSlice<CategoryVO> slice = categoryService.findAllIntegrally(CategoryType.Collection, filter, sorter, page);

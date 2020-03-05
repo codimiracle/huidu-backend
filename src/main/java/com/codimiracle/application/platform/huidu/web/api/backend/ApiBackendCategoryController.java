@@ -35,7 +35,7 @@ public class ApiBackendCategoryController {
         category.setTags(TagUtil.mutateToPersistent(tagService, Arrays.asList(categoryDTO.getTags())));
         BeanUtils.copyProperties(categoryDTO, category);
         categoryService.save(category);
-        return RestfulUtil.entity(categoryService.findByIdIntegrally(CategoryType.Category, category.getId()));
+        return RestfulUtil.entity(categoryService.findByIdIntegrally(category.getId()));
     }
 
     private void mergeTagList(CategoryDTO categoryDTO, Category category) {
@@ -63,12 +63,12 @@ public class ApiBackendCategoryController {
         BeanUtils.copyProperties(categoryDTO, category);
         mergeTagList(categoryDTO, category);
         categoryService.update(category);
-        return RestfulUtil.entity(categoryService.findByIdIntegrally(CategoryType.Category, id));
+        return RestfulUtil.entity(categoryService.findByIdIntegrally(id));
     }
 
     @GetMapping("/{id}")
     public ApiResponse entity(@PathVariable String id) {
-        CategoryVO categoryVO = categoryService.findByIdIntegrally(CategoryType.Category, id);
+        CategoryVO categoryVO = categoryService.findByIdIntegrally(id);
         return RestfulUtil.success(categoryVO);
     }
 

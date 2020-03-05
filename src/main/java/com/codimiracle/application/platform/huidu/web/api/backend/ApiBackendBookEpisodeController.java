@@ -32,7 +32,7 @@ public class ApiBackendBookEpisodeController {
         episode.setCreateTime(new Date());
         episode.setUpdateTime(episode.getCreateTime());
         episode.setOwnerId(user.getId());
-        BookEpisodeVO existsBookEpisode = bookEpisodeService.findByEpisodeNumberIntegrally(episode.getEpisodeNumber());
+        BookEpisodeVO existsBookEpisode = bookEpisodeService.findByEpisodeNumberIntegrally(episode.getBookId(), episode.getEpisodeNumber());
         if (Objects.nonNull(existsBookEpisode)) {
             return RestfulUtil.fail("章节号对应的章节已经存在！");
         }
@@ -58,7 +58,7 @@ public class ApiBackendBookEpisodeController {
         Objects.requireNonNull(episode, "没有需要更新的数据！");
         episode.setId(id);
         episode.setUpdateTime(new Date());
-        BookEpisodeVO existsBookEpisode = bookEpisodeService.findByEpisodeNumberIntegrally(episode.getEpisodeNumber());
+        BookEpisodeVO existsBookEpisode = bookEpisodeService.findByEpisodeNumberIntegrally(episode.getBookId(), episode.getEpisodeNumber());
         if (Objects.nonNull(existsBookEpisode) && !Objects.equals(existsBookEpisode.getId(), id)) {
             return RestfulUtil.fail("章节号对应的章节已经存在！");
         }
@@ -73,19 +73,19 @@ public class ApiBackendBookEpisodeController {
     }
 
     @GetMapping("/last-update-episode")
-    public ApiResponse lastUpdateEpisode() {
-        BookEpisodeVO lastUpdateEpisodeIntegrally = bookEpisodeService.findLastUpdateEpisodeIntegrally();
+    public ApiResponse lastUpdateEpisode(@PathVariable("book_id") String bookId) {
+        BookEpisodeVO lastUpdateEpisodeIntegrally = bookEpisodeService.findLastUpdateEpisodeByBookIdIntegrally(bookId);
         return RestfulUtil.entity(lastUpdateEpisodeIntegrally);
     }
 
     @GetMapping("/last-episode-number")
-    public ApiResponse lastEpisodeNumber() {
-        Integer lastEpisodeNumber = bookEpisodeService.findLastEpisodeNumber();
+    public ApiResponse lastEpisodeNumber(@PathVariable("book_id") String bookId) {
+        Integer lastEpisodeNumber = bookEpisodeService.findLastEpisodeNumberByBookId(bookId);
         return RestfulUtil.success(Objects.nonNull(lastEpisodeNumber) ? lastEpisodeNumber : 0);
     }
 
     @GetMapping
-    public ApiResponse collection(@PathVariable String bookId, @RequestParam("filter") Filter filter, @RequestParam("sorter") Sorter sorter, @ModelAttribute Page page) {
+    public ApiResponse collection(@PathVariable("book_id") String bookId, @RequestParam("filter") Filter filter, @RequestParam("sorter") Sorter sorter, @ModelAttribute Page page) {
         PageSlice<BookEpisodeVO> slice = bookEpisodeService.findAllIntegrally(bookId, filter, sorter, page);
         return RestfulUtil.list(slice);
     }
