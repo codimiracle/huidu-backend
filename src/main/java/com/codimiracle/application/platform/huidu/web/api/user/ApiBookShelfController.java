@@ -1,11 +1,13 @@
-package com.codimiracle.application.platform.huidu.web.api;
+package com.codimiracle.application.platform.huidu.web.api.user;
 
 import com.codimiracle.application.platform.huidu.contract.ApiResponse;
 import com.codimiracle.application.platform.huidu.contract.Page;
 import com.codimiracle.application.platform.huidu.contract.PageSlice;
 import com.codimiracle.application.platform.huidu.entity.po.BookShelf;
+import com.codimiracle.application.platform.huidu.entity.po.User;
 import com.codimiracle.application.platform.huidu.service.BookShelfService;
 import com.codimiracle.application.platform.huidu.util.RestfulUtil;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -13,27 +15,22 @@ import javax.annotation.Resource;
 /**
  * @author Codimiracle
  */
+@CrossOrigin
 @RestController
-@RequestMapping("api//book/shelf")
+@RequestMapping("/api/user/shelves/default")
 public class ApiBookShelfController {
     @Resource
     private BookShelfService bookShelfService;
 
-    @PostMapping
-    public ApiResponse create(@RequestBody BookShelf bookShelf) {
-        bookShelfService.save(bookShelf);
+    @PostMapping("/join")
+    public ApiResponse join(@AuthenticationPrincipal User user, @RequestParam("book_id") String bookId) {
+        bookShelfService.join(user.getId(), bookId);
         return RestfulUtil.success();
     }
 
     @DeleteMapping("/{id}")
     public ApiResponse delete(@PathVariable String id) {
         bookShelfService.deleteById(id);
-        return RestfulUtil.success();
-    }
-
-    @PutMapping
-    public ApiResponse update(@RequestBody BookShelf bookShelf) {
-        bookShelfService.update(bookShelf);
         return RestfulUtil.success();
     }
 
