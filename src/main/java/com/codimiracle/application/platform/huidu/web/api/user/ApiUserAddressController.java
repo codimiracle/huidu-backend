@@ -11,6 +11,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -19,7 +20,7 @@ import java.util.Objects;
 @CrossOrigin
 @RestController
 @RequestMapping("/api/user/addresses")
-public class ApiAddressController {
+public class ApiUserAddressController {
     @Resource
     private AddressService addressService;
 
@@ -34,7 +35,7 @@ public class ApiAddressController {
     @DeleteMapping("/{id}")
     public ApiResponse delete(@AuthenticationPrincipal User user, @PathVariable String id) {
         Address original = addressService.findById(id);
-        if (!Objects.equals(original.getUserId(), user.getId())) {
+        if (Objects.isNull(original) || !Objects.equals(original.getUserId(), user.getId())) {
             return RestfulUtil.fail("权限不足！");
         } else {
             addressService.deleteByIdLogically(id);
@@ -45,18 +46,31 @@ public class ApiAddressController {
     @PutMapping("/{id}")
     public ApiResponse update(@AuthenticationPrincipal User user, @PathVariable("id") String id, @RequestBody AddressDTO addressDTO) {
         Address original = addressService.findById(id);
-        if (!Objects.equals(original.getUserId(), user.getId())) {
+        if (Objects.isNull(original) || !Objects.equals(original.getUserId(), user.getId())) {
             return RestfulUtil.fail("权限不足！");
         }
         Address address = Address.from(addressDTO);
+        address.setId(id);
         addressService.update(address);
-        return RestfulUtil.success();
+        return RestfulUtil.entity(addressService.findByIdIntegrally(id));
     }
 
     @GetMapping("/{id}")
     public ApiResponse entity(@PathVariable String id) {
         AddressVO addressVO = addressService.findByIdIntegrally(id);
-        return RestfulUtil.success(addressVO);
+        return RestfulUtil.entity(addressVO);
+    }
+
+    @PostMapping("/default")
+    public ApiResponse makeDefaultAddress(@AuthenticationPrincipal User user, @RequestBody Map<String, String> parameters) {
+        addressService.defaultAddress(user.getId(), parameters.get("addressId"));
+        return RestfulUtil.success();
+    }
+
+    @GetMapping("/default")
+    public ApiResponse defaultAddress(@AuthenticationPrincipal User user) {
+        AddressVO addressVO = addressService.findDefaultByUserIdIntegrally(user.getId());
+        return RestfulUtil.entity(addressVO);
     }
 
     @GetMapping

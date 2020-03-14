@@ -5,6 +5,7 @@ import com.codimiracle.application.platform.huidu.entity.dto.BookNotesDTO;
 import com.codimiracle.application.platform.huidu.entity.po.BookNotes;
 import com.codimiracle.application.platform.huidu.entity.po.User;
 import com.codimiracle.application.platform.huidu.entity.vo.BookNotesVO;
+import com.codimiracle.application.platform.huidu.entity.vt.BookNoteCollection;
 import com.codimiracle.application.platform.huidu.service.BookNotesService;
 import com.codimiracle.application.platform.huidu.util.RestfulUtil;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -17,6 +18,7 @@ import java.util.Date;
 /**
  * @author Codimiracle
  */
+
 @CrossOrigin
 @RestController
 @RequestMapping("/api/user/book-notes")
@@ -26,6 +28,9 @@ public class ApiBookNotesController {
 
     @PostMapping
     public ApiResponse create(@AuthenticationPrincipal User user, @RequestBody BookNotesDTO bookNotesDTO) {
+        if (bookNotesService.isDommarkExists(bookNotesDTO.getDommark())) {
+            return RestfulUtil.fail("附近已有笔记标注，请删除后重试！");
+        }
         BookNotes bookNotes = BookNotes.from(bookNotesDTO);
         bookNotes.setUserId(user.getId());
         bookNotes.setCreateTime(new Date());
@@ -34,13 +39,13 @@ public class ApiBookNotesController {
         return RestfulUtil.success();
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{book_id}/notes/{id}")
     public ApiResponse delete(@PathVariable String id) {
         bookNotesService.deleteByIdLogically(id);
         return RestfulUtil.success();
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/{book_id}/notes/{id}")
     public ApiResponse update(@PathVariable String id, @RequestBody BookNotesDTO bookNotesDTO) {
         BookNotes bookNotes = BookNotes.from(bookNotesDTO);
         bookNotes.setUpdateTime(new Date());
@@ -50,10 +55,10 @@ public class ApiBookNotesController {
         return RestfulUtil.success();
     }
 
-    @GetMapping("/{id}")
-    public ApiResponse entity(@PathVariable String id) {
-        BookNotesVO bookNotesVO = bookNotesService.findByIdIntegrally(id);
-        return RestfulUtil.success(bookNotesVO);
+    @GetMapping("/{book_id}")
+    public ApiResponse bookNotesCollection(@AuthenticationPrincipal User user, @PathVariable("book_id") String bookId) {
+        BookNoteCollection bookNoteCollection = bookNotesService.findBookNotesCollectionByBookIdAndUserId(bookId, user.getId());
+        return RestfulUtil.entity(bookNoteCollection);
     }
 
     @GetMapping

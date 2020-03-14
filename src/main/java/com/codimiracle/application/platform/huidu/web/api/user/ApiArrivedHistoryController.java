@@ -11,22 +11,20 @@ import com.codimiracle.application.platform.huidu.service.HistoryService;
 import com.codimiracle.application.platform.huidu.service.MottoService;
 import com.codimiracle.application.platform.huidu.service.UserService;
 import com.codimiracle.application.platform.huidu.util.RestfulUtil;
+import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.time.LocalDate;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * @author Codimiracle
  */
 @CrossOrigin
 @RestController
-@RequestMapping("/api/arrive")
+@RequestMapping("/api/user/arrive")
 public class ApiArrivedHistoryController {
     @Resource
     private ArrivedHistoryService arrivedHistoryService;
@@ -42,9 +40,8 @@ public class ApiArrivedHistoryController {
 
     @PostMapping("/signin")
     public ApiResponse signin(@AuthenticationPrincipal User user, @RequestBody ArrivingDTO arrivingDTO) {
-        //补签
         LocalDate nowDate = LocalDate.now();
-        LocalDate signedDate = LocalDate.ofEpochDay(arrivingDTO.getDate().getTime());
+        LocalDate signedDate = LocalDate.parse(DateFormatUtils.format(arrivingDTO.getDate(), "yyyy-MM-dd"));
         if (nowDate.compareTo(signedDate) == 0) {
             //当天签到
             ArrivedHistory signed = arrivedHistoryService.signin(user.getId(), arrivingDTO.getDate());
@@ -59,17 +56,21 @@ public class ApiArrivedHistoryController {
     @GetMapping("/today")
     public ApiResponse today(@AuthenticationPrincipal User user) {
         Date now = new Date();
-        ArrivedHistoryVO arrivedHistoryVO = arrivedHistoryService.findByThatDayIntegrally(now);
+        ArrivedHistoryVO arrivedHistoryVO = arrivedHistoryService.findByThatDayIntegrally(user.getId(), now);
         if (Objects.isNull(arrivedHistoryVO)) {
             arrivedHistoryVO = new ArrivedHistoryVO();
+            arrivedHistoryVO.setDays(0);
             arrivedHistoryVO.setMotto(mottoService.randomMotto());
-            List<HistoryVO> reads = historyService.findThatDayByUserIdIntegrally(user.getId(), now);
-            arrivedHistoryVO.setReads(reads);
-            Map<String, Boolean> historyMap = arrivedHistoryService.retriveHistoryMap(user.getId());
-            arrivedHistoryVO.setHistory(historyMap);
             arrivedHistoryVO.setToday(now);
             arrivedHistoryVO.setUser(userService.findByIdProtectly(user.getId()));
         }
+        List<HistoryVO> reads = historyService.findByThatDayAndUserIdIntegrally(user.getId(), now);
+        arrivedHistoryVO.setReads(reads);
+        Map<String, Boolean> historyMap = arrivedHistoryService.retriveHistoryMap(user.getId());
+        if (Objects.isNull(historyMap)) {
+            historyMap = Collections.emptyMap();
+        }
+        arrivedHistoryVO.setHistory(historyMap);
         return RestfulUtil.entity(arrivedHistoryVO);
     }
 }
