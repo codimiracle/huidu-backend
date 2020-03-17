@@ -9,4 +9,5 @@ import com.codimiracle.application.platform.huidu.entity.po.BookShelf;
  */
 public interface BookShelfService extends Service<String, BookShelf> {
 
+    void join(String userId, String bookId);
 }

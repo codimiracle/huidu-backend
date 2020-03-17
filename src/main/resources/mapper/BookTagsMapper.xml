@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.codimiracle.application.platform.huidu.mapper.BookTagsMapper">
+    <resultMap id="BaseResultMap" type="com.codimiracle.application.platform.huidu.entity.po.BookTags">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="book_id" jdbcType="INTEGER" property="bookId"/>
+        <result column="tag_id" jdbcType="INTEGER" property="tagId"/>
+        <result column="deleted" jdbcType="INTEGER" property="deleted"/>
+    </resultMap>
+    <update id="deleteByLogically">
+        UPDATE book_tags
+        SET deleted = 1
+        WHERE id = #{id}
+    </update>
+    <select id="selectByBookIdIntegrally"
+            resultMap="com.codimiracle.application.platform.huidu.mapper.TagMapper.IntegratedResultMap">
+        SELECT t.id   tag_id,
+               t.name tag_name
+        FROM book_tags bt
+                 LEFT JOIN tag t ON bt.tag_id = t.id
+        WHERE bt.book_id = #{id}
+    </select>
+</mapper>

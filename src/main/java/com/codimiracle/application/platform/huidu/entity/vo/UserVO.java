@@ -1,0 +1,84 @@
+package com.codimiracle.application.platform.huidu.entity.vo;/*
+ * MIT License
+ *
+ * Copyright (c) 2020 Codimiracle
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, Publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+import lombok.Data;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
+import java.util.stream.Collectors;
+
+/**
+ * @author Codimiracle
+ */
+@Data
+public class UserVO {
+    /**
+     * 用户id
+     */
+    private Integer id;
+
+    /**
+     * 用户名
+     */
+    private String username;
+
+    /**
+     * 昵称
+     */
+    private String nickname;
+
+    /**
+     * 头像url
+     */
+    private String avatar;
+
+    /**
+     * 账号过期时间
+     */
+    private Date accountExpired;
+
+    /**
+     * 登录凭据过期时间
+     */
+    private Date credentialsExpired;
+
+    /**
+     * 账号是否锁定(1: 锁定, 0: 未锁定)
+     */
+    private boolean accountLocked;
+
+    /**
+     * 账号是否禁用(1: 可用, 0: 不可用)
+     */
+    private boolean enabled;
+
+    /**
+     * 角色id
+     */
+    private UserRoleVO role;
+    private UserInfoVO extra;
+}

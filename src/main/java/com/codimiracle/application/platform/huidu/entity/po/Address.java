@@ -1,17 +1,21 @@
 package com.codimiracle.application.platform.huidu.entity.po;
 
+import com.codimiracle.application.platform.huidu.entity.vo.AddressDTO;
 import lombok.Data;
+import org.springframework.beans.BeanUtils;
 
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import java.util.Objects;
+import java.util.Optional;
 
 @Data
 public class Address {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private String id;
 
     /**
      * 地区
@@ -44,87 +48,25 @@ public class Address {
      * 所属用户
      */
     @Column(name = "user_id")
-    private Integer userId;
+    private String userId;
 
+    /**
+     * 默认标识
+     */
+    private boolean defaulted;
     /**
      * 删除标识
      */
     private Boolean deleted;
 
-    /**
-     * @return id
-     */
-    /**
-     * @param id
-     */
-    /**
-     * 获取地区
-     *
-     * @return region - 地区
-     */
-    /**
-     * 设置地区
-     *
-     * @param region 地区
-     */
-    /**
-     * 获取详细地址
-     *
-     * @return address - 详细地址
-     */
-    /**
-     * 设置详细地址
-     *
-     * @param address 详细地址
-     */
-    /**
-     * 获取邮政编码
-     *
-     * @return postcode - 邮政编码
-     */
-    /**
-     * 设置邮政编码
-     *
-     * @param postcode 邮政编码
-     */
-    /**
-     * 获取收件人
-     *
-     * @return receiver_name - 收件人
-     */
-    /**
-     * 设置收件人
-     *
-     * @param receiverName 收件人
-     */
-    /**
-     * 获取联系电话
-     *
-     * @return receiver_phone - 联系电话
-     */
-    /**
-     * 设置联系电话
-     *
-     * @param receiverPhone 联系电话
-     */
-    /**
-     * 获取所属用户
-     *
-     * @return user_id - 所属用户
-     */
-    /**
-     * 设置所属用户
-     *
-     * @param userId 所属用户
-     */
-    /**
-     * 获取删除标识
-     *
-     * @return deleted - 删除标识
-     */
-    /**
-     * 设置删除标识
-     *
-     * @param deleted 删除标识
-     */
+    public static Address from(AddressDTO addressDTO) {
+        if (Objects.isNull(addressDTO)) {
+            return null;
+        }
+        Address address = new Address();
+        BeanUtils.copyProperties(addressDTO, address);
+        address.setReceiverName(addressDTO.getReceiver().getName());
+        address.setReceiverPhone(addressDTO.getReceiver().getPhone());
+        return address;
+    }
 }

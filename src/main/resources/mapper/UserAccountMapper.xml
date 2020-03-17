@@ -10,4 +10,12 @@
         <result column="balance" jdbcType="BIGINT" property="balance"/>
         <result column="version" jdbcType="INTEGER" property="version"/>
     </resultMap>
+    <select id="selectByUserId" resultMap="BaseResultMap">
+        SELECT ua.id,
+               ua.user_id,
+               ua.balance,
+               ua.version
+        FROM user_account ua
+        WHERE user_id = #{userId}
+    </select>
 </mapper>

@@ -11,4 +11,30 @@
         <result column="prices" jdbcType="DECIMAL" property="prices"/>
         <result column="order_number" jdbcType="INTEGER" property="orderNumber"/>
     </resultMap>
+    <resultMap id="IntegratedResultMap" type="com.codimiracle.application.platform.huidu.entity.vo.OrderDetailsVO">
+        <id column="order_details_id" jdbcType="INTEGER" property="id"/>
+        <result column="order_details_quantity" jdbcType="INTEGER" property="quantity"/>
+        <result column="order_details_prices" jdbcType="DECIMAL" property="prices"/>
+        <result column="order_number" jdbcType="INTEGER" property="orderNumber"/>
+        <association property="commodity"
+                     resultMap="com.codimiracle.application.platform.huidu.mapper.CommodityMapper.IntegratedResultMap"/>
+    </resultMap>
+    <sql id="select_statement">
+        SELECT od.id       order_details_id,
+               od.quantity order_details_quantity,
+               od.prices   order_details_prices,
+               od.order_number,
+               od.commodity_id,
+               od.commodity_name,
+               od.commodity_picture,
+               od.commodity_introduction,
+               od.commodity_weight,
+               od.commodity_type,
+               od.commodity_prices
+        FROM order_details od
+    </sql>
+    <select id="selectByOrderNumber" resultMap="IntegratedResultMap">
+        <include refid="select_statement"/>
+        WHERE od.order_number = #{orderNumber}
+    </select>
 </mapper>

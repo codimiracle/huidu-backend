@@ -6,6 +6,7 @@ import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import java.util.Date;
 
 @Data
 public class Subscribe {
@@ -14,22 +15,29 @@ public class Subscribe {
      */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private String id;
 
     /**
-     * 订阅类型（electronic-book: 电子书更新, audio-book: 有声书更新）
+     * 订阅类型（put-on-sales：图书上架通知，content-comment：内容评论通知，）
      */
     private String type;
 
-    /**
-     * 图书id
-     */
     @Column(name = "book_id")
-    private Integer bookId;
+    private String bookId;
 
-    /**
-     * 最后更新章节
-     */
-    @Column(name = "last_update_episode_id")
-    private Integer lastUpdateEpisodeId;
+    @Column(name = "content_id")
+    private String contentId;
+
+    @Column(name = "commodity_id")
+    private String commodityId;
+
+    @Column(name = "subscriber_id")
+    private String subscriberId;
+
+    @Column(name = "create_time")
+    private Date createTime;
+
+    @Column(name = "update_time")
+    private Date updateTime;
+
 }

@@ -60,41 +60,40 @@
         WHERE id = #{id}
     </update>
     <sql id="select_statement">
-        SELECT u.id user_id,
-        u.username user_username,
-        '(protected)' user_password,
-        u.nickname user_nickname,
-        u.avatar user_avatar,
-        u.account_expired user_account_expired,
-        u.credentials_expired user_credentials_expired,
-        u.account_locked user_account_locked,
-        u.enabled user_enabled,
-        ui.user_id user_info_user_id,
-        ui.gender user_info_gender,
-        ui.age user_info_age,
-        ui.slogan user_info_slogan,
-        ui.introduction user_info_introduction,
-        ui.birthdate user_info_birthdate,
-        ui.phone user_info_phone,
-        ui.email user_info_email,
-        ui.region user_info_region,
-        ui.user_id user_info_user_id,
-        ui.gender user_info_gender,
-        ui.age user_info_age,
-        ui.slogan user_info_slogan,
-        ui.introduction user_info_introduction,
-        ui.birthdate user_info_birthdate,
-        ui.phone user_info_phone,
-        ui.email user_info_email,
-        ui.region user_info_region,
-        ur.id user_role_id,
-        ur.name user_role_name,
-        ur.authorities user_role_authorities
-        FROM (SELECT * FROM user WHERE user.deleted = 0 <if test="page != null">LIMIT #{page.offset}, #{page.limit}</if>)
-        u
-        LEFT JOIN user_info ui ON u.id = ui.user_id
-        LEFT JOIN user_role ur ON u.role_id = ur.id
-        WHERE 1=1
+        SELECT u.id                  user_id,
+               u.username            user_username,
+               '(protected)'         user_password,
+               u.nickname            user_nickname,
+               u.avatar              user_avatar,
+               u.account_expired     user_account_expired,
+               u.credentials_expired user_credentials_expired,
+               u.account_locked      user_account_locked,
+               u.enabled             user_enabled,
+               ui.user_id            user_info_user_id,
+               ui.gender             user_info_gender,
+               ui.age                user_info_age,
+               ui.slogan             user_info_slogan,
+               ui.introduction       user_info_introduction,
+               ui.birthdate          user_info_birthdate,
+               ui.phone              user_info_phone,
+               ui.email              user_info_email,
+               ui.region             user_info_region,
+               ui.user_id            user_info_user_id,
+               ui.gender             user_info_gender,
+               ui.age                user_info_age,
+               ui.slogan             user_info_slogan,
+               ui.introduction       user_info_introduction,
+               ui.birthdate          user_info_birthdate,
+               ui.phone              user_info_phone,
+               ui.email              user_info_email,
+               ui.region             user_info_region,
+               ur.id                 user_role_id,
+               ur.name               user_role_name,
+               ur.authorities        user_role_authorities
+        FROM user u
+                 LEFT JOIN user_info ui ON u.id = ui.user_id
+                 LEFT JOIN user_role ur ON u.role_id = ur.id
+        WHERE u.deleted = 0
     </sql>
     <select id="selectByIdIntegrally" resultMap="IntegratedResultMap">
         <include refid="select_statement"/>
@@ -120,7 +119,7 @@
         </if>
     </select>
 
-    <select id="selectByUsername" resultMap="BaseResultMap">
+    <sql id="select_statement_for_system">
         SELECT u.id,
                u.username,
                u.password,
@@ -145,6 +144,22 @@
                  LEFT JOIN user_role ur ON u.role_id = ur.id
                  LEFT JOIN user_info ui ON u.id = ui.user_id
         WHERE u.deleted = 0
-          AND u.username = #{username}
+    </sql>
+
+    <select id="selectByUsername" resultMap="BaseResultMap">
+        <include refid="select_statement_for_system"/>
+        AND u.username = #{username}
+    </select>
+    <select id="selectByIdProtectly" resultMap="ProtectedResultMap">
+        SELECT u.id       user_id,
+               u.username user_username,
+               u.nickname user_nickname,
+               u.avatar   user_avatar
+        FROM user u
+        WHERE u.id = #{userId}
+    </select>
+    <select id="selectById" resultMap="BaseResultMap">
+        <include refid="select_statement_for_system"/>
+        AND u.id = #{id}
     </select>
 </mapper>

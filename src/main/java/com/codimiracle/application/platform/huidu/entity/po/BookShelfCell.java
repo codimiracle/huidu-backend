@@ -1,8 +1,11 @@
 package com.codimiracle.application.platform.huidu.entity.po;
 
+import com.codimiracle.application.platform.huidu.entity.dto.BookShelfCellDTO;
 import lombok.Data;
+import org.springframework.beans.BeanUtils;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Data
 @Table(name = "book_shelf_cell")
@@ -18,57 +21,22 @@ public class BookShelfCell {
      * 图书id
      */
     @Column(name = "book_id")
-    private Integer bookId;
+    private String bookId;
 
     /**
      * 书架id
      */
     @Column(name = "shelf_id")
-    private Integer shelfId;
+    private String shelfId;
 
-    /**
-     * 读书进度
-     */
-    private Float progress;
+    private boolean finished;
 
-    /**
-     * 获取书架书籍id
-     *
-     * @return id - 书架书籍id
-     */
-    /**
-     * 设置书架书籍id
-     *
-     * @param id 书架书籍id
-     */
-    /**
-     * 获取图书id
-     *
-     * @return book_id - 图书id
-     */
-    /**
-     * 设置图书id
-     *
-     * @param bookId 图书id
-     */
-    /**
-     * 获取书架id
-     *
-     * @return shelf_id - 书架id
-     */
-    /**
-     * 设置书架id
-     *
-     * @param shelfId 书架id
-     */
-    /**
-     * 获取读书进度
-     *
-     * @return progress - 读书进度
-     */
-    /**
-     * 设置读书进度
-     *
-     * @param progress 读书进度
-     */
+    public static BookShelfCell from(BookShelfCellDTO bookShelfCellDTO) {
+        if (Objects.isNull(bookShelfCellDTO)) {
+            return null;
+        }
+        BookShelfCell bookShelfCell = new BookShelfCell();
+        BeanUtils.copyProperties(bookShelfCellDTO, bookShelfCell);
+        return bookShelfCell;
+    }
 }

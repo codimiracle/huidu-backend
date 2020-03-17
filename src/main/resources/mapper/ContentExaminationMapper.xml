@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.codimiracle.application.platform.huidu.mapper.ContentExaminationMapper">
+  <resultMap id="BaseResultMap" type="com.codimiracle.application.platform.huidu.entity.po.ContentExamination">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="target_content_id" jdbcType="INTEGER" property="targetContentId" />
+    <result column="from_status" jdbcType="VARCHAR" property="fromStatus" />
+    <result column="to_status" jdbcType="VARCHAR" property="toStatus" />
+    <result column="reason" jdbcType="VARCHAR" property="reason" />
+  </resultMap>
+</mapper>

@@ -35,15 +35,13 @@
         <result column="order_total_money" jdbcType="VARCHAR" property="totalMoney"/>
         <result column="order_shipment_money" jdbcType="VARCHAR" property="shipmentMoney"/>
         <result column="order_status" jdbcType="VARCHAR" property="status"/>
+        <result column="logistics_information_id" jdbcType="INTEGER" property="logisticsInformationId"/>
         <association property="address"
                      resultMap="com.codimiracle.application.platform.huidu.mapper.AddressMapper.IntegratedResultMap"/>
         <association property="owner"
                      resultMap="com.codimiracle.application.platform.huidu.mapper.UserMapper.ProtectedResultMap"/>
         <association property="logisticsInformation"
                      resultMap="com.codimiracle.application.platform.huidu.mapper.LogisticsInformationMapper.IntegratedResultMap"/>
-        <collection property="detailsList"
-                    resultMap="com.codimiracle.application.platform.huidu.mapper.OrderDetailsMapper.IntegratedResultMap">
-        </collection>
     </resultMap>
     <sql id="select_statement">
         SELECT o.order_number,
@@ -61,38 +59,19 @@
         o.shipment_money order_shipment_money,
         o.status order_status,
         o.logistics_information_id,
-        li.express_number logistics_information_express_number,
-        li.express_company logistics_information_express_company,
-        pp.id passing_point_id,
-        pp.name passing_point_name,
-        pp.update_time passing_point_update_time,
-        pp.status passing_point_status,
         o.address_id address_id,
         o.address_region,
         o.address_address,
         o.address_receiver_name,
         o.address_receiver_phone,
-        o.address_postcode,
-        od.id order_details_id,
-        od.quantity order_details_quantity,
-        od.prices order_details_prices,
-        od.order_number order_details_order_number,
-        od.commodity_id,
-        od.commodity_name,
-        od.commodity_picture,
-        od.commodity_introduction,
-        od.commodity_weight,
-        od.commodity_type,
-        od.commodity_prices
-        FROM (SELECT * FROM `order` <if test="page != null">LIMIT #{page.offset}, #{page.limit}</if>) o
-        LEFT JOIN order_details od ON o.order_number = od.order_number
+        o.address_postcode
+        FROM `order`  o
         LEFT JOIN user u ON o.owner_id = u.id
-        LEFT JOIN logistics_information li ON o.logistics_information_id = li.id
-        LEFT JOIN passing_point pp ON o.logistics_information_id = pp.logistics_infomation_id
+        WHERE 1 = 1
     </sql>
     <select id="selectByOrderNumberIntegrally" resultMap="IntegratedResultMap">
         <include refid="select_statement"/>
-        WHERE o.order_number = #{orderNumber}
+        AND o.order_number = #{orderNumber}
     </select>
     <select id="selectAllIntegrally" resultMap="IntegratedResultMap">
         <include refid="select_statement"/>
@@ -113,8 +92,11 @@
             </if>
         </if>
         <if test="sorter != null and sorter.field == 'total_money'">
-            ORDER BY total_money
+            ORDER BY o.total_money
             <if test="sorter.order == 'descend'">DESC</if>
+        </if>
+        <if test="sorter == null">
+            ORDER BY o.create_time DESC
         </if>
     </select>
 </mapper>

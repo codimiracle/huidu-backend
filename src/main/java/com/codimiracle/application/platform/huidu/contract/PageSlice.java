@@ -10,4 +10,11 @@ public class PageSlice<T> {
     private int limit;
     private List<T> list;
     private long total;
+    public PageSlice() {}
+    public PageSlice(List<T> list) {
+        this.page = 1;
+        this.limit = list.size();
+        this.list = list;
+        this.total = list.size();
+    }
 }

@@ -7,7 +7,75 @@
         -->
         <id column="id" jdbcType="INTEGER" property="id"/>
         <result column="type" jdbcType="VARCHAR" property="type"/>
+        <result column="subscriber_id" jdbcType="INTEGER" property="subscriberId"/>
         <result column="book_id" jdbcType="INTEGER" property="bookId"/>
-        <result column="last_update_episode_id" jdbcType="INTEGER" property="lastUpdateEpisodeId"/>
+        <result column="commodity_id" jdbcType="INTEGER" property="commodityId"/>
+        <result column="content_id" jdbcType="INTEGER" property="contentId"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="createTime"/>
     </resultMap>
+    <resultMap id="IntegratedResultMap" type="com.codimiracle.application.platform.huidu.entity.vo.SubscribeVO">
+        <id column="subscribe_id" jdbcType="INTEGER" property="id"/>
+        <result column="subscribe_type" jdbcType="VARCHAR" property="type"/>
+        <result column="subscriber_id" jdbcType="INTEGER" property="subscriberId"/>
+        <result column="subscribe_book_id" jdbcType="INTEGER" property="bookId"/>
+        <result column="subscribe_commodity_id" jdbcType="INTEGER" property="commodityId"/>
+        <result column="subscribe_content_id" jdbcType="INTEGER" property="contentId"/>
+        <result column="subscribe_create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="subscribe_update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+    <sql id="select_statement_basic">
+        SELECT s.id,
+               s.type,
+               s.content_id,
+               s.commodity_id,
+               s.book_id,
+               s.subscriber_id,
+               s.create_time,
+               s.update_time
+        FROM subscribe s
+        WHERE s.deleted = 0
+    </sql>
+    <sql id="select_statement">
+        SELECT s.id           subscribe_id,
+               s.type         subscribe_type,
+               s.content_id   subscribe_content_id,
+               s.commodity_id subscribe_commodity_id,
+               s.book_id      subscribe_book_id,
+               s.subscriber_id subscribe_subscriberId,
+               s.create_time  subscribe_create_time,
+               s.update_time  subscribe_update_time
+        FROM subscribe s
+        WHERE s.deleted = 0
+    </sql>
+    <update id="deleteByIdLogically">
+        UPDATE subscribe s SET s.deleted = 1 WHERE s.id = #{subscribeId}
+    </update>
+    <select id="selectAllIntegrally" resultMap="IntegratedResultMap">
+        <include refid="select_statement"/>
+        <if test="filter != null">
+            <if test="filter.userId != null and filter.userId.length gt 0">
+                AND s.subscriber_id = #{filter.userId[0]}
+            </if>
+            <if test="filter.type != null and filter.type.length gt 0">
+                AND s.type = #{filter.type[0]}
+            </if>
+        </if>
+    </select>
+    <select id="selectBySubscriberIdAndBookId" resultMap="BaseResultMap">
+        <include refid="select_statement_basic"/>
+        AND s.subscriber_id = #{subscriberId} AND s.book_id = #{bookId}
+    </select>
+    <select id="selectBySubscriberIdAndCommodityId" resultMap="BaseResultMap">
+        <include refid="select_statement_basic"/>
+        AND s.subscriber_id = #{subscriberId} AND s.book_id = #{commodityId}
+    </select>
+    <select id="selectBySubscriberIdAndContentId" resultMap="BaseResultMap">
+        <include refid="select_statement_basic"/>
+        AND s.subscriber_id = #{subscriberId} AND s.book_id = #{contentId}
+    </select>
+    <select id="selectBySubscriberIdAndType" resultMap="BaseResultMap">
+        <include refid="select_statement_basic"/>
+        AND s.subscriber_id = #{subscriberId} AND s.type = #{type}
+    </select>
 </mapper>

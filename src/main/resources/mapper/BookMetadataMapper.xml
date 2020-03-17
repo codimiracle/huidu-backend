@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.codimiracle.application.platform.huidu.mapper.BookMetadataMapper">
+    <resultMap id="BaseResultMap" type="com.codimiracle.application.platform.huidu.entity.po.BookMetadata">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="cover" jdbcType="VARCHAR" property="cover"/>
+        <result column="description" jdbcType="VARCHAR" property="description"/>
+        <result column="words" jdbcType="VARCHAR" property="words"/>
+        <result column="author" jdbcType="VARCHAR" property="author"/>
+    </resultMap>
+    <resultMap id="IntegratedResultMap" type="com.codimiracle.application.platform.huidu.entity.vo.BookMetadataVO">
+        <id column="book_metadata_id" jdbcType="INTEGER" property="id"/>
+        <result column="book_metadata_name" jdbcType="VARCHAR" property="name"/>
+        <result column="book_metadata_cover" jdbcType="VARCHAR" property="cover"/>
+        <result column="book_metadata_description" jdbcType="VARCHAR" property="description"/>
+        <result column="book_metadata_words" jdbcType="VARCHAR" property="words"/>
+        <result column="book_metadata_author" jdbcType="VARCHAR" property="author"/>
+    </resultMap>
+    <update id="deleteByIdLogically">
+        UPDATE book_metadata
+        SET deleted = 1
+        WHERE id = #{id}
+    </update>
+    <update id="deleteByIdsLogically">
+        UPDATE book_metadata SET deleted = 1 WHERE id IN
+        <foreach collection="list" item="item" open="(" close=")" separator=",">#{item}</foreach>
+    </update>
+    <sql id="select_statement">
+        SELECT bm.id          book_metadata_id,
+               bm.name        book_metadata_name,
+               bm.cover       book_metadata_cover,
+               bm.description book_metadata_description,
+               bm.words       book_metadata_words,
+               bm.author      book_metadata_author
+        FROM book_metadata bm
+        WHERE bm.deleted = 0
+    </sql>
+    <select id="selectByIdIntegrally" resultMap="IntegratedResultMap">
+        <include refid="select_statement"/>
+        AND bm.id = ${id}
+    </select>
+    <select id="selectAllIntegrally" resultMap="IntegratedResultMap">
+        <include refid="select_statement"/>
+        <if test="filter != null">
+            <if test="filter.name != null and filter.name.length gt 0">
+                AND bm.name LIKE concat('%', #{filter.name[0]}, '%')
+            </if>
+            <if test="filter.author != null and filter.author.length gt 0">
+                AND bm.author LIKE concat('%', #{filter.author[0]}, '%')
+            </if>
+        </if>
+    </select>
+</mapper>

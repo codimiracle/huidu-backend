@@ -8,16 +8,9 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Component;
-import org.springframework.util.ReflectionUtils;
-import tk.mybatis.mapper.entity.Condition;
-import tk.mybatis.mapper.entity.Example;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * 分页器
@@ -33,64 +26,24 @@ public class Paginator {
     }
 
     @Around(value = "paginatableMethods(page)", argNames = "proceedingJoinPoint,page")
-    public Object pagination(ProceedingJoinPoint proceedingJoinPoint, Page page) throws NoSuchMethodException {
-        String methodName = proceedingJoinPoint.getSignature().getName();
-        PageSlice slice = new PageSlice();
-
+    public Object pagination(ProceedingJoinPoint proceedingJoinPoint, Page page) {
+        PageHelper.startPage(page.getPage(), page.getLimit());
         try {
-            if (methodName.endsWith("Integrally")) {
-                //获取实体的类
-                Class<?> mapperInterface = proceedingJoinPoint.getSignature().getDeclaringType();
-                ParameterizedType parameterizedType = (ParameterizedType) mapperInterface.getGenericInterfaces()[0];
-                Class<?> entityClass = (Class<?>) parameterizedType.getActualTypeArguments()[0];
-                long total = PageHelper.count(() -> {
-                    try {
-                        String validCountMapperMethodName = methodName.replaceAll("Integrally", "");
-                        Method method = null;
-                        if (proceedingJoinPoint.getArgs().length >= 3) {
-                            validCountMapperMethodName = "selectByCondition";
-                            Condition condition = new Condition(entityClass);
-                            Example.Criteria criteria = condition.createCriteria();
-                            Object first = proceedingJoinPoint.getArgs()[0];
-                            //针对 type 相关的查询
-                            if (Objects.nonNull(first) && first.getClass().getSimpleName().endsWith("Type")) {
-                                criteria.andEqualTo("type", first);
-                            }
-                            //处理逻辑删除
-                            if (ReflectionUtils.findField(entityClass, "deleted") != null) {
-                                criteria.andEqualTo("deleted", 0);
-                            }
-                            method = ReflectionUtils.findMethod(mapperInterface, validCountMapperMethodName, Object.class);
-                            method.invoke(proceedingJoinPoint.getTarget(), condition);
-                        } else {
-                            log.debug("deleted field not found in [$s].", entityClass);
-                            method = ReflectionUtils.findMethod(mapperInterface, validCountMapperMethodName);
-                            method.invoke(proceedingJoinPoint.getTarget());
-                        }
-                    } catch (IllegalAccessException | InvocationTargetException e) {
-                        e.printStackTrace();
-                    }
-                });
-                List list = (List) proceedingJoinPoint.proceed();
-                slice.setTotal(total);
-                slice.setPage(page.getPage());
-                slice.setLimit(page.getLimit());
-                slice.setList(list);
-            } else {
-                PageHelper.startPage(page.getPage(), page.getLimit());
-                List list = (List) proceedingJoinPoint.proceed();
-                PageInfo info = new PageInfo(list);
-                slice.setList(list);
-                slice.setPage(info.getPages());
-                slice.setLimit(info.getPageSize());
-                slice.setTotal(info.getTotal());
-            }
+            List list = (List) proceedingJoinPoint.proceed();
+            PageInfo info = new PageInfo(list);
+            PageSlice slice = new PageSlice();
+            slice.setList(list);
+            slice.setPage(info.getPageNum());
+            slice.setLimit(info.getPageSize());
+            slice.setTotal(info.getTotal());
+            // 利用类型擦除，把 PageSlice 放进列表中返回
+            return Collections.singletonList(slice);
         } catch (Throwable throwable) {
             throwable.printStackTrace();
             log.error("pagination failed:", throwable);
             throw new ServiceException("无法进行分页，原因：" + throwable.getMessage());
+        } finally {
+            PageHelper.clearPage();
         }
-        // 利用类型擦除，把 PageSlice 放进列表中返回
-        return Collections.singletonList(slice);
     }
 }

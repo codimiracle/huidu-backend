@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.codimiracle.application.platform.huidu.mapper.UserTokenMapper">
+    <resultMap id="BaseResultMap" type="com.codimiracle.application.platform.huidu.entity.po.UserToken">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="user_id" jdbcType="INTEGER" property="userId"/>
+        <result column="expire_time" jdbcType="TIMESTAMP" property="expireTime"/>
+        <result column="token" jdbcType="VARCHAR" property="token"/>
+    </resultMap>
+    <resultMap id="IntegratedResultMap" type="com.codimiracle.application.platform.huidu.entity.vo.UserTokenVO">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="user_id" jdbcType="INTEGER" property="userId"/>
+        <result column="expire_time" jdbcType="TIMESTAMP" property="expireTime"/>
+        <result column="token" jdbcType="VARCHAR" property="token"/>
+        <association property="user"
+                     resultMap="com.codimiracle.application.platform.huidu.mapper.UserMapper.IntegratedResultMap"/>
+    </resultMap>
+    <select id="selectByIdIntegrally" resultMap="IntegratedResultMap">
+        SELECT ut.id,
+               ut.user_id,
+               ut.expire_time,
+               ut.token
+        FROM user_token ut
+        WHERE id = #{id}
+    </select>
+</mapper>

@@ -9,4 +9,16 @@
         <result column="name" jdbcType="VARCHAR" property="name"/>
         <result column="owner_id" jdbcType="INTEGER" property="ownerId"/>
     </resultMap>
+    <resultMap id="IntegratedResultMap" type="com.codimiracle.application.platform.huidu.entity.vo.BookShelfVO">
+        <id column="shelf_id" jdbcType="INTEGER" property="id"/>
+        <result column="shelf_name" jdbcType="VARCHAR" property="name"/>
+        <result column="shelf_owner_id" jdbcType="INTEGER" property="ownerId"/>
+    </resultMap>
+    <select id="selectByUserId" resultMap="BaseResultMap">
+        SELECT bs.id,
+               bs.name,
+               bs.owner_id
+        FROM book_shelf bs
+        WHERE bs.owner_id = #{userId}
+    </select>
 </mapper>

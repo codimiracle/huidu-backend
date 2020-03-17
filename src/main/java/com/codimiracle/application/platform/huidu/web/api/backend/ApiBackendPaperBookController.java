@@ -5,11 +5,13 @@ import com.codimiracle.application.platform.huidu.contract.Filter;
 import com.codimiracle.application.platform.huidu.contract.Page;
 import com.codimiracle.application.platform.huidu.contract.Sorter;
 import com.codimiracle.application.platform.huidu.entity.dto.PaperBookDTO;
+import com.codimiracle.application.platform.huidu.entity.po.User;
 import com.codimiracle.application.platform.huidu.enumeration.BookType;
 import com.codimiracle.application.platform.huidu.enumeration.CommodityType;
 import com.codimiracle.application.platform.huidu.util.RestfulUtil;
-import com.codimiracle.application.platform.huidu.web.api.BookController;
+import com.codimiracle.application.platform.huidu.web.api.base.BookController;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Objects;
@@ -25,11 +27,11 @@ public class ApiBackendPaperBookController {
     private BookController bookController;
 
     @PostMapping
-    public ApiResponse create(@RequestBody PaperBookDTO paperBookDTO) {
+    public ApiResponse create(@AuthenticationPrincipal User user, @RequestBody PaperBookDTO paperBookDTO) {
         if (Objects.nonNull(paperBookDTO.getCommodity())) {
             paperBookDTO.getCommodity().setType(CommodityType.MaterialObject.getType());
         }
-        return bookController.create(paperBookDTO.toBookDTO());
+        return bookController.create(user, paperBookDTO.toBookDTO());
     }
 
     @DeleteMapping("/{id}")

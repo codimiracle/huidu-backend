@@ -16,4 +16,92 @@
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
     </resultMap>
+
+    <resultMap id="IntegratedResultMap" type="com.codimiracle.application.platform.huidu.entity.vo.ContentVO">
+        <id column="content_id" jdbcType="INTEGER" property="contentId"/>
+        <result column="content_type" jdbcType="VARCHAR" property="type"/>
+        <result column="content_comments" jdbcType="INTEGER" property="comments"/>
+        <result column="content_rate" jdbcType="REAL" property="rate"/>
+        <result column="content_likes" jdbcType="BIGINT" property="likes"/>
+        <result column="content_reposts" jdbcType="BIGINT" property="reposts"/>
+        <result column="content_create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="content_update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <association property="owner"
+                     resultMap="com.codimiracle.application.platform.huidu.mapper.UserMapper.ProtectedResultMap"/>
+    </resultMap>
+    <update id="deleteByIdLogically">
+        UPDATE content
+        SET deleted = 1
+        WHERE id = #{id}
+    </update>
+    <update id="deleteByIdsLogically">
+        UPDATE content
+        SET deleted = 1
+        WHERE id IN
+        <foreach collection="list" item="item" open="(" close=")" separator=",">#{item}</foreach>
+    </update>
+    <update id="likesIncrement">
+        UPDATE content c
+        SET c.likes = c.likes + 1
+        WHERE c.id = #{contentId}
+    </update>
+    <update id="likesDecrement">
+        UPDATE content c
+        SET c.likes = c.likes - 1
+        WHERE c.id = #{contentId}
+    </update>
+    <update id="commentsIncrement">
+        UPDATE content c
+        SET c.comments = c.comments + 1
+        WHERE c.id = #{contentId}
+    </update>
+    <update id="commentsDecrement">
+        UPDATE content c
+        SET c.comments = c.comments - 1
+        WHERE c.id = #{contentId}
+    </update>
+    <update id="rateIncrementBy">
+        UPDATE content c
+        SET c.rate = (c.rate + #{rate}) / 2
+        WHERE c.id = #{contentId}
+    </update>
+    <update id="rateDecrementBy">
+        UPDATE content c
+        SET c.rate = (c.rate * 2 - #{rate})
+        WHERE c.id = #{contentId}
+    </update>
+    <sql id="select_statement">
+        SELECT c.id          content_id,
+               c.type        content_type,
+               c.owner_id    content_owner_id,
+               c.comments    content_comments,
+               c.rate        content_rate,
+               c.likes       content_likes,
+               c.reposts     content_reposts,
+               c.create_time content_create_time,
+               c.update_time content_update_time,
+               u.id          user_id,
+               u.username    user_username,
+               u.nickname    user_nickname,
+               u.avatar      user_avatar
+        FROM content c
+                 LEFT JOIN user u ON c.owner_id = u.id
+        WHERE c.deleted = 0
+    </sql>
+    <select id="findByIdIntegrally" resultMap="IntegratedResultMap">
+        <include refid="select_statement"/>
+        AND c.id = #{id}
+    </select>
+    <select id="selectAllIntegrally" resultMap="IntegratedResultMap">
+        <include refid="select_statement"/>
+        <if test="filter != null">
+            <if test="filter.ownerId != null and filter.ownerId.length gt 0">
+                AND c.owner_id = #{filter.ownerId[0]}
+            </if>
+            <if test="filter.type != null and filter.type.length gt 0">
+                AND c.type IN
+                <foreach collection="filter.type" separator="," open="(" close=")" item="item">#{item}</foreach>
+            </if>
+        </if>
+    </select>
 </mapper>

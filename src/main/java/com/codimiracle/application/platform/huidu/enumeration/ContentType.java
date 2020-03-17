@@ -7,7 +7,7 @@ package com.codimiracle.application.platform.huidu.enumeration;
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * to use, copy, modify, merge, Publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
  *
@@ -23,6 +23,9 @@ package com.codimiracle.application.platform.huidu.enumeration;
  * SOFTWARE.
  */
 
+import java.util.Arrays;
+import java.util.Objects;
+
 /**
  * @author Codimiracle
  */
@@ -31,19 +34,20 @@ public enum ContentType {
     /**
      * 内容是一个话题
      */
-    TOPIC("topic", 110),
+    Topic("topic", 110),
     /**
      * 内容是一个点评
      */
-    REVIEW("review", 120),
+    Review("review", 120),
     /**
      * 内容是一个评论
      */
-    COMMENT("comment", 100),
+    Comment("comment", 100),
     /**
-     * 内容是一本书
+     * 图书数据
      */
-    BOOK("book", 200);
+    Book("book", 200)
+    ;
     private final String type;
     private final int code;
 
@@ -52,12 +56,20 @@ public enum ContentType {
         this.code = code;
     }
 
+    public static ContentType valueOfCode(String code) {
+        return Arrays.stream(ContentType.values()).filter((e) -> Objects.equals(e.type, code)).findFirst().orElseGet(() -> Enum.valueOf(ContentType.class, code));
+    }
+
+    public String getType() {
+        return type;
+    }
+
     public int getCode() {
         return code;
     }
 
     @Override
     public String toString() {
-        return String.format("%s-%d", this.type, this.code);
+        return this.type;
     }
 }

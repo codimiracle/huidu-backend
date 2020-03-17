@@ -1,6 +1,9 @@
 package com.codimiracle.application.platform.huidu.entity.po;
 
+import com.codimiracle.application.platform.huidu.entity.dto.ActivityDTO;
+import com.codimiracle.application.platform.huidu.enumeration.ActivityStatus;
 import lombok.Data;
+import org.springframework.beans.BeanUtils;
 
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
@@ -15,23 +18,25 @@ public class Activity {
      */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private String id;
 
     /**
      * 活动横幅
      */
     private String banner;
 
+    private String url;
+
     /**
      * 活动状态（activated: 已激活，deactivated: 未激活）
      */
-    private String status;
+    private ActivityStatus status;
 
     /**
      * 图书id
      */
     @Column(name = "book_id")
-    private Integer bookId;
+    private String bookId;
 
     /**
      * 删除标识
@@ -49,4 +54,11 @@ public class Activity {
      */
     @Column(name = "update_time")
     private Date updateTime;
+
+    public static Activity from(ActivityDTO activityDTO) {
+        Activity activity = new Activity();
+        BeanUtils.copyProperties(activityDTO, activity);
+        activity.setStatus(ActivityStatus.valueOfCode(activityDTO.getStatus()));
+        return activity;
+    }
 }

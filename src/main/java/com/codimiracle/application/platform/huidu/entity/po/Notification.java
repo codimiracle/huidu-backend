@@ -15,19 +15,19 @@ public class Notification {
      */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private String id;
 
     /**
      * 发送者
      */
     @Column(name = "sender_id")
-    private Integer senderId;
+    private String senderId;
 
     /**
      * 接收者
      */
     @Column(name = "receiver_id")
-    private Integer receiverId;
+    private String receiverId;
 
     /**
      * 通知类型（subscribe: 订阅通知, message: 消息）
@@ -47,7 +47,8 @@ public class Notification {
     /**
      * 已读标识（0: 未读, 1:已读）
      */
-    private Boolean read;
+    @Column(name = "`read`")
+    private boolean read;
 
     /**
      * 创建时间

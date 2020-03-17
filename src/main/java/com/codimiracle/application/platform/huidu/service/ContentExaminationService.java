@@ -1,0 +1,8 @@
+package com.codimiracle.application.platform.huidu.service;
+
+import com.codimiracle.application.platform.huidu.contract.Service;
+import com.codimiracle.application.platform.huidu.entity.po.ContentExamination;
+
+public interface ContentExaminationService extends Service<String, ContentExamination> {
+
+}

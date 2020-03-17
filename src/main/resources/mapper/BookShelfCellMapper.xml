@@ -8,6 +8,43 @@
         <id column="id" jdbcType="INTEGER" property="id"/>
         <result column="book_id" jdbcType="INTEGER" property="bookId"/>
         <result column="shelf_id" jdbcType="INTEGER" property="shelfId"/>
-        <result column="progress" jdbcType="REAL" property="progress"/>
+        <result column="finished" jdbcType="BIT" property="finished"/>
     </resultMap>
+
+    <resultMap id="IntegratedResultMap" type="com.codimiracle.application.platform.huidu.entity.vo.BookShelfCellVO">
+        <result column="shelf_cell_book_id" jdbcType="INTEGER" property="bookId"/>
+        <result column="shelf_id" jdbcType="INTEGER" property="shelfId"/>
+        <result column="shelf_cell_finished" jdbcType="BIT" property="finished"/>
+        <association property="shelf"
+                     resultMap="com.codimiracle.application.platform.huidu.mapper.BookShelfMapper.IntegratedResultMap"/>
+    </resultMap>
+    <sql id="select_statement">
+        SELECT bsc.id         shelf_cell_id,
+               bsc.book_id    shelf_cell_book_id,
+               bsc.shelf_id   shelf_cell_shelf_id,
+               bsc.finished   shelf_cell_finished,
+               bs.id          shelf_id,
+               bs.name        shelf_name,
+               bs.owner_id    shelf_owner_id
+        FROM book_shelf_cell bsc
+                 LEFT JOIN book_shelf bs ON bsc.shelf_id = bs.id
+                 LEFT JOIN book b ON b.id = bsc.book_id
+                 LEFT JOIN history h ON h.user_id = bs.owner_id AND h.book_id = bsc.book_id
+        WHERE bsc.deleted = 0 AND b.deleted = 0
+    </sql>
+    <select id="findAllIntegrally" resultMap="IntegratedResultMap">
+        <include refid="select_statement"/>
+        <if test="filter != null">
+            <if test="filter.ownerId and filter.ownerId.length gt 0">
+                AND bs.owner_id = #{filter.ownerId[0]}
+            </if>
+        </if>
+        <if test="sorter != null">
+            ORDER BY
+            <if test="sorter.field == 'read_time'">
+                h.read_time
+            </if>
+            <if test="sorter.order == 'descend'">DESC</if>
+        </if>
+    </select>
 </mapper>

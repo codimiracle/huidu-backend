@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.codimiracle.application.platform.huidu.mapper.UserCartMapper">
+    <resultMap id="BaseResultMap" type="com.codimiracle.application.platform.huidu.entity.po.CartItem">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="commodity_id" jdbcType="INTEGER" property="commodityId"/>
+        <result column="user_id" jdbcType="INTEGER" property="userId"/>
+        <result column="quantity" jdbcType="INTEGER" property="quantity"/>
+        <result column="join_time" jdbcType="TIMESTAMP" property="joinTime"/>
+        <result column="settled" jdbcType="BIT" property="settled"/>
+        <result column="deleted" jdbcType="BIT" property="deleted"/>
+    </resultMap>
+    <resultMap id="IntegratedResultMap" type="com.codimiracle.application.platform.huidu.entity.vo.CartItemVO">
+        <id column="cart_item_id" jdbcType="INTEGER" property="id"/>
+        <result column="commodity_id" jdbcType="INTEGER" property="commodityId"/>
+        <result column="cart_item_user_id" jdbcType="INTEGER" property="userId"/>
+        <result column="cart_item_quantity" jdbcType="INTEGER" property="quantity"/>
+        <result column="cart_item_join_time" jdbcType="TIMESTAMP" property="joinTime"/>
+        <association property="commodity"
+                     resultMap="com.codimiracle.application.platform.huidu.mapper.CommodityMapper.IntegratedResultMap"/>
+    </resultMap>
+    <update id="deleteByIdLogically">
+        UPDATE user_cart uc SET uc.deleted = 1 WHERE uc.id = #{id}
+    </update>
+    <update id="settleByIdLogically">
+        UPDATE user_cart uc SET uc.deleted = 1, uc.settled = 1 WHERE uc.id = #{id}
+    </update>
+    <sql id="select_statement">
+        SELECT
+        uc.id cart_item_id,
+        uc.quantity cart_item_quantity,
+        uc.user_id cart_item_user_id,
+        uc.join_time cart_item_join_time,
+        c.id commodity_id,
+        c.name commodity_name,
+        c.type commodity_type,
+        c.picture commodity_picture,
+        c.introduction commodity_introduction,
+        c.rate commodity_rate,
+        c.weight commodity_weight,
+        c.stock commodity_stock,
+        c.available_stock commodity_available_stock,
+        c.sales commodity_sales,
+        c.shipment commodity_shipment,
+        c.extra commodity_extra,
+        c.prices commodity_prices,
+        c.status commodity_status
+        FROM user_cart uc
+        LEFT JOIN commodity c ON uc.commodity_id = c.id
+        WHERE uc.deleted = 0
+    </sql>
+    <select id="selectByIdIntegrally" resultMap="IntegratedResultMap">
+        <include refid="select_statement"/>
+        AND uc.id = #{id}
+    </select>
+    <select id="selectAllIntegrally" resultMap="IntegratedResultMap">
+        <include refid="select_statement"/>
+        <if test="filter != null">
+            <if test="filter.userId != null and filter.userId.length gt 0">
+                AND uc.user_id = #{filter.userId[0]}
+            </if>
+        </if>
+    </select>
+    <select id="selectByIdsIntegrally" resultMap="IntegratedResultMap">
+        <include refid="select_statement"/>
+        AND uc.id IN <foreach collection="ids" open="(" close=")" separator="," item="item">#{item}</foreach>
+    </select>
+</mapper>

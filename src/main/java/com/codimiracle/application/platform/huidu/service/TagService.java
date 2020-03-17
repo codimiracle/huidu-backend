@@ -17,4 +17,8 @@ public interface TagService extends Service<String, Tag> {
     PageSlice<TagVO> findAllIntegrally(Filter filter, Sorter sorter, Page page);
 
     List<Tag> findByTagNames(List<String> tagNames);
+
+    void deleteByIdLogically(String id);
+
+    void deleteByIdsLogically(List<String> ids);
 }

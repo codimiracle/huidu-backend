@@ -1,9 +1,14 @@
 package com.codimiracle.application.platform.huidu.entity.po;
 
+import com.codimiracle.application.platform.huidu.entity.dto.BookEpisodeDTO;
+import com.codimiracle.application.platform.huidu.enumeration.ContentStatus;
 import lombok.Data;
+import org.springframework.beans.BeanUtils;
+import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.Objects;
 
 @Data
 @Table(name = "book_episode")
@@ -13,7 +18,7 @@ public class BookEpisode {
      */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private String id;
 
     /**
      * 章节标题
@@ -22,6 +27,12 @@ public class BookEpisode {
 
     @Column(name = "commodity_id")
     private Integer commodityId;
+
+    @Column(name = "owner_id")
+    private String ownerId;
+
+    @Column(name = "episode_number")
+    private Integer episodeNumber;
 
     /**
      * 内容源类型（html: HTML代码）
@@ -41,12 +52,12 @@ public class BookEpisode {
     private Integer words;
 
     /**
-     * 章节状态（draft: 草稿, examining: 审批, rejected: 驳回, publish: 发布）
+     * 章节状态（Draft: 草稿, Examining: 审批, rejected: 驳回, Publish: 发布）
      */
-    private String status;
+    private ContentStatus status;
 
     @Column(name = "book_id")
-    private Integer bookId;
+    private String bookId;
 
     /**
      * 删除标识
@@ -59,98 +70,15 @@ public class BookEpisode {
     @Column(name = "update_time")
     private Date updateTime;
 
-    /**
-     * 获取章节id
-     *
-     * @return id - 章节id
-     */
-    /**
-     * 设置章节id
-     *
-     * @param id 章节id
-     */
-    /**
-     * 获取章节标题
-     *
-     * @return title - 章节标题
-     */
-    /**
-     * 设置章节标题
-     *
-     * @param title 章节标题
-     */
-    /**
-     * @return commodity_id
-     */
-    /**
-     * @param commodityId
-     */
-    /**
-     * 获取内容源类型（html: HTML代码）
-     *
-     * @return content_type - 内容源类型（html: HTML代码）
-     */
-    /**
-     * 设置内容源类型（html: HTML代码）
-     *
-     * @param contentType 内容源类型（html: HTML代码）
-     */
-    /**
-     * 获取内容源
-     *
-     * @return content_source - 内容源
-     */
-    /**
-     * 设置内容源
-     *
-     * @param contentSource 内容源
-     */
-    /**
-     * 获取字数
-     *
-     * @return words - 字数
-     */
-    /**
-     * 设置字数
-     *
-     * @param words 字数
-     */
-    /**
-     * 获取章节状态（draft: 草稿, examining: 审批, rejected: 驳回, publish: 发布）
-     *
-     * @return status - 章节状态（draft: 草稿, examining: 审批, rejected: 驳回, publish: 发布）
-     */
-    /**
-     * 设置章节状态（draft: 草稿, examining: 审批, rejected: 驳回, publish: 发布）
-     *
-     * @param status 章节状态（draft: 草稿, examining: 审批, rejected: 驳回, publish: 发布）
-     */
-    /**
-     * @return book_id
-     */
-    /**
-     * @param bookId
-     */
-    /**
-     * 获取删除标识
-     *
-     * @return deleted - 删除标识
-     */
-    /**
-     * 设置删除标识
-     *
-     * @param deleted 删除标识
-     */
-    /**
-     * @return create_time
-     */
-    /**
-     * @param createTime
-     */
-    /**
-     * @return update_time
-     */
-    /**
-     * @param updateTime
-     */
+    public static BookEpisode from(BookEpisodeDTO bookEpisodeDTO) {
+        if (Objects.isNull(bookEpisodeDTO)) {
+            return null;
+        }
+        BookEpisode episode = new BookEpisode();
+        BeanUtils.copyProperties(bookEpisodeDTO, episode);
+        episode.setContentType(bookEpisodeDTO.getContent().getType());
+        episode.setContentSource(bookEpisodeDTO.getContent().getSource());
+        episode.setStatus(ContentStatus.valueOfCode(bookEpisodeDTO.getStatus()));
+        return episode;
+    }
 }

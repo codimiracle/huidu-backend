@@ -10,7 +10,7 @@ public class RestfulUtil {
     }
 
     public static <T> ApiResponse<T> success(T data) {
-        return new ApiResponse<>(0, "success", data);
+        return new ApiResponse<>(200, "success", data);
     }
 
     public static ApiResponse fail(String message) {

@@ -1,13 +1,19 @@
 package com.codimiracle.application.platform.huidu.service.impl;
 
 import com.codimiracle.application.platform.huidu.contract.AbstractService;
+import com.codimiracle.application.platform.huidu.contract.ServiceException;
 import com.codimiracle.application.platform.huidu.entity.po.LogisticsInformation;
+import com.codimiracle.application.platform.huidu.entity.po.PassingPoint;
+import com.codimiracle.application.platform.huidu.entity.vo.LogisticsInformationVO;
 import com.codimiracle.application.platform.huidu.mapper.LogisticsInformationMapper;
 import com.codimiracle.application.platform.huidu.service.LogisticsInformationService;
+import com.codimiracle.application.platform.huidu.service.PassingPointService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.Date;
+import java.util.Objects;
 
 
 /**
@@ -19,4 +25,48 @@ public class LogisticsInformationServiceImpl extends AbstractService<String, Log
     @Resource
     private LogisticsInformationMapper logisticsInformationMapper;
 
+    @Resource
+    private PassingPointService passingPointService;
+
+    @Override
+    public void save(LogisticsInformation model) {
+        super.save(model);
+        Date now = new Date();
+        model.getPassingPoints().stream().forEach((e) -> {
+            e.setLogisticsInfomationId(model.getId());
+            e.setCreateTime(now);
+            e.setUpdateTime(now);
+            passingPointService.save(e);
+        });
+    }
+
+    @Override
+    public void update(LogisticsInformation model) {
+        super.update(model);
+        Date now = new Date();
+        model.getPassingPoints().forEach((e) -> {
+            if (Objects.isNull(e.getId())) {
+                e.setCreateTime(now);
+                e.setUpdateTime(now);
+                e.setLogisticsInfomationId(model.getId());
+                passingPointService.save(e);
+            } else {
+                PassingPoint passingPoint = passingPointService.findById(e.getId());
+                if (!Objects.equals(passingPoint.getLogisticsInfomationId(), model.getId())) {
+                    throw new ServiceException("未知途经点!");
+                }
+                if (passingPoint.getStatus() == e.getStatus()) {
+                    return;
+                }
+                e.setName(null);
+                e.setUpdateTime(now);
+                passingPointService.update(e);
+            }
+        });
+    }
+
+    @Override
+    public LogisticsInformationVO findByIdIntegrally(String id) {
+        return logisticsInformationMapper.selectByIdIntegrally(id);
+    }
 }

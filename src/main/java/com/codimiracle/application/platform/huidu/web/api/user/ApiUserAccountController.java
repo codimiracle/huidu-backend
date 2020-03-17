@@ -12,7 +12,7 @@ import com.codimiracle.application.platform.huidu.enumeration.PaymentType;
 import com.codimiracle.application.platform.huidu.service.OrderService;
 import com.codimiracle.application.platform.huidu.service.UserAccountService;
 import com.codimiracle.application.platform.huidu.util.RestfulUtil;
-import com.codimiracle.application.platform.huidu.web.api.expose.ApiOrderController;
+import com.codimiracle.application.platform.huidu.web.api.base.OrderController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -35,7 +35,7 @@ public class ApiUserAccountController {
     private OrderService orderService;
 
     @Autowired
-    private ApiOrderController apiOrderController;
+    private OrderController orderController;
 
     @Resource
     private PasswordEncoder passwordEncoder;
@@ -61,7 +61,7 @@ public class ApiUserAccountController {
         OrderringDTO orderringDTO = new OrderringDTO();
         orderringDTO.setType(OrderType.Recharge.getType());
         orderringDTO.setCharge(rechargeDTO.getCharge());
-        return apiOrderController.orderring(user, orderringDTO);
+        return orderController.orderring(user, orderringDTO);
     }
 
     @GetMapping

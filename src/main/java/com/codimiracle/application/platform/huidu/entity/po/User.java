@@ -32,6 +32,7 @@ public class User implements UserDetails {
     /**
      * 密码
      */
+    @JsonIgnore
     private String password;
 
     /**

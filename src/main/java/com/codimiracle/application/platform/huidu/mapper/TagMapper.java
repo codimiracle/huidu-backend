@@ -18,4 +18,8 @@ public interface TagMapper extends Mapper<Tag> {
     List<TagVO> selectAllIntegrally(@Param("filter") Filter filter, @Param("sorter") Sorter sorter, @Param("page") Page page);
 
     List<Tag> selectByTagNames(List<String> tagNames);
+
+    void deleteByIdLogically(String id);
+
+    void deleteByIdsLogically(List<String> ids);
 }

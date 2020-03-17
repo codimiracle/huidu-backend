@@ -1,6 +1,7 @@
 package com.codimiracle.application.platform.huidu.entity.po;
 
 import lombok.Data;
+import org.joda.money.Money;
 
 import javax.persistence.*;
 
@@ -12,12 +13,12 @@ public class UserAccount {
     private Integer id;
 
     @Column(name = "user_id")
-    private Integer userId;
+    private String userId;
 
     /**
      * 荟币余额
      */
-    private Long balance;
+    private Money balance;
 
     private Integer version;
 }

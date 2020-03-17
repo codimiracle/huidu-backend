@@ -5,6 +5,8 @@ import com.codimiracle.application.platform.huidu.entity.po.Category;
 import com.codimiracle.application.platform.huidu.entity.po.CategoryTags;
 import com.codimiracle.application.platform.huidu.entity.po.Tag;
 import com.codimiracle.application.platform.huidu.entity.vo.CategoryVO;
+import com.codimiracle.application.platform.huidu.enumeration.BookType;
+import com.codimiracle.application.platform.huidu.enumeration.CategoryType;
 import com.codimiracle.application.platform.huidu.mapper.CategoryMapper;
 import com.codimiracle.application.platform.huidu.service.CategoryService;
 import com.codimiracle.application.platform.huidu.service.CategoryTagsService;
@@ -34,10 +36,12 @@ public class CategoryServiceImpl extends AbstractService<String, Category> imple
 
     @Override
     public void save(Category model) {
+        if (Objects.nonNull(model.getTags())) {
+            model.getTags().stream().filter((t) -> Objects.isNull(t.getId())).forEach(tagService::save);
+            List<CategoryTags> categoryTagsList = model.getTags().stream().map((t) -> CategoryTags.valueOf(model, t)).collect(Collectors.toList());
+            categoryTagsService.save(categoryTagsList);
+        }
         super.save(model);
-        model.getTags().stream().filter((t) -> Objects.isNull(t.getId())).forEach(tagService::save);
-        List<CategoryTags> categoryTagsList = model.getTags().stream().map((t) -> CategoryTags.valueOf(model, t)).collect(Collectors.toList());
-        categoryTagsService.save(categoryTagsList);
     }
 
     @Override
@@ -51,13 +55,28 @@ public class CategoryServiceImpl extends AbstractService<String, Category> imple
     }
 
     @Override
+    public List<CategoryVO> findByIdsIntegrally(List<String> ids) {
+        return ids.stream().map(this::findByIdIntegrally).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<CategoryVO> findRelativeCategoriesByBookType(BookType bookType) {
+        return categoryMapper.selectRelativeCategoriesByBookType(bookType);
+    }
+
+    @Override
     public CategoryVO findByIdIntegrally(String id) {
         return categoryMapper.selectByIdIntegrally(id);
     }
 
     @Override
-    public PageSlice<CategoryVO> findAllIntegrally(Filter filter, Sorter sorter, Page page) {
-        return extractPageSlice(categoryMapper.selectAllIntegrally(filter, sorter, page));
+    public PageSlice<CategoryVO> findAllIntegrally(CategoryType type, Filter filter, Sorter sorter, Page page) {
+        PageSlice<CategoryVO> slice = extractPageSlice(categoryMapper.selectAllIntegrally(type, filter, sorter, page));
+        List<CategoryVO> list = slice.getList();
+        list.forEach((categoryVO -> {
+            categoryVO.setTags(categoryTagsService.findTagByCategoryId(categoryVO.getId()));
+        }));
+        return slice;
     }
 
     @Override

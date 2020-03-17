@@ -7,8 +7,16 @@
         -->
         <result column="id" jdbcType="INTEGER" property="id"/>
         <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
         <result column="status" jdbcType="VARCHAR" property="status"/>
         <result column="logistics_infomation_id" jdbcType="INTEGER" property="logisticsInfomationId"/>
+    </resultMap>
+    <resultMap id="IntegratedResultMap" type="com.codimiracle.application.platform.huidu.entity.vo.PassingPointVO">
+        <result column="passing_point_id" jdbcType="INTEGER" property="id"/>
+        <result column="passing_point_name" jdbcType="VARCHAR" property="name"/>
+        <result column="passing_point_create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="passing_point_update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="passing_point_status" jdbcType="VARCHAR" property="status"/>
     </resultMap>
 </mapper>

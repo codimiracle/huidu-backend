@@ -22,7 +22,7 @@
         <result column="deleted" jdbcType="BIT" property="deleted"/>
     </resultMap>
     <resultMap id="IntegratedResultMap" type="com.codimiracle.application.platform.huidu.entity.vo.CommodityVO">
-        <result column="commodity_id" jdbcType="INTEGER" property="id"/>
+        <id column="commodity_id" jdbcType="INTEGER" property="id"/>
         <result column="commodity_name" jdbcType="VARCHAR" property="name"/>
         <result column="commodity_type" jdbcType="VARCHAR" property="type"/>
         <result column="commodity_picture" jdbcType="VARCHAR" property="picture"/>
@@ -49,22 +49,21 @@
         <foreach collection="list" item="item" open="(" close=")" separator=",">#{item}</foreach>
     </update>
     <sql id="select_statement">
-        SELECT c.id commodity_id,
-        c.name commodity_name,
-        c.type commodity_type,
-        c.picture commodity_picture,
-        c.introduction commodity_introduction,
-        c.rate commodity_rate,
-        c.weight commodity_weight,
-        c.stock commodity_stock,
-        c.available_stock commodity_available_stock,
-        c.sales commodity_sales,
-        c.shipment commodity_shipment,
-        c.extra commodity_extra,
-        c.prices commodity_prices,
-        c.status commodity_status
-        FROM (SELECT * FROM commodity WHERE commodity.deleted = 0 <if test="page != null">LIMIT #{page.offset},
-        #{page.limit}</if>) c
+        SELECT c.id              commodity_id,
+               c.name            commodity_name,
+               c.type            commodity_type,
+               c.picture         commodity_picture,
+               c.introduction    commodity_introduction,
+               c.rate            commodity_rate,
+               c.weight          commodity_weight,
+               c.stock           commodity_stock,
+               c.available_stock commodity_available_stock,
+               c.sales           commodity_sales,
+               c.shipment        commodity_shipment,
+               c.extra           commodity_extra,
+               c.prices          commodity_prices,
+               c.status          commodity_status
+        FROM commodity c
         WHERE c.deleted = 0
     </sql>
     <select id="selectByIdIntegrally" resultMap="IntegratedResultMap">

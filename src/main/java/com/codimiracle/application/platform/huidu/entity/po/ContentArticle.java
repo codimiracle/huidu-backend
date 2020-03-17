@@ -1,10 +1,14 @@
 package com.codimiracle.application.platform.huidu.entity.po;
 
+import com.codimiracle.application.platform.huidu.entity.dto.ContentArticleDTO;
+import com.codimiracle.application.platform.huidu.enumeration.ContentStatus;
 import lombok.Data;
+import org.springframework.beans.BeanUtils;
 
 import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.util.Objects;
 
 @Data
 @Table(name = "content_article")
@@ -14,13 +18,13 @@ public class ContentArticle {
      */
     @Id
     @Column(name = "content_id")
-    private Integer contentId;
+    private String contentId;
 
     /**
      * 内容对内容id
      */
     @Column(name = "target_content_id")
-    private Integer targetContentId;
+    private String targetContentId;
 
     /**
      * 标题
@@ -30,7 +34,7 @@ public class ContentArticle {
     /**
      * 字数
      */
-    private String words;
+    private Integer words;
 
     /**
      * 内容源类型（html: HTML代码, plaintext: 纯文本）
@@ -47,10 +51,23 @@ public class ContentArticle {
     /**
      * 内容状态
      */
-    private String status;
+    private ContentStatus status;
 
     /**
      * 阅读数
      */
-    private String reads;
+    @Column(name = "`reads`")
+    private Integer reads;
+
+    public static ContentArticle from(ContentArticleDTO contentArticleDTO) {
+        if (Objects.isNull(contentArticleDTO)) {
+            return null;
+        }
+        ContentArticle article = new ContentArticle();
+        BeanUtils.copyProperties(contentArticleDTO, article);
+        article.setContentType(contentArticleDTO.getContent().getType());
+        article.setContentSource(contentArticleDTO.getContent().getSource());
+        article.setStatus(ContentStatus.valueOfCode(contentArticleDTO.getStatus()));
+        return article;
+    }
 }

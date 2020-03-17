@@ -9,6 +9,68 @@
         <result column="user_id" jdbcType="INTEGER" property="userId"/>
         <result column="book_id" jdbcType="INTEGER" property="bookId"/>
         <result column="episode_id" jdbcType="INTEGER" property="episodeId"/>
+        <result column="audio_episode_id" jdbcType="INTEGER" property="audioEpisodeId"/>
         <result column="read_time" jdbcType="TIMESTAMP" property="readTime"/>
+        <result column="progress" jdbcType="FLOAT" property="progress"/>
     </resultMap>
+
+    <resultMap id="IntegratedResultMap" type="com.codimiracle.application.platform.huidu.entity.vo.HistoryVO">
+        <id column="history_id" jdbcType="INTEGER" property="id"/>
+        <result column="history_user_id" jdbcType="INTEGER" property="userId"/>
+        <result column="history_book_id" jdbcType="INTEGER" property="bookId"/>
+        <result column="history_episode_id" jdbcType="INTEGER" property="episodeId"/>
+        <result column="history_audio_episode_id" jdbcType="INTEGER" property="audioEpisodeId"/>
+        <result column="history_read_time" jdbcType="TIMESTAMP" property="readTime"/>
+        <result column="history_progress" jdbcType="FLOAT" property="progress"/>
+    </resultMap>
+
+    <sql id="select_statement">
+        SELECT h.id               history_id,
+               h.user_id          history_user_id,
+               h.book_id          history_book_id,
+               h.episode_id       history_episode_id,
+               h.audio_episode_id history_audio_episode_id,
+               h.read_time        history_read_time
+        FROM history h
+        WHERE h.deleted = 0
+    </sql>
+    <update id="deleteByIdLogically">
+        UPDATE history h
+        SET h.deleted = 1
+        WHERE h.id = #{id}
+    </update>
+    <select id="selectByUserIdAndBookIdIntegrally" resultMap="IntegratedResultMap">
+        <include refid="select_statement"/>
+        AND h.user_id = #{userId}
+        AND h.book_id = #{bookId}
+    </select>
+    <select id="selectByUserIdAndBookId" resultMap="BaseResultMap">
+        SELECT h.id,
+               h.user_id,
+               h.book_id,
+               h.audio_episode_id,
+               h.episode_id,
+               h.read_time,
+               h.progress
+        FROM history h
+        WHERE h.deleted = 0
+          AND h.user_id = #{userId}
+          AND h.book_id = #{bookId}
+    </select>
+    <select id="selectByIdIntegrally" resultMap="IntegratedResultMap">
+        <include refid="select_statement"/>
+        AND h.id = #{historyId}
+    </select>
+    <select id="selectThatDayByUserIdIntegrally" resultMap="IntegratedResultMap">
+        <include refid="select_statement"/>
+        AND DATE(h.read_time) = DATE(#{thatDay})
+    </select>
+    <select id="selectAllIntegrally" resultMap="IntegratedResultMap">
+        <include refid="select_statement"/>
+        <if test="filter != null">
+            <if test="filter.userId != null and filter.userId.length gt 0">
+                AND h.user_id = #{filter.userId[0]}
+            </if>
+        </if>
+    </select>
 </mapper>

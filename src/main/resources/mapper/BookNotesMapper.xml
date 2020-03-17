@@ -7,15 +7,140 @@
         -->
         <result column="id" jdbcType="INTEGER" property="id"/>
         <result column="book_id" jdbcType="INTEGER" property="bookId"/>
+        <result column="user_id" jdbcType="INTEGER" property="userId"/>
         <result column="episode_id" jdbcType="INTEGER" property="episodeId"/>
         <result column="ref" jdbcType="VARCHAR" property="ref"/>
         <result column="content_type" jdbcType="VARCHAR" property="contentType"/>
         <result column="content_source" jdbcType="VARCHAR" property="contentSource"/>
-        <result column="dommark_startdom" jdbcType="VARCHAR" property="dommarkStartdom"/>
-        <result column="dommark_startoffset" jdbcType="VARCHAR" property="dommarkStartoffset"/>
-        <result column="dommark_enddom" jdbcType="VARCHAR" property="dommarkEnddom"/>
-        <result column="dommark_endoffset" jdbcType="VARCHAR" property="dommarkEndoffset"/>
+        <result column="dommark_start_dom" jdbcType="VARCHAR" property="dommarkStartDom"/>
+        <result column="dommark_start_offset" jdbcType="VARCHAR" property="dommarkStartOffset"/>
+        <result column="dommark_end_dom" jdbcType="VARCHAR" property="dommarkEndDom"/>
+        <result column="dommark_end_offset" jdbcType="VARCHAR" property="dommarkEndOffset"/>
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
     </resultMap>
+    <resultMap id="CollectionIntegratedResultMap"
+               type="com.codimiracle.application.platform.huidu.entity.vt.BookNoteCollection">
+        <id column="collection_id" jdbcType="INTEGER" property="id"/>
+        <result column="collection_user_id" jdbcType="INTEGER" property="userId"/>
+        <result column="collection_book_id" jdbcType="INTEGER" property="bookId"/>
+        <result column="collection_note_count" jdbcType="INTEGER" property="noteCount" />
+        <collection property="notes" foreignColumn="book_notes_id" resultMap="IntegratedResultMap"/>
+    </resultMap>
+    <resultMap id="IntegratedResultMap" type="com.codimiracle.application.platform.huidu.entity.vo.BookNotesVO">
+        <id column="book_notes_id" jdbcType="INTEGER" property="id"/>
+        <result column="book_notes_ref" jdbcType="VARCHAR" property="ref"/>
+        <result column="book_notes_book_id" jdbcType="VARCHAR" property="bookId"/>
+        <result column="book_notes_episode_id" jdbcType="VARCHAR" property="episodeId"/>
+        <result column="book_notes_create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="book_notes_update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <association property="dommark" javaType="com.codimiracle.application.platform.huidu.entity.embedded.Dommark">
+            <result column="book_notes_dommark_start_dom" jdbcType="VARCHAR" property="startDom"/>
+            <result column="book_notes_dommark_start_offset" jdbcType="VARCHAR" property="startOffset"/>
+            <result column="book_notes_dommark_end_dom" jdbcType="VARCHAR" property="endDom"/>
+            <result column="book_notes_dommark_end_offset" jdbcType="VARCHAR" property="endOffset"/>
+        </association>
+        <association property="content"
+                     javaType="com.codimiracle.application.platform.huidu.entity.embedded.ContentSource">
+            <result column="book_notes_content_type" jdbcType="VARCHAR" property="type"/>
+            <result column="book_notes_content_source" jdbcType="VARCHAR" property="source"/>
+        </association>
+    </resultMap>
+    <update id="deleteByIdLogically">
+        UPDATE book_notes
+        SET deleted = 1
+        WHERE id = #{id}
+    </update>
+
+    <update id="deleteByIdsLogically">
+        UPDATE book_notes
+        SET deleted = 1
+        WHERE id IN
+        <foreach collection="list" separator="," open="(" close=")" item="item">#{item}</foreach>
+    </update>
+
+    <sql id="select_statement">
+        SELECT
+        concat(bn.user_id, '-', bn.book_id) collection_id,
+        bn.id book_notes_id,
+        bn.user_id book_notes_user_id,
+        bn.book_id book_notes_book_id,
+        bn.episode_id book_notes_episode_id,
+        bn.ref book_notes_ref,
+        bn.content_type book_notes_content_type,
+        bn.content_source book_notes_content_source,
+        bn.dommark_start_dom book_notes_dommark_start_dom,
+        bn.dommark_start_offset book_notes_dommark_start_offset,
+        bn.dommark_end_dom book_notes_dommark_end_dom,
+        bn.dommark_end_offset book_notes_dommark_end_offset,
+        bn.create_time book_notes_create_time,
+        bn.update_time book_notes_update_time,
+        b.id book_id,
+        b.title book_title,
+        b.description book_description,
+        b.cover book_cover,
+        b.teller book_teller,
+        b.metadata_id book_metadata_id,
+        b.category_id book_category_id,
+        b.publish_year book_publish_year,
+        b.type book_type,
+        b.episodes book_episodes,
+        b.status book_status,
+        b.money book_money
+        FROM book_notes bn
+        LEFT JOIN book b ON bn.book_id = b.id
+        WHERE bn.deleted = 0
+    </sql>
+    <sql id="select_collection_statement">
+        SELECT
+        concat(bn.user_id, '-', bn.book_id) collection_id,
+        bn.user_id collection_user_id,
+        count(bn.id) collection_note_count,
+        bn.book_id collection_book_id
+        FROM book_notes bn
+        LEFT JOIN book b ON bn.book_id = b.id WHERE bn.deleted = 0
+    </sql>
+
+    <select id="selectAllIntegrally" resultMap="IntegratedResultMap">
+        <include refid="select_statement"/>
+        <if test="filter != null">
+            <if test="filter.userId != null and filter.userId.length gt 0">
+                AND bn.user_id = #{filter.userId[0]}
+            </if>
+            <if test="filter.bookId != null and filter.bookId.length gt 0">
+                AND bn.book_id = #{filter.bookId[0]}
+            </if>
+            <if test="filter.bookName != null and filter.bookName.length gt 0">
+                AND b.name LIKE concat('%', #{filter.bookName}, '%')
+            </if>
+            <if test="filter.ref != null and filter.ref.length gt 0">
+                AND bn.ref LIKE concat('%', #{filter.ref}, '%')
+            </if>
+        </if>
+    </select>
+    <select id="selectByIdIntegrally" resultMap="IntegratedResultMap">
+        <include refid="select_statement"/>
+        AND bn.id = #{id}
+    </select>
+    <select id="selectAllBookNotesCollectionByUserId" resultMap="IntegratedResultMap">
+        <include refid="select_collection_statement"/>
+        AND bn.user_id = #{userId}
+    </select>
+    <select id="selectBookNotesCollectionByBookIdAndUserId" resultMap="CollectionIntegratedResultMap">
+        <include refid="select_statement"/>
+        AND bn.book_id = #{bookId}
+        AND bn.user_id = #{userId}
+    </select>
+    <select id="existsWithMainDommarkPath" resultType="java.lang.Boolean">
+        SELECT true FROM book_notes bn WHERE bn.deleted = 0 AND (bn.dommark_start_dom LIKE concat(#{mainStartPath}, '%')
+        OR bn.dommark_end_dom LIKE concat(#{mainEndPath}, '%')) LIMIT 0, 1
+    </select>
+    <select id="selectAllCollectionIntegrally" resultMap="CollectionIntegratedResultMap">
+        <include refid="select_collection_statement"/>
+        <if test="filter != null">
+            <if test="filter.userId != null and filter.userId.length gt 0">
+                AND bn.user_id = #{filter.userId[0]}
+            </if>
+        </if>
+    </select>
 </mapper>

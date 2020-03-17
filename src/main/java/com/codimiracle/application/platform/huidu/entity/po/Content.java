@@ -1,12 +1,16 @@
 package com.codimiracle.application.platform.huidu.entity.po;
 
+import com.codimiracle.application.platform.huidu.entity.dto.ContentDTO;
+import com.codimiracle.application.platform.huidu.enumeration.ContentType;
 import lombok.Data;
+import org.springframework.beans.BeanUtils;
 
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import java.util.Date;
+import java.util.Objects;
 
 @Data
 public class Content {
@@ -15,18 +19,18 @@ public class Content {
      */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private String id;
 
     /**
-     * 内容类型（topic: 话题, comment: 评论, review: 点评, book: 图书）
+     * 内容类型（Topic: 话题, Comment: 评论, Review: 点评, Book: 图书）
      */
-    private String type;
+    private ContentType type;
 
     /**
      * 拥有者id
      */
     @Column(name = "owner_id")
-    private Integer ownerId;
+    private String ownerId;
 
     /**
      * 评论数
@@ -64,4 +68,13 @@ public class Content {
      */
     @Column(name = "update_time")
     private Date updateTime;
+
+    public static Content from(ContentDTO contentDTO) {
+        if (Objects.isNull(contentDTO)) {
+            return null;
+        }
+        Content content = new Content();
+        BeanUtils.copyProperties(contentDTO, content);
+        return content;
+    }
 }

@@ -7,7 +7,7 @@ package com.codimiracle.application.platform.huidu.util;
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
  *  in the Software without restriction, including without limitation the rights
- *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ *  to use, copy, modify, merge, Publish, distribute, sublicense, and/or sell
  *  copies of the Software, and to permit persons to whom the Software is
  *  furnished to do so, subject to the following conditions:
  *
@@ -40,15 +40,28 @@ public class StringifizationUtil {
         return toString(set, s -> s);
     }
 
-    public static <T> String toString(Set<T> set, Function<T, String> tToString) {
+    public static String toString(List<String> set) {
+        return toString(set, s -> s);
+    }
+
+    public static <T> String toString(Iterator<T> iterator, Function<T, String> tToString) {
         StringBuilder builder = new StringBuilder();
         String sep = "";
-        for (T s : set) {
-            builder.append(tToString.apply(s));
+        while (iterator.hasNext()) {
+            T t = iterator.next();
             builder.append(sep);
+            builder.append(tToString.apply(t));
             sep = SEPARATOR_STRINGIFIED_SET;
         }
         return builder.toString();
+    }
+
+    public static <T> String toString(List<T> list, Function<T, String> tToString) {
+        return toString(list.iterator(), tToString);
+    }
+
+    public static <T> String toString(Set<T> set, Function<T, String> tToString) {
+        return toString(set.iterator(), tToString);
     }
 
     public static Set<String> toSet(String stringifiedSet) {
@@ -65,5 +78,21 @@ public class StringifizationUtil {
             set.add(stringToT.apply(tokenizer.nextToken()));
         }
         return Collections.unmodifiableSet(set);
+    }
+
+    public static <T> List<T> toList(String stringifiedSet, Function<String, T> stringToT) {
+        if (Objects.isNull(stringifiedSet)) {
+            return Collections.emptyList();
+        }
+        List<T> list = new ArrayList<>();
+        StringTokenizer tokenizer = new StringTokenizer(stringifiedSet, SEPARATOR_STRINGIFIED_SET);
+        while (tokenizer.hasMoreTokens()) {
+            list.add(stringToT.apply(tokenizer.nextToken()));
+        }
+        return Collections.unmodifiableList(list);
+    }
+
+    public static List<String> toList(String stringifiedSet) {
+        return new ArrayList<>(toList(stringifiedSet, s -> s));
     }
 }

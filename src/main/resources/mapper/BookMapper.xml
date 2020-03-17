@@ -5,11 +5,12 @@
         <!--
           WARNING - @mbg.generated
         -->
-        <result column="id" jdbcType="INTEGER" property="id"/>
+        <id column="id" jdbcType="INTEGER" property="id"/>
         <result column="title" jdbcType="VARCHAR" property="title"/>
         <result column="description" jdbcType="VARCHAR" property="description"/>
         <result column="cover" jdbcType="VARCHAR" property="cover"/>
         <result column="teller" jdbcType="VARCHAR" property="teller"/>
+        <result column="content_id" jdbcType="INTEGER" property="contentId"/>
         <result column="metadata_id" jdbcType="INTEGER" property="metadataId"/>
         <result column="category_id" jdbcType="INTEGER" property="categoryId"/>
         <result column="publish_year" jdbcType="CHAR" property="publishYear"/>
@@ -20,4 +21,173 @@
         <result column="commodity_id" jdbcType="INTEGER" property="commodityId"/>
         <result column="deleted" jdbcType="BIT" property="deleted"/>
     </resultMap>
+    <resultMap id="IntegratedResultMap" type="com.codimiracle.application.platform.huidu.entity.vo.BookVO"
+               extends="com.codimiracle.application.platform.huidu.mapper.ContentMapper.IntegratedResultMap">
+        <id column="book_id" jdbcType="INTEGER" property="id"/>
+        <result column="book_title" jdbcType="VARCHAR" property="title"/>
+        <result column="book_description" jdbcType="VARCHAR" property="description"/>
+        <result column="book_cover" jdbcType="VARCHAR" property="cover"/>
+        <result column="book_teller" jdbcType="VARCHAR" property="teller"/>
+        <result column="book_publish_year" jdbcType="CHAR" property="publishYear"/>
+        <result column="book_type" jdbcType="VARCHAR" property="type"/>
+        <result column="book_episodes" jdbcType="INTEGER" property="episodes"/>
+        <result column="book_status" jdbcType="VARCHAR" property="status"/>
+        <result column="book_money" jdbcType="INTEGER" property="money"/>
+        <result column="book_metadata_id" jdbcType="INTEGER" property="metadataId" />
+        <result column="owner_id" jdbcType="INTEGER" property="ownerId" />
+        <result column="category_id" jdbcType="INTEGER" property="categoryId" />
+        <association property="metadata" foreignColumn="book_metadata_id"
+                     resultMap="com.codimiracle.application.platform.huidu.mapper.BookMetadataMapper.IntegratedResultMap"/>
+        <association property="commodity" foreignColumn="commodity_id"
+                     resultMap="com.codimiracle.application.platform.huidu.mapper.CommodityMapper.IntegratedResultMap"/>
+    </resultMap>
+    <sql id="book_vo_fields">
+        b.id                 book_id,
+               b.title              book_title,
+               b.description        book_description,
+               b.cover              book_cover,
+               b.teller             book_teller,
+               b.publish_year       book_publish_year,
+               b.type               book_type,
+               b.episodes           book_episodes,
+               b.status             book_status,
+               b.money              book_money,
+               ct.id                content_id,
+               ct.owner_id          owner_id,
+               ct.comments          content_comments,
+               ct.rate              content_rate,
+               ct.likes             content_likes,
+               ct.reposts           content_reposts,
+               ct.create_time       content_create_time,
+               ct.update_time       content_update_time,
+               bm.id                book_metadata_id,
+               bm.name              book_metadata_name,
+               bm.cover             book_metadata_cover,
+               bm.description       book_metadata_description,
+               bm.words             book_metadata_words,
+               bm.author            book_metadata_author,
+               c.id                 commodity_id,
+               c.name               commodity_name,
+               c.type               commodity_type,
+               c.picture            commodity_picture,
+               c.introduction       commodity_introduction,
+               c.rate               commodity_rate,
+               c.weight             commodity_weight,
+               c.stock              commodity_stock,
+               c.available_stock    commodity_available_stock,
+               c.sales              commodity_sales,
+               c.shipment           commodity_shipment,
+               c.extra              commodity_extra,
+               c.prices             commodity_prices,
+               c.status             commodity_status,
+               b.category_id        category_id
+    </sql>
+    <sql id="select_statement">
+        SELECT
+        <include refid="book_vo_fields"/>
+        FROM book b
+        LEFT JOIN book_metadata bm ON b.metadata_id = bm.id
+        LEFT JOIN commodity c ON b.commodity_id = c.id
+        LEFT JOIN content ct ON ct.id = b.content_id
+        WHERE b.deleted = 0
+        <if test="type != null">AND b.type = #{type}</if>
+    </sql>
+    <sql id="select_statement_without_type">
+        SELECT
+        <include refid="book_vo_fields"/>
+        FROM book b
+        LEFT JOIN book_metadata bm ON b.metadata_id = bm.id
+        LEFT JOIN commodity c ON b.commodity_id = c.id
+        LEFT JOIN content ct ON ct.id = b.content_id
+        WHERE b.deleted = 0
+    </sql>
+    <update id="deleteByIdLogically">
+        UPDATE book
+        SET deleted = 1
+        WHERE id = #{id}
+    </update>
+
+    <update id="deleteByIdsLogically">
+        UPDATE book
+        SET deleted = 1
+        WHERE id IN
+        <foreach collection="list" separator="," open="(" close=")" item="item">#{item}</foreach>
+    </update>
+    <update id="readsIncrement">
+        UPDATE book b
+        SET b.`reads` = b.`reads` + 1
+        WHERE b.id = #{id}
+          AND b.type = 'electronic-book'
+    </update>
+    <update id="playsIncrement">
+        UPDATE book b
+        SET b.plays = b.plays + 1
+        WHERE b.id = #{id}
+          AND b.type = 'audio-book'
+    </update>
+    <select id="selectByIdIntegrally" resultMap="IntegratedResultMap">
+        <include refid="select_statement"/>
+        AND b.id = #{id}
+    </select>
+    <select id="selectAllIntegrally" resultMap="IntegratedResultMap">
+        <include refid="select_statement"/>
+        <if test="filter != null">
+            <if test="filter.ownerId != null and filter.ownerId.length gt 0">
+                AND ct.owner_id = #{filter.ownerId[0]}
+            </if>
+            <if test="filter.title != null and filter.title.length gt 0">
+                AND b.title LIKE concat('%', #{filter.title[0]}, '%')
+            </if>
+            <if test="filter.metadataName != null and filter.metadataName.length gt 0">
+                AND bm.name LIKE concat('%', #{filter.metadataName[0]}, '%')
+            </if>
+            <if test="filter.metadataAuthor != null and filter.metadataAuthor.length gt 0">
+                AND bm.author LIKE concat('%', #{filter.metadataAuthor[0]}, '%')
+            </if>
+            <if test="filter.publishYear != null and filter.publishYear.length gt 0">
+                AND bm.publishYear = #{filter.publishYear[0]}
+            </if>
+            <if test="filter.status != null and filter.status.length gt 0">
+                AND b.status IN
+                <foreach collection="filter.status" item="item" open="(" close=")" separator=",">#{item}</foreach>
+            </if>
+            <if test="filter.commodityStatus != null and filter.commodityStatus.length gt 0">
+                AND c.status IN
+                <foreach collection="filter.commodityStatus" item="item" open="(" close=")" separator=",">#{item}
+                </foreach>
+            </if>
+        </if>
+        <if test="sorter != null and sorter.field != null">
+            ORDER BY
+            <if test="sorter.field == 'publish_year'">b.publish_year</if>
+            <if test="sorter.field == 'commodity_prices'">c.prices</if>
+            <if test="sorter.field == 'episodes'">b.episodes</if>
+            <if test="sorter.field == 'reads'">b.reads</if>
+            <if test="sorter.field == 'plays'">b.plays</if>
+            <if test="sorter.order == 'descend'">DESC</if>
+        </if>
+    </select>
+    <select id="selectByCategoryIdIntegrally" resultMap="IntegratedResultMap">
+        <include refid="select_statement_without_type"/>
+        AND cc.id = #{categoryId}
+        AND b.status = 'publish'
+        <if test="filter != null">
+            <if test="filter.publishYear != null and filter.publishYear.length gt 0">
+                AND bm.publishYear = #{filter.publishYear[0]}
+            </if>
+            <if test="filter.tagName != null and filter.tagName.length gt 0">
+                AND b.id IN (SELECT bt.book_id FROM book_tags bt LEFT JOIN tag t ON bt.tag_id = t.id AND bt.deleted = 0
+                WHERE t.name = 'sdfa')
+            </if>
+        </if>
+        GROUP BY b.type
+    </select>
+    <select id="selectPublishYearsByType" resultType="java.lang.String">
+        SELECT DISTINCT b.publish_year
+        FROM book b
+    </select>
+    <select id="selectByContentIdIntegrally" resultMap="IntegratedResultMap">
+        <include refid="select_statement_without_type"/>
+        AND b.content_id = #{contentId}
+    </select>
 </mapper>

@@ -8,6 +8,8 @@
         <id column="id" jdbcType="INTEGER" property="id"/>
         <result column="title" jdbcType="VARCHAR" property="title"/>
         <result column="episode_id" jdbcType="INTEGER" property="episodeId"/>
+        <result column="owner_id" jdbcType="INTEGER" property="ownerId"/>
+        <result column="media_number" jdbcType="INTEGER" property="mediaNumber"/>
         <result column="duration" jdbcType="VARCHAR" property="duration"/>
         <result column="status" jdbcType="VARCHAR" property="status"/>
         <result column="book_id" jdbcType="INTEGER" property="bookId"/>
@@ -18,4 +20,127 @@
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
     </resultMap>
+    <resultMap id="IntegratedResultMap" type="com.codimiracle.application.platform.huidu.entity.vo.BookAudioEpisodeVO">
+        <id column="book_audio_episode_id" jdbcType="INTEGER" property="id"/>
+        <result column="book_audio_episode_title" jdbcType="VARCHAR" property="title"/>
+        <result column="book_audio_episode_episode_id" jdbcType="INTEGER" property="episodeId"/>
+        <result column="book_audio_episode_media_number" jdbcType="INTEGER" property="mediaNumber"/>
+        <result column="book_audio_episode_duration" jdbcType="VARCHAR" property="duration"/>
+        <result column="book_audio_episode_status" jdbcType="VARCHAR" property="status"/>
+        <result column="book_audio_episode_book_id" jdbcType="INTEGER" property="bookId"/>
+        <result column="book_audio_episode_commodity_id" jdbcType="INTEGER" property="commodityId"/>
+        <result column="book_audio_episode_stream_url" jdbcType="VARCHAR" property="streamUrl"/>
+        <result column="book_audio_episode_next_episode_id" jdbcType="INTEGER" property="nextEpisodeId"/>
+        <result column="book_audio_episode_deleted" jdbcType="BIT" property="deleted"/>
+        <result column="book_audio_episode_create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="book_audio_episode_update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <association property="book"
+                     resultMap="com.codimiracle.application.platform.huidu.mapper.BookMapper.IntegratedResultMap"/>
+        <association property="episode"
+                     resultMap="com.codimiracle.application.platform.huidu.mapper.BookEpisodeMapper.IntegratedResultMap"/>
+    </resultMap>
+    <resultMap id="CatalogsResultMap" type="com.codimiracle.application.platform.huidu.entity.vt.AudioCatalogs">
+        <result column="catalogs_media_number" jdbcType="INTEGER" property="mediaNumber"/>
+        <result column="catalogs_title" jdbcType="VARCHAR" property="title"/>
+        <result column="catalogs_book_id" jdbcType="INTEGER" property="bookId"/>
+        <result column="catalogs_audio_episode_id" jdbcType="INTEGER" property="audioEpisodeId"/>
+    </resultMap>
+    <sql id="select_statement">
+        SELECT bae.id book_audio_episode_id,
+        bae.title book_audio_episode_title,
+        bae.episode_id book_audio_episode_episode_id,
+        bae.media_number book_audio_episode_media_number,
+        bae.duration book_audio_episode_duration,
+        bae.status book_audio_episode_status,
+        bae.book_id book_audio_episode_book_id,
+        bae.commodity_id book_audio_episode_commodity_id,
+        bae.stream_url book_audio_episode_stream_url,
+        bae.next_episode_id book_audio_episode_next_episode_id,
+        bae.deleted book_audio_episode_deleted,
+        bae.create_time book_audio_episode_create_time,
+        bae.update_time book_audio_episode_update_time,
+        b.id book_id,
+        b.title book_title,
+        b.description book_description,
+        b.cover book_cover,
+        b.teller book_teller,
+        b.category_id book_category_id,
+        b.publish_year book_publish_year,
+        b.type book_type,
+        b.episodes book_episodes,
+        b.status book_status,
+        b.money book_money,
+        bm.id book_metadata_id,
+        bm.name book_metadata_name,
+        bm.cover book_metadata_cover,
+        bm.description book_metadata_description,
+        bm.words book_metadata_words,
+        bm.author book_metadata_author,
+        be.id book_episode_id,
+        be.title book_episode_title,
+        be.episode_number book_episode_episode_number,
+        be.content_type book_episode_content_type,
+        be.content_source book_episode_content_source,
+        be.words book_episode_words,
+        be.status book_episode_status,
+        be.create_time book_episode_create_time,
+        be.update_time book_episode_update_time,
+        c.id category_id,
+        c.name category_name,
+        c.description category_description,
+        c.extra_url category_extra_url,
+        c.extra_aside_title category_extra_aside_title
+        FROM book_audio_episode bae
+        LEFT JOIN book_episode be ON bae.episode_id = be.id
+        LEFT JOIN book b ON bae.book_id = b.id
+        LEFT JOIN book_metadata bm ON b.metadata_id = bm.id
+        LEFT JOIN category c ON b.category_id = c.id
+        WHERE bae.deleted = 0
+    </sql>
+    <update id="deleteByIdLogically">
+        UPDATE book_audio_episode bae
+        SET bae.deleted = 1
+        WHERE bae.id = #{id}
+    </update>
+    <select id="selectByIdIntegrally" resultMap="IntegratedResultMap">
+        <include refid="select_statement"/>
+        AND bae.id = #{id}
+    </select>
+    <select id="selectAllIntegrally" resultMap="IntegratedResultMap">
+        <include refid="select_statement"/>
+        AND bae.book_id = #{bookId}
+        <if test="filter != null">
+            <if test="filter.title != null and filter.title.length gt 0">
+                AND bae.title LIKE concat('%', #{filter.title[0]}, '%')
+            </if>
+            <if test="filter.status != null and filter.status.length gt 0">
+                AND bae.status IN
+                <foreach collection="filter.status" separator="," open="(" close=")" item="item">#{item}</foreach>
+            </if>
+        </if>
+    </select>
+    <select id="selectCatalogsByBookIdAndStatus" resultMap="CatalogsResultMap">
+        SELECT bae.title catalogs_title,
+        bae.media_number catalogs_media_number,
+        bae.book_id catalogs_book_id,
+        bae.id catalogs_audio_episode_id
+        FROM book_audio_episode bae
+        WHERE bae.deleted = 0
+        <if test="status != null">
+            AND bae.status = #{status}
+        </if>
+        AND bae.book_id = #{bookId}
+        ORDER BY bae.media_number
+    </select>
+    <select id="selectLastUpdateEpisodeByBookId" resultMap="IntegratedResultMap">
+        <include refid="select_statement"/>
+        and bae.book_id = #{bookId}
+        ORDER BY bae.update_time DESC
+        LIMIT 0,1;
+    </select>
+    <select id="selectByMediaNumberIntegrally" resultMap="IntegratedResultMap">
+        <include refid="select_statement"/>
+        AND bae.book_id = #{bookId}
+        AND bae.media_number = #{mediaNumber}
+    </select>
 </mapper>

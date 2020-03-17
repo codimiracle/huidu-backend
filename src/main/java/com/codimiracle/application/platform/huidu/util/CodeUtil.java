@@ -48,7 +48,7 @@ public class CodeUtil {
      * @param contentType
      * @return
      */
-    public static String getContentId(ContentType contentType) {
+    public synchronized static String getContentId(ContentType contentType) {
         int contentCode = contentType.getCode();
         long timeCode = System.currentTimeMillis() % 100000000;
         String randomCode = RandomStringUtils.randomNumeric(5);

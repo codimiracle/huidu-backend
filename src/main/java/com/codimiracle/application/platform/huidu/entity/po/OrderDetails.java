@@ -1,8 +1,13 @@
 package com.codimiracle.application.platform.huidu.entity.po;
 
+import com.codimiracle.application.platform.huidu.entity.dto.OrderDetailsDTO;
+import com.codimiracle.application.platform.huidu.enumeration.CommodityType;
 import lombok.Data;
+import org.joda.money.Money;
+import org.springframework.beans.BeanUtils;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Data
 @Table(name = "order_details")
@@ -18,7 +23,44 @@ public class OrderDetails {
      * 商品id
      */
     @Column(name = "commodity_id")
-    private Integer commodityId;
+    private String commodityId;
+
+
+    /**
+     * 购买项名称
+     */
+    @Column(name = "commodity_name")
+    private String commodityName;
+
+    /**
+     * 购买项类型
+     */
+    @Column(name = "commodity_type")
+    private CommodityType commodityType;
+
+    /**
+     * 购买项图片
+     */
+    @Column(name = "commodity_picture")
+    private String commodityPicture;
+
+    /**
+     * 购买项介绍
+     */
+    @Column(name = "commodity_introduction")
+    private String commodityIntroduction;
+
+    /**
+     * 购买项净重量(g)
+     */
+    @Column(name = "commodity_weight")
+    private Double commodityWeight;
+
+    /**
+     * 购买项价格
+     */
+    @Column(name = "commodity_prices")
+    private Money commodityPrices;
 
     /**
      * 数量
@@ -28,8 +70,18 @@ public class OrderDetails {
     /**
      * 小计
      */
-    private Long prices;
+    private Money prices;
 
     @Column(name = "order_number")
-    private Integer orderNumber;
+    private String orderNumber;
+
+    public static OrderDetails from(OrderDetailsDTO orderDetailsDTO) {
+        if (Objects.isNull(orderDetailsDTO)) {
+            return null;
+        }
+        OrderDetails orderDetails = new OrderDetails();
+        BeanUtils.copyProperties(orderDetailsDTO, orderDetails);
+        return orderDetails;
+    }
+
 }

@@ -11,4 +11,55 @@
         <result column="sign_time" jdbcType="TIMESTAMP" property="signTime"/>
         <result column="user_id" jdbcType="INTEGER" property="userId"/>
     </resultMap>
+    <resultMap id="IntegratedResultMap" type="com.codimiracle.application.platform.huidu.entity.vo.ArrivedHistoryVO">
+        <id column="arrived_history_id" jdbcType="INTEGER" property="id"/>
+        <result column="arrived_history_days" jdbcType="INTEGER" property="days"/>
+        <result column="arrived_history_today" jdbcType="INTEGER" property="today"/>
+        <result column="arrived_history_motto" jdbcType="VARCHAR" property="motto"/>
+        <result column="arrived_history_sign_time" jdbcType="TIMESTAMP" property="signTime"/>
+        <association property="user"
+                     resultMap="com.codimiracle.application.platform.huidu.mapper.UserMapper.ProtectedResultMap"/>
+    </resultMap>
+    <select id="selectLastArrivedHistory" resultMap="BaseResultMap">
+        SELECT ah.id,
+               ah.days,
+               ah.motto,
+               ah.sign_time,
+               ah.user_id
+        FROM arrived_history ah
+        WHERE ah.sign_time &lt; #{signingDate}
+        AND ah.user_id = #{signerId}
+        ORDER BY ah.sign_time DESC
+        LIMIT 0,1
+    </select>
+    <select id="selectByThatDayIntegrally" resultMap="IntegratedResultMap">
+        SELECT ah.id        arrived_history_id,
+               ah.days      arrived_history_days,
+               ah.motto     arrived_history_motto,
+               ah.sign_time arrived_history_today,
+               ah.sign_time arrived_history_sign_time,
+               ah.user_id,
+               u.avatar     user_avatar,
+               u.username   user_username,
+               u.nickname   user_nickname
+        FROM arrived_history ah
+                 LEFT JOIN user u ON ah.user_id = u.id
+        WHERE DATE(ah.sign_time) = DATE(#{thatDay})
+        AND ah.user_id = #{signerId}
+    </select>
+    <select id="selectByThatDay" resultMap="BaseResultMap">
+        SELECT ah.id,
+               ah.days,
+               ah.motto,
+               ah.sign_time,
+               ah.user_id
+        FROM arrived_history ah
+        WHERE DATE(ah.sign_time) = DATE(#{thatDay})
+        AND ah.user_id = #{signerId}
+    </select>
+    <select id="retriveSignedMapByUserId" resultType="java.util.Map">
+        SELECT DATE(ah.sign_time) `key`, TRUE value
+        FROM arrived_history ah
+        WHERE ah.user_id = #{userId}
+    </select>
 </mapper>

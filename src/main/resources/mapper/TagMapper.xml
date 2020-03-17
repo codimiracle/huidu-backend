@@ -29,46 +29,28 @@
         WHERE tag.id IN
         <foreach collection="list" open="(" close=")" item="item" separator=",">#{item}</foreach>
     </update>
-
-    <select id="selectByIdIntegrally" resultMap="IntegratedResultMap">
-        SELECT t.id           tag_id,
-               t.name         tag_name,
-               ct.category_id category_id,
-               c.name         category_name,
-               c.description  category_description
+    <sql id="select_statement">
+        SELECT t.id   tag_id,
+               t.name tag_name
         FROM tag t
-                 LEFT JOIN category_tags ct ON t.id = ct.tag_id
-                 LEFT JOIN category c ON ct.category_id = c.id
-        WHERE t.deleted = 0
-          AND t.id = #{id}
+        WHERE 1 = 1
+    </sql>
+    <select id="selectByIdIntegrally" resultMap="IntegratedResultMap">
+        <include refid="select_statement"/>
+        AND t.id = #{id}
     </select>
     <select id="selectByCategoryIdIntegrally" resultMap="IntegratedResultMap">
-        SELECT t.id           tag_id,
-               t.name         tag_name,
-               ct.category_id category_id,
-               c.name         category_name,
-               c.description  category_description
-        FROM tag t
-                 LEFT JOIN category_tags ct ON t.id = ct.tag_id
-                 LEFT JOIN category c ON ct.category_id = c.id
-        WHERE t.deleted = 0
-          AND category_id = #{categoryId}
+        <include refid="select_statement"/>
+        AND category_id = #{categoryId}
     </select>
     <select id="selectAllIntegrally" resultMap="IntegratedResultMap">
-        SELECT t.id tag_id,
-        t.name tag_name,
-        ct.category_id category_id,
-        c.name category_name,
-        c.description category_description
-        FROM tag t
-        LEFT JOIN category_tags ct ON t.id = ct.tag_id
-        LEFT JOIN category c ON ct.category_id = c.id
-        WHERE t.deleted = 0
+        <include refid="select_statement"/>
         <if test="filter != null and filter.name != null">
             AND t.name LIKE concat('%',#{filter.name[0]}, '%')
         </if>
         <if test="filter != null and filter.categoryName != null">
-            AND c.name LIKE concat('%',#{filter.categoryName[0]}, '%')
+            AND t.category_id IN (SELECT c.id FROM category c WHERE c.name LIKE concat('%',#{filter.categoryName[0]},
+            '%'))
         </if>
     </select>
     <select id="selectByTagNames" resultMap="BaseResultMap">

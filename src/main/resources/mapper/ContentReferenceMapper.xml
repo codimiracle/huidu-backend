@@ -8,6 +8,24 @@
         <result column="id" jdbcType="INTEGER" property="id"/>
         <result column="type" jdbcType="VARCHAR" property="type"/>
         <result column="content_id" jdbcType="INTEGER" property="contentId"/>
-        <result column="ref_id" jdbcType="INTEGER" property="refId"/>
+        <result column="ref_id" jdbcType="VARCHAR" property="refId"/>
     </resultMap>
+    <delete id="deleteByContentId">
+        DELETE
+        FROM content_reference
+        WHERE content_id = #{contentId};
+    </delete>
+    <delete id="deleteByContentIds">
+        DELETE
+        FROM content_reference
+        WHERE content_id IN (#{contentIds});
+    </delete>
+    <select id="findByContentId" resultMap="BaseResultMap">
+        SELECT cr.id,
+               cr.type,
+               cr.ref_id,
+               cr.content_id
+        FROM content_reference AS cr
+        WHERE cr.content_id = #{contentId}
+    </select>
 </mapper>

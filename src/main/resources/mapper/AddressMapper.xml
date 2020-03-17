@@ -14,4 +14,65 @@
         <result column="user_id" jdbcType="INTEGER" property="userId"/>
         <result column="deleted" jdbcType="BIT" property="deleted"/>
     </resultMap>
+    <resultMap id="IntegratedResultMap" type="com.codimiracle.application.platform.huidu.entity.vo.AddressVO">
+        <id column="address_id" jdbcType="INTEGER" property="id"/>
+        <result column="address_defaulted" jdbcType="INTEGER" property="defaulted"/>
+        <result column="address_region" jdbcType="VARCHAR" property="region"/>
+        <result column="address_address" jdbcType="VARCHAR" property="address"/>
+        <result column="address_postcode" jdbcType="VARCHAR" property="postcode"/>
+        <result column="address_user_id" jdbcType="INTEGER" property="userId"/>
+        <association property="receiver" javaType="com.codimiracle.application.platform.huidu.entity.embedded.Receiver">
+            <result column="address_receiver_name" jdbcType="VARCHAR" property="name"/>
+            <result column="address_receiver_phone" jdbcType="VARCHAR" property="phone"/>
+        </association>
+    </resultMap>
+    <sql id="select_statement">
+        SELECT a.id address_id,
+        a.region address_region,
+        a.address address_address,
+        a.postcode address_postcode,
+        a.defaulted address_defaulted,
+        a.receiver_name address_receiver_name,
+        a.receiver_phone address_receiver_phone,
+        a.user_id
+        FROM address a
+        WHERE a.deleted = 0
+    </sql>
+    <update id="deleteByIdLogically">
+        UPDATE address a
+        SET a.deleted = 1
+        WHERE a.id = #{id}
+    </update>
+    <select id="selectDefaultByUserIdIntegrally" resultMap="IntegratedResultMap">
+        <include refid="select_statement"/>
+        AND a.defaulted = 1
+        AND a.user_id = #{userId}
+        LIMIT 0,1
+    </select>
+    <select id="selectByIdIntegrally" resultMap="IntegratedResultMap">
+        <include refid="select_statement"/>
+        AND a.id = #{id}
+    </select>
+    <select id="selectAllIntegrally" resultMap="IntegratedResultMap">
+        <include refid="select_statement"/>
+        <if test="filter != null">
+            <if test="filter.userId != null and filter.userId.length > 0">
+                AND a.user_id = #{filter.userId[0]}
+            </if>
+        </if>
+    </select>
+    <select id="selectDefaultByUserId" resultMap="BaseResultMap">
+        SELECT a.id,
+        a.region,
+        a.address,
+        a.postcode,
+        a.defaulted,
+        a.receiver_name,
+        a.receiver_phone,
+        a.user_id
+        FROM address a
+        WHERE a.deleted = 0
+        AND a.defaulted = 1
+        AND a.user_id = #{userId}
+    </select>
 </mapper>

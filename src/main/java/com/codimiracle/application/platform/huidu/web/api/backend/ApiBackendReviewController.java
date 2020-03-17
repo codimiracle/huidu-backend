@@ -50,15 +50,6 @@ public class ApiBackendReviewController {
     @Resource
     private ReviewService reviewService;
 
-    @PostMapping
-    public ApiResponse create(@RequestBody ReviewDTO reviewDTO, @AuthenticationPrincipal User user) {
-        Review review = Review.from(reviewDTO);
-        review.setCreateTime(new Date());
-        review.setUpdateTime(review.getCreateTime());
-        reviewService.save(review);
-        return RestfulUtil.entity(reviewService.findByIdIntegrally(review.getId()));
-    }
-
     @GetMapping("/{id}")
     public ApiResponse entity(@PathVariable String id) {
         ReviewVO review = reviewService.findByIdIntegrally(id);

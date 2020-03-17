@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * @author Codimiracle
@@ -61,9 +62,20 @@ public class ApiBookNotesController {
         return RestfulUtil.entity(bookNoteCollection);
     }
 
-    @GetMapping
-    public ApiResponse collection(@RequestParam("filter") Filter filter, @RequestParam("sorter") Sorter sorter, @ModelAttribute Page page) {
+    @GetMapping("/{book_id}/notes")
+    public ApiResponse noteCollection(@AuthenticationPrincipal User user, @PathVariable("book_id") String bookId, @RequestParam("filter") Filter filter, @RequestParam("sorter") Sorter sorter, @ModelAttribute Page page) {
+        filter = Objects.isNull(filter) ? new Filter() : filter;
+        filter.put("userId", new String[]{user.getId()});
+        filter.put("bookId", new String[]{bookId});
         PageSlice<BookNotesVO> slice = bookNotesService.findAllIntegrally(filter, sorter, page);
+        return RestfulUtil.list(slice);
+    }
+
+    @GetMapping
+    public ApiResponse collection(@AuthenticationPrincipal User user, @RequestParam("filter") Filter filter, @RequestParam("sorter") Sorter sorter, @ModelAttribute Page page) {
+        filter = Objects.isNull(filter) ? new Filter() : filter;
+        filter.put("userId", new String[]{user.getId()});
+        PageSlice<BookNoteCollection> slice = bookNotesService.findAllCollectionIntegrally(filter, sorter, page);
         return RestfulUtil.list(slice);
     }
 }

@@ -1,8 +1,11 @@
 package com.codimiracle.application.platform.huidu.entity.po;
 
+import com.codimiracle.application.platform.huidu.entity.dto.BookShelfDTO;
 import lombok.Data;
+import org.springframework.beans.BeanUtils;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Data
 @Table(name = "book_shelf")
@@ -12,7 +15,7 @@ public class BookShelf {
      */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private String id;
 
     /**
      * 书架名称
@@ -23,36 +26,15 @@ public class BookShelf {
      * 书架所有者id
      */
     @Column(name = "owner_id")
-    private Integer ownerId;
+    private String ownerId;
 
-    /**
-     * 获取书架id
-     *
-     * @return id - 书架id
-     */
-    /**
-     * 设置书架id
-     *
-     * @param id 书架id
-     */
-    /**
-     * 获取书架名称
-     *
-     * @return name - 书架名称
-     */
-    /**
-     * 设置书架名称
-     *
-     * @param name 书架名称
-     */
-    /**
-     * 获取书架所有者id
-     *
-     * @return owner_id - 书架所有者id
-     */
-    /**
-     * 设置书架所有者id
-     *
-     * @param ownerId 书架所有者id
-     */
+
+    public static BookShelf from(BookShelfDTO bookShelfDTO) {
+        if (Objects.isNull(bookShelfDTO)) {
+            return null;
+        }
+        BookShelf shelf = new BookShelf();
+        BeanUtils.copyProperties(bookShelfDTO, shelf);
+        return shelf;
+    }
 }

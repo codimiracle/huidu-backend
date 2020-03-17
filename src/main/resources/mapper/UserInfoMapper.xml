@@ -5,7 +5,6 @@
         <!--
           WARNING - @mbg.generated
         -->
-        <id column="id" jdbcType="INTEGER" property="id"/>
         <result column="user_id" jdbcType="INTEGER" property="userId"/>
         <result column="gender" jdbcType="VARCHAR" property="gender"/>
         <result column="age" jdbcType="INTEGER" property="age"/>
@@ -15,5 +14,16 @@
         <result column="phone" jdbcType="VARCHAR" property="phone"/>
         <result column="email" jdbcType="VARCHAR" property="email"/>
         <result column="region" jdbcType="VARCHAR" property="region"/>
+    </resultMap>
+    <resultMap id="IntegratedResultMap" type="com.codimiracle.application.platform.huidu.entity.vo.UserInfoVO">
+        <result column="user_info_user_id" jdbcType="INTEGER" property="userId"/>
+        <result column="user_info_gender" jdbcType="VARCHAR" property="gender"/>
+        <result column="user_info_age" jdbcType="INTEGER" property="age"/>
+        <result column="user_info_slogan" jdbcType="VARCHAR" property="slogan"/>
+        <result column="user_info_introduction" jdbcType="VARCHAR" property="introduction"/>
+        <result column="user_info_birthdate" jdbcType="TIMESTAMP" property="birthdate"/>
+        <result column="user_info_phone" jdbcType="VARCHAR" property="phone"/>
+        <result column="user_info_email" jdbcType="VARCHAR" property="email"/>
+        <result column="user_info_region" jdbcType="VARCHAR" property="region"/>
     </resultMap>
 </mapper>

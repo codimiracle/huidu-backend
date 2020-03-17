@@ -11,21 +11,8 @@ import javax.persistence.Table;
 public class ContentMention {
     @Id
     @Column(name = "content_id")
-    private Integer contentId;
+    private String contentId;
 
     @Column(name = "mention_user_id")
-    private Integer mentionUserId;
-
-    /**
-     * @return content_id
-     */
-    /**
-     * @param contentId
-     */
-    /**
-     * @return mention_user_id
-     */
-    /**
-     * @param mentionUserId
-     */
+    private String mentionUserId;
 }

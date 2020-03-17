@@ -1,22 +1,28 @@
 package com.codimiracle.application.platform.huidu.entity.po;
 
+import com.codimiracle.application.platform.huidu.entity.dto.BookNotesDTO;
 import lombok.Data;
+import org.springframework.beans.BeanUtils;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.Objects;
 
 @Data
 @Table(name = "book_notes")
 public class BookNotes {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private String id;
 
     @Column(name = "book_id")
-    private Integer bookId;
+    private String bookId;
+
+    @Column(name = "user_id")
+    private String userId;
 
     @Column(name = "episode_id")
-    private Integer episodeId;
+    private String episodeId;
 
     private String ref;
 
@@ -26,17 +32,17 @@ public class BookNotes {
     @Column(name = "content_source")
     private String contentSource;
 
-    @Column(name = "dommark_startdom")
-    private String dommarkStartdom;
+    @Column(name = "dommark_start_dom")
+    private String dommarkStartDom;
 
-    @Column(name = "dommark_startoffset")
-    private String dommarkStartoffset;
+    @Column(name = "dommark_start_offset")
+    private String dommarkStartOffset;
 
-    @Column(name = "dommark_enddom")
-    private String dommarkEnddom;
+    @Column(name = "dommark_end_dom")
+    private String dommarkEndDom;
 
-    @Column(name = "dommark_endoffset")
-    private String dommarkEndoffset;
+    @Column(name = "dommark_end_offset")
+    private String dommarkEndOffset;
 
     @Column(name = "create_time")
     private Date createTime;
@@ -44,76 +50,20 @@ public class BookNotes {
     @Column(name = "update_time")
     private Date updateTime;
 
-    /**
-     * @return id
-     */
-    /**
-     * @param id
-     */
-    /**
-     * @return book_id
-     */
-    /**
-     * @param bookId
-     */
-    /**
-     * @return episode_id
-     */
-    /**
-     * @param episodeId
-     */
-    /**
-     * @return ref
-     */
-    /**
-     * @param ref
-     */
-    /**
-     * @return content_type
-     */
-    /**
-     * @param contentType
-     */
-    /**
-     * @return content_source
-     */
-    /**
-     * @param contentSource
-     */
-    /**
-     * @return dommark_startdom
-     */
-    /**
-     * @param dommarkStartdom
-     */
-    /**
-     * @return dommark_startoffset
-     */
-    /**
-     * @param dommarkStartoffset
-     */
-    /**
-     * @return dommark_enddom
-     */
-    /**
-     * @param dommarkEnddom
-     */
-    /**
-     * @return dommark_endoffset
-     */
-    /**
-     * @param dommarkEndoffset
-     */
-    /**
-     * @return create_time
-     */
-    /**
-     * @param createTime
-     */
-    /**
-     * @return update_time
-     */
-    /**
-     * @param updateTime
-     */
+    public static BookNotes from(BookNotesDTO bookNotesDTO) {
+        if (Objects.isNull(bookNotesDTO)) {
+            return null;
+        }
+        BookNotes bookNotes = new BookNotes();
+        BeanUtils.copyProperties(bookNotesDTO, bookNotes);
+        bookNotes.setBookId(bookNotesDTO.getBookId().toString());
+        bookNotes.setEpisodeId(bookNotesDTO.getEpisodeId().toString());
+        bookNotes.setContentType(bookNotesDTO.getContent().getType());
+        bookNotes.setContentSource(bookNotesDTO.getContent().getSource());
+        bookNotes.setDommarkStartDom(bookNotesDTO.getDommark().getStartDom());
+        bookNotes.setDommarkStartOffset(Objects.toString(bookNotesDTO.getDommark().getStartOffset(), null));
+        bookNotes.setDommarkEndDom(bookNotesDTO.getDommark().getEndDom());
+        bookNotes.setDommarkEndOffset(Objects.toString(bookNotesDTO.getDommark().getEndOffset(), null));
+        return bookNotes;
+    }
 }
