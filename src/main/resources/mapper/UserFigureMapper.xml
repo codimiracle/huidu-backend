@@ -1,12 +1,60 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.company.project.dao.UserFigureMapper">
-  <resultMap id="BaseResultMap" type="com.codimiracle.application.platform.huidu.entity.po.UserFigure">
-    <!--
-      WARNING - @mbg.generated
-    -->
-    <id column="id" jdbcType="INTEGER" property="id" />
-    <result column="tag_id" jdbcType="INTEGER" property="tagId" />
-    <result column="user_id" jdbcType="INTEGER" property="userId" />
-  </resultMap>
+<mapper namespace="com.codimiracle.application.platform.huidu.mapper.UserFigureMapper">
+    <resultMap id="BaseResultMap" type="com.codimiracle.application.platform.huidu.entity.po.FigureTag">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="tag_id" jdbcType="INTEGER" property="tagId"/>
+        <result column="user_id" jdbcType="INTEGER" property="userId"/>
+    </resultMap>
+    <resultMap id="IntegratedResultMap" type="com.codimiracle.application.platform.huidu.entity.vo.FigureTagVO">
+        <id column="figure_id" jdbcType="INTEGER" property="id"/>
+        <result column="user_id" jdbcType="INTEGER" property="userId"/>
+        <result column="figure_score" jdbcType="DECIMAL" property="score"/>
+        <association property="tag"
+                     resultMap="com.codimiracle.application.platform.huidu.mapper.TagMapper.IntegratedResultMap"/>
+    </resultMap>
+    <sql id="select_statement">
+        SELECT
+        uf.id figure_id,
+        uf.id user_id,
+        uf.score figure_score,
+        t.id tag_id,
+        t.name tag_name
+        FROM user_figure uf
+        LEFT JOIN tag t ON uf.tag_id = t.id
+        WHERE uf.deleted = 0 AND t.deleted = 0
+    </sql>
+    <update id="deleteByIdIntegrally">
+        UPDATE user_figure uf SET uf.deleted = 1 WHERE uf.id = #{figureId}
+    </update>
+    <select id="selectAllTagIntegrally" resultMap="IntegratedResultMap">
+        <include refid="select_statement"/>
+        <if test="filter != null">
+            <if test="filter.userId != null and filter.userId.length gt 0">
+                AND uf.user_id = #{filter.userId[0]}
+            </if>
+        </if>
+        <if test="sorter != null">
+            <if test="sorter.field == 'socre'">
+                ORDER BY uf.score
+                <if test="sorter.order == 'descend'">DESC</if>
+            </if>
+        </if>
+    </select>
+    <select id="selectSimilarUserByUserIdProtectly"
+            resultMap="com.codimiracle.application.platform.huidu.mapper.UserMapper.ProtectedResultMap">
+        SELECT u.id user_id,
+        u.username user_username,
+        u.nickname user_nickname,
+        u.avatar user_avatar
+        FROM user u
+        WHERE u.id IN (
+        SELECT ufs.user_id FROM user_figure ufs WHERE ufs.user_id != #{userId} AND ufs.tag_id IN (
+                SELECT tag_id FROM user_figure uf WHERE uf.user_id = #{userId} ORDER BY uf.score DESC
+            )
+        )
+    </select>
 </mapper>

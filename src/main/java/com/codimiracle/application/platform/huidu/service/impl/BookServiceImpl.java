@@ -1,14 +1,12 @@
 package com.codimiracle.application.platform.huidu.service.impl;
 
 import com.codimiracle.application.platform.huidu.contract.*;
-import com.codimiracle.application.platform.huidu.elasticsearch.document.BookDocument;
 import com.codimiracle.application.platform.huidu.elasticsearch.repository.BookRepository;
 import com.codimiracle.application.platform.huidu.entity.po.Book;
 import com.codimiracle.application.platform.huidu.entity.po.BookTags;
 import com.codimiracle.application.platform.huidu.entity.po.Content;
 import com.codimiracle.application.platform.huidu.entity.vo.BookVO;
 import com.codimiracle.application.platform.huidu.enumeration.BookType;
-import com.codimiracle.application.platform.huidu.enumeration.ContentType;
 import com.codimiracle.application.platform.huidu.mapper.BookMapper;
 import com.codimiracle.application.platform.huidu.service.*;
 import org.springframework.stereotype.Service;
@@ -157,6 +155,26 @@ public class BookServiceImpl extends AbstractService<String, Book> implements Bo
     @Override
     public BookVO findByContentIdIntegrally(String contentId) {
         return bookMapper.selectByContentIdIntegrally(contentId);
+    }
+
+    @Override
+    public PageSlice<BookVO> findAllUsingUserFigureByUserIdIntegrally(String userId, Filter filter, Sorter sorter, Page page) {
+        return extractPageSlice(bookMapper.selectAllUsingUserFigureByUserIdIntegrally(userId, filter, sorter, page));
+    }
+
+    @Override
+    public PageSlice<BookVO> findAllUsingUserFigureByAvgIntegrally(Filter filter, Sorter sorter, Page page) {
+        return extractPageSlice(bookMapper.selectAllUsingUserFigureByAvgIntegrally(filter, sorter, page));
+    }
+
+    @Override
+    public PageSlice<BookVO> findAllUsingUserFigureByTagId(String tagId, Filter filter, Sorter sorter, Page page) {
+        return extractPageSlice(bookMapper.selectAllUsingUserFigureByTagId(tagId, filter, sorter, page));
+    }
+
+    @Override
+    public PageSlice<BookVO> findAllUsingUserFigureByCategoryId(String categoryId, Filter filter, Sorter sorter, Page page) {
+        return extractPageSlice(bookMapper.selectAllUsingUserFigureByCategoryId(categoryId, filter, sorter, page));
     }
 
 }

@@ -1,6 +1,9 @@
 package com.codimiracle.application.platform.huidu.mapper;
 
-import com.codimiracle.application.platform.huidu.contract.*;
+import com.codimiracle.application.platform.huidu.contract.Filter;
+import com.codimiracle.application.platform.huidu.contract.Mapper;
+import com.codimiracle.application.platform.huidu.contract.Page;
+import com.codimiracle.application.platform.huidu.contract.Sorter;
 import com.codimiracle.application.platform.huidu.entity.po.Book;
 import com.codimiracle.application.platform.huidu.entity.vo.BookVO;
 import com.codimiracle.application.platform.huidu.enumeration.BookType;
@@ -19,11 +22,19 @@ public interface BookMapper extends Mapper<Book> {
 
     List<BookVO> selectByCategoryIdIntegrally(@Param("categoryId") String categoryId, @Param("filter") Filter filter, @Param("sorter") Sorter sorter, @Param("page") Page page);
 
-    List<String> selectPublishYearsByType(BookType bookType);
+    List<String> selectPublishYearsByType(@Param("type") BookType bookType);
 
     void readsIncrement(String id);
 
     void playsIncrement(String id);
 
     BookVO selectByContentIdIntegrally(String contentId);
+
+    List<BookVO> selectAllUsingUserFigureByUserIdIntegrally(@Param("userId") String userId, @Param("filter") Filter filter, @Param("sorter") Sorter sorter, @Param("page") Page page);
+
+    List<BookVO> selectAllUsingUserFigureByAvgIntegrally(@Param("filter") Filter filter, @Param("sorter") Sorter sorter, @Param("page") Page page);
+
+    List<BookVO> selectAllUsingUserFigureByTagId(@Param("tagId") String tagId, @Param("filter") Filter filter, @Param("sorter") Sorter sorter, @Param("page") Page page);
+
+    List<BookVO> selectAllUsingUserFigureByCategoryId(@Param("categoryId") String categoryId, @Param("filter") Filter filter, @Param("sorter") Sorter sorter, @Param("page") Page page);
 }

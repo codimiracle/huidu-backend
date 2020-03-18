@@ -190,4 +190,46 @@
         <include refid="select_statement_without_type"/>
         AND b.content_id = #{contentId}
     </select>
+    <select id="selectAllUsingUserFigureByUserIdIntegrally" resultMap="IntegratedResultMap">
+        <include refid="select_statement_without_type" />
+        AND b.id IN (SELECT bt.book_id FROM book_tags bt LEFT JOIN user_figure uf ON bt.tag_id = uf.tag_id WHERE uf.user_id = #{userId})
+        <if test="filter != null">
+            <if test="filter.type != null and filter.type.length gt 0">
+                AND b.type = #{filter.type[0]}
+            </if>
+        </if>
+        <if test="sorter != null">
+            <if test="sorter.field == 'reads'">
+                ORDER BY b.reads <if test="sorter.order =='descend'">DESC</if>
+            </if>
+
+            <if test="sorter.field == 'plays'">
+                ORDER BY b.plays <if test="sorter.order =='descend'">DESC</if>
+            </if>
+        </if>
+    </select>
+    <select id="selectAllUsingUserFigureByAvgIntegrally" resultMap="IntegratedResultMap">
+        AND b.id IN (SELECT bt.book_id FROM book_tags bt WHERE bt.tag_id IN (SELECT uf.tag_id FROM user_figure uf GROUP BY tag_id ORDER BY avg(uf.score) DESC))
+        <if test="filter != null">
+            <if test="filter.type != null and filter.type.length gt 0">
+                AND b.type = #{filter.type[0]}
+            </if>
+        </if>
+    </select>
+    <select id="selectAllUsingUserFigureByTagId" resultMap="IntegratedResultMap">
+        AND b.id IN (SELECT bt.book_id FROM book_tags bt WHERE bt.tag_id IN (SELECT uf.tag_id from user_figure uf INNER JOIN user_figure uft ON uft.user_id = uf.user_id WHERE uft.tag_id = 15 GROUP BY uf.tag_id ORDER By avg(uf.score)))
+        <if test="filter != null">
+            <if test="filter.type != null and filter.type.length gt 0">
+                AND b.type = #{filter.type[0]}
+            </if>
+        </if>
+    </select>
+    <select id="selectAllUsingUserFigureByCategoryId" resultMap="IntegratedResultMap">
+        AND b.id IN (SELECT bt.book_id FROM book_tags bt WHERE bt.tag_id IN (SELECT uf.tag_id FROM user_figure uf WHERE uf.tag_id IN (SELECT ct.tag_id FROM category_tags ct WHERE ct.category_id = #{categoryId}) GROUP By uf.tag_id ORDER BY uf.score))
+        <if test="filter != null">
+            <if test="filter.type != null and filter.type.length gt 0">
+                AND b.type = #{filter.type[0]}
+            </if>
+        </if>
+    </select>
 </mapper>
