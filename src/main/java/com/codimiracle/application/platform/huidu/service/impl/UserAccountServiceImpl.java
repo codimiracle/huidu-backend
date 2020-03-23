@@ -95,6 +95,8 @@ public class UserAccountServiceImpl extends AbstractService<String, UserAccount>
         //充值订单
         if (oringinal.getType() == OrderType.Recharge) {
             //完成订单
+            updatingOrder.setDeliverTime(new Date());
+            updatingOrder.setClosingTime(new Date());
             updatingOrder.setStatus(OrderStatus.Completed);
             //给用户加帐户
             refund(oringinal.getTotalMoney(), oringinal.getOwnerId());

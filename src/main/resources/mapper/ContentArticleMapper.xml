@@ -82,12 +82,21 @@
                 </foreach>
             </if>
         </if>
-        <if test="sorter != null and sorter.field != null">
-            ORDER BY
-            <if test="sorter.field == 'likes'">c.likes</if>
-            <if test="sorter.field == 'comments'">c.comments</if>
-            <if test="sorter.field == 'reads'">ca.reads</if>
-            <if test="sorter.order == 'descend'">DESC</if>
+        <if test="sorter != null">
+            <if test="sorter.field == 'create_time'">
+                ORDER BY c.create_time <if test="sorter.order == 'descend'">DESC</if>
+            </if>
+            <if test="sorter.field == 'hot_degree'">
+                ORDER BY (c.likes * 3 + c.reads + c.comments) * c.rate <if test="sorter.order == 'descend'">DESC</if>
+            </if>
         </if>
+    </select>
+    <select id="selectHotIntegrally" resultMap="IntegratedResultMap">
+        <include refid="select_statement" />
+        ORDER BY (c.likes * 3 + c.comments + c.rate * 2) DESC
+    </select>
+    <select id="selectFocusArticleByTypeAndReferenceId" resultMap="IntegratedResultMap">
+        <include refid="select_statement" />
+        AND c.id IN (select cr.content_id from content_reference cr where type=#{type} and cr.ref_id = #{referenceId} group by cr.ref_id,cr.content_id order by count(id))
     </select>
 </mapper>

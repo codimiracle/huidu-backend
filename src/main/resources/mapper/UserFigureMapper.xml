@@ -51,10 +51,35 @@
         u.nickname user_nickname,
         u.avatar user_avatar
         FROM user u
-        WHERE u.id IN (
+        WHERE u.id IN (<include refid="similar_user_id"/>)
+    </select>
+    <sql id="similar_user_id">
         SELECT ufs.user_id FROM user_figure ufs WHERE ufs.user_id != #{userId} AND ufs.tag_id IN (
-                SELECT tag_id FROM user_figure uf WHERE uf.user_id = #{userId} ORDER BY uf.score DESC
-            )
-        )
+        SELECT tag_id FROM user_figure uf WHERE uf.user_id = #{userId} ORDER BY uf.score DESC)
+    </sql>
+    <select id="selectSimilarCategoryByUserIdIntegrally"
+            resultMap="com.codimiracle.application.platform.huidu.mapper.CategoryMapper.IntegratedResultMap">
+        <include
+                refid="com.codimiracle.application.platform.huidu.mapper.CategoryMapper.select_statement_without_type"/>
+        AND c.id IN (SELECT category_id FROM user_figure uf LEFT JOIN category_tags ct ON ct.tag_id = uf.tag_id WHERE
+        uf.user_id = #{userId} GROUP BY ct.category_id ORDER BY SUM(uf.score) DESC)
+    </select>
+    <select id="selectSametastCategoryByUserIdIntegrally"
+            resultMap="com.codimiracle.application.platform.huidu.mapper.CategoryMapper.IntegratedResultMap">
+        <include
+                refid="com.codimiracle.application.platform.huidu.mapper.CategoryMapper.select_statement_without_type"/>
+        AND c.id IN (SELECT category_id FROM user_figure uf LEFT JOIN category_tags ct ON ct.tag_id = uf.tag_id WHERE
+        uf.user_id IN (<include refid="similar_user_id"/>) GROUP BY ct.category_id ORDER BY SUM(uf.score) DESC)
+    </select>
+    <select id="selectSimilarCategoryByAvgIntegrally"
+            resultMap="com.codimiracle.application.platform.huidu.mapper.CategoryMapper.IntegratedResultMap">
+        <include
+                refid="com.codimiracle.application.platform.huidu.mapper.CategoryMapper.select_statement_without_type"/>
+        AND c.id IN (SELECT category_id FROM user_figure uf LEFT JOIN category_tags ct ON ct.tag_id = uf.tag_id GROUP BY ct.category_id ORDER BY SUM(uf.score) DESC)
+    </select>
+    <select id="selectSametasteCategoryByAvgIntegrally" resultMap="com.codimiracle.application.platform.huidu.mapper.CategoryMapper.IntegratedResultMap">
+        <include
+                refid="com.codimiracle.application.platform.huidu.mapper.CategoryMapper.select_statement_without_type"/>
+        AND c.id IN (SELECT category_id FROM user_figure uf LEFT JOIN category_tags ct ON ct.tag_id = uf.tag_id GROUP BY ct.category_id ORDER BY SUM(uf.score) DESC)
     </select>
 </mapper>

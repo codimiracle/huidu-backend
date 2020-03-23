@@ -34,8 +34,8 @@ public class PassingPoint {
      */
     private PassingPointStatus status;
 
-    @Column(name = "logistics_infomation_id")
-    private String logisticsInfomationId;
+    @Column(name = "logistics_information_id")
+    private String logisticsInformationId;
 
     public static PassingPoint form(PassingPointDTO passingPointDTO) {
         if (Objects.isNull(passingPointDTO)) {

@@ -47,7 +47,7 @@ public class PaperBookDTO {
 
     private final String type = "paper-book";
 
-    private Integer commodityId;
+    private String commodityId;
     private CommodityDTO commodity;
 
     private String[] tags;

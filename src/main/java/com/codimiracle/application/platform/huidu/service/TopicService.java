@@ -28,6 +28,7 @@ import com.codimiracle.application.platform.huidu.entity.vo.TopicVO;
 import com.codimiracle.application.platform.huidu.entity.vt.Topic;
 import org.springframework.cache.annotation.Cacheable;
 
+import javax.swing.*;
 import java.util.List;
 
 public interface TopicService extends Service<String, Topic> {
@@ -39,4 +40,10 @@ public interface TopicService extends Service<String, Topic> {
     List<TopicVO> findAllIntegrally();
 
     PageSlice<TopicVO> findAllIntegrally(Filter filter, Sorter sorter, Page page);
+
+    PageSlice<TopicVO> findHotIntegrally(Filter filter, Sorter sorter, Page page);
+
+    PageSlice<TopicVO> findTopIntegrally(Filter filter, Sorter sorter, Page page);
+
+    PageSlice<TopicVO> findFocusTopicByReferenceIdIntegrally(String bookId, Filter filter, Sorter sorter, Page page);
 }

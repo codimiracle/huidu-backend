@@ -34,7 +34,13 @@ public interface BookMapper extends Mapper<Book> {
 
     List<BookVO> selectAllUsingUserFigureByAvgIntegrally(@Param("filter") Filter filter, @Param("sorter") Sorter sorter, @Param("page") Page page);
 
-    List<BookVO> selectAllUsingUserFigureByTagId(@Param("tagId") String tagId, @Param("filter") Filter filter, @Param("sorter") Sorter sorter, @Param("page") Page page);
+    List<BookVO> selectAllUsingUserFigureByTagId(@Param("tagId") String tagId, @Param("userId") String userId, @Param("filter") Filter filter, @Param("sorter") Sorter sorter, @Param("page") Page page);
 
-    List<BookVO> selectAllUsingUserFigureByCategoryId(@Param("categoryId") String categoryId, @Param("filter") Filter filter, @Param("sorter") Sorter sorter, @Param("page") Page page);
+    List<BookVO> selectAllUsingUserFigureByCategoryId(@Param("categoryId") String categoryId, @Param("userId") String userId, @Param("filter") Filter filter, @Param("sorter") Sorter sorter, @Param("page") Page page);
+
+    List<BookVO> selectAllUsingUserFigureByBookId(@Param("bookId") String bookId, @Param("userId") String userId, @Param("filter") Filter filter, @Param("sorter") Sorter sorter, @Param("page") Page page);
+
+    List<BookVO> selectAllUsingUserFigureByBookType(@Param("type") BookType type, @Param("userId") String userId, @Param("filter") Filter filter, @Param("sorter") Sorter sorter, @Param("page") Page page);
+
+    List<BookVO> selectAllUsingUserFigureByHistoryToday(@Param("userId") String userId, @Param("filter") Filter filter, @Param("sorter") Sorter sorter, @Param("page") Page page);
 }

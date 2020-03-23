@@ -30,6 +30,7 @@ import java.util.List;
 
 @Data
 public class CommunityFocus {
+    private String bookId;
     private BookVO book;
     private List<TopicVO> topics;
 }

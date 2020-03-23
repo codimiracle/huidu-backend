@@ -31,6 +31,7 @@ import com.codimiracle.application.platform.huidu.entity.po.ContentReference;
 import com.codimiracle.application.platform.huidu.entity.po.User;
 import com.codimiracle.application.platform.huidu.entity.vo.ReviewVO;
 import com.codimiracle.application.platform.huidu.entity.vt.Review;
+import com.codimiracle.application.platform.huidu.enumeration.ContentStatus;
 import com.codimiracle.application.platform.huidu.service.ReviewService;
 import com.codimiracle.application.platform.huidu.util.RestfulUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -56,6 +57,7 @@ public class ApiUserReviewController {
         review.setOwnerId(user.getId());
         review.setCreateTime(new Date());
         review.setUpdateTime(review.getCreateTime());
+        review.setStatus(ContentStatus.Examining);
         reviewService.save(review);
         return RestfulUtil.entity(reviewService.findByIdIntegrally(review.getId()));
     }
@@ -104,6 +106,9 @@ public class ApiUserReviewController {
     public ApiResponse collection(@AuthenticationPrincipal User user, @RequestParam("filter") Filter filter, @RequestParam("sorter") Sorter sorter, @ModelAttribute Page page) {
         filter = Objects.isNull(filter) ? new Filter() : filter;
         filter.put("ownerId", new String[] {user.getId()});
+        sorter = Objects.isNull(sorter) ? new Sorter() : sorter;
+        sorter.setField("createTime");
+        sorter.setOrder("descend");
         return RestfulUtil.list(reviewService.findAllIntegrally(filter, sorter, page));
     }
 }

@@ -6,6 +6,7 @@ import com.codimiracle.application.platform.huidu.contract.Page;
 import com.codimiracle.application.platform.huidu.contract.Sorter;
 import com.codimiracle.application.platform.huidu.entity.po.Category;
 import com.codimiracle.application.platform.huidu.entity.vo.CategoryVO;
+import com.codimiracle.application.platform.huidu.entity.vo.CollectionStatisticsVO;
 import com.codimiracle.application.platform.huidu.enumeration.BookType;
 import com.codimiracle.application.platform.huidu.enumeration.CategoryType;
 import org.apache.ibatis.annotations.Param;
@@ -22,4 +23,6 @@ public interface CategoryMapper extends Mapper<Category> {
     void deleteByIdLogically(String id);
 
     List<CategoryVO> selectRelativeCategoriesByBookType(BookType bookType);
+
+    List<CollectionStatisticsVO> selectCollectionStatisticsByCollectionId(@Param("collectionId") String collectionId, @Param("filter") Filter filter, @Param("sorter") Sorter sorter, @Param("page") Page page);
 }

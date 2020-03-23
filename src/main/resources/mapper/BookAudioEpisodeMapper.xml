@@ -97,6 +97,10 @@
         LEFT JOIN category c ON b.category_id = c.id
         WHERE bae.deleted = 0
     </sql>
+    <sql id="select_statement_publish">
+        <include refid="select_statement" />
+        AND bae.status = 'publish'
+    </sql>
     <update id="deleteByIdLogically">
         UPDATE book_audio_episode bae
         SET bae.deleted = 1
@@ -142,5 +146,11 @@
         <include refid="select_statement"/>
         AND bae.book_id = #{bookId}
         AND bae.media_number = #{mediaNumber}
+    </select>
+    <select id="selectLastPublishedEpisodeByBookId" resultMap="IntegratedResultMap">
+        <include refid="select_statement_publish" />
+        AND bae.book_id = #{bookId}
+        ORDER BY bae.update_time DESC
+        LIMIT 0,1
     </select>
 </mapper>

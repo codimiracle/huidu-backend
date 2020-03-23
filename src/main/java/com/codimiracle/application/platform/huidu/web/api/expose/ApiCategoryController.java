@@ -30,7 +30,7 @@ public class ApiCategoryController {
     @GetMapping("/{id}")
     public ApiResponse entity(@PathVariable String id) {
         CategoryVO categoryVO = categoryService.findByIdIntegrally(id);
-        return RestfulUtil.success(categoryVO);
+        return RestfulUtil.entity(categoryVO);
     }
 
     @GetMapping("/{id}/items")

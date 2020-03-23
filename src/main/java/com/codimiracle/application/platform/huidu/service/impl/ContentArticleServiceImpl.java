@@ -4,6 +4,7 @@ import com.codimiracle.application.platform.huidu.contract.*;
 import com.codimiracle.application.platform.huidu.entity.po.ContentArticle;
 import com.codimiracle.application.platform.huidu.entity.po.ContentExamination;
 import com.codimiracle.application.platform.huidu.entity.vo.ArticleVO;
+import com.codimiracle.application.platform.huidu.entity.vo.TopicVO;
 import com.codimiracle.application.platform.huidu.enumeration.ContentStatus;
 import com.codimiracle.application.platform.huidu.enumeration.ContentType;
 import com.codimiracle.application.platform.huidu.mapper.ContentArticleMapper;
@@ -51,6 +52,7 @@ public class ContentArticleServiceImpl extends AbstractService<String, ContentAr
     public void passExamination(String id, String reason, String userId) {
         examinate(id, reason, userId, ContentStatus.Publish);
     }
+
     @Override
     public void rejectExamination(String id, String reason, String userId) {
         examinate(id, reason, userId, ContentStatus.Rejected);
@@ -70,6 +72,16 @@ public class ContentArticleServiceImpl extends AbstractService<String, ContentAr
     @Override
     public PageSlice<ArticleVO> findAllIntegrally(ContentType type, Filter filter, Sorter sorter, Page page) {
         return extractPageSlice(contentArticleMapper.selectAllIntegrally(type, filter, sorter, page));
+    }
+
+    @Override
+    public PageSlice<ArticleVO> findHotIntegrally(ContentType type, Filter filter, Sorter sorter, Page page) {
+        return extractPageSlice(contentArticleMapper.selectHotIntegrally(type, filter, sorter, page));
+    }
+
+    @Override
+    public PageSlice<ArticleVO> findFocusArticleByTypeAndReferenceId(String type, String bookId, Filter filter, Sorter sorter, Page page) {
+        return extractPageSlice(contentArticleMapper.selectFocusArticleByTypeAndReferenceId(type, bookId, filter, sorter, page));
     }
 
 }

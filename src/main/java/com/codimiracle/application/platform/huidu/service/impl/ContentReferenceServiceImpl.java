@@ -1,6 +1,7 @@
 package com.codimiracle.application.platform.huidu.service.impl;
 
-import com.codimiracle.application.platform.huidu.contract.AbstractService;
+import com.codimiracle.application.platform.huidu.contract.*;
+import com.codimiracle.application.platform.huidu.entity.embedded.CommunityFocus;
 import com.codimiracle.application.platform.huidu.entity.po.ContentReference;
 import com.codimiracle.application.platform.huidu.entity.vo.ReferenceVO;
 import com.codimiracle.application.platform.huidu.enumeration.ContentType;
@@ -14,6 +15,7 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 
 /**
@@ -67,5 +69,17 @@ public class ContentReferenceServiceImpl extends AbstractService<String, Content
             referenceVOList.add(referenceVO);
         }
         return referenceVOList;
+    }
+
+    private void mutate(CommunityFocus communityFocus) {
+        communityFocus.setBook(bookService.findByIdIntegrally(communityFocus.getBookId()));
+        communityFocus.setTopics(topicService.findFocusTopicByReferenceIdIntegrally(communityFocus.getBookId(), null, null, new Page()).getList());
+    }
+
+    @Override
+    public PageSlice<CommunityFocus> findCommunityFocusIntegrally(Filter filter, Sorter sorter, Page page) {
+        PageSlice<CommunityFocus> slice = extractPageSlice(contentReferenceMapper.selectCommunityFocus(filter, sorter, page));
+        slice.getList().forEach(this::mutate);
+        return slice;
     }
 }

@@ -18,13 +18,17 @@
         <result column="category_description" jdbcType="VARCHAR" property="description"/>
         <association property="extra"
                      javaType="com.codimiracle.application.platform.huidu.entity.embedded.CategoryExtra">
-            <result column="cateogry_extra_url" jdbcType="VARCHAR" property="url"/>
+            <result column="category_extra_url" jdbcType="VARCHAR" property="url"/>
             <result column="category_extra_aside_title" jdbcType="VARCHAR" property="asideTitle"/>
         </association>
         <collection property="tags" ofType="com.codimiracle.application.platform.huidu.entity.vo.TagVO">
             <result column="tag_name" jdbcType="VARCHAR" property="name"/>
             <result column="tag_id" jdbcType="VARCHAR" property="id"/>
         </collection>
+    </resultMap>
+    <resultMap id="StatisticsResultMap" type="com.codimiracle.application.platform.huidu.entity.vo.CollectionStatisticsVO">
+        <id column="book_id" property="bookId" jdbcType="INTEGER"/>
+        <association property="book" resultMap="com.codimiracle.application.platform.huidu.mapper.BookMapper.IntegratedResultMap" />
     </resultMap>
     <update id="deleteByIdsLogically">
         UPDATE category
@@ -42,16 +46,16 @@
                c.name              category_name,
                c.description       category_description,
                c.extra_url         category_extra_url,
-               c.extra_aside_title category_aside_title
+               c.extra_aside_title category_extra_aside_title
         FROM category c
         WHERE c.deleted = 0
     </sql>
     <sql id="select_statement">
         <include refid="select_statement_without_type"/>
-        <if test="#type != null">AND c.type = #{type}</if>
+        <if test="type != null">AND c.type = #{type}</if>
     </sql>
     <select id="selectByIdIntegrally" resultMap="IntegratedResultMap">
-        <include refid="select_statement"/>
+        <include refid="select_statement_without_type"/>
         AND c.id = #{id}
     </select>
     <select id="selectAllIntegrally" resultMap="IntegratedResultMap">
@@ -66,5 +70,9 @@
         WHERE b.type = #{bookType}
         AND b.deleted = 0
         AND b.status = 'publish')
+    </select>
+    <select id="selectCollectionStatisticsByCollectionId" resultMap="StatisticsResultMap">
+        <include refid="com.codimiracle.application.platform.huidu.mapper.BookMapper.select_statement_without_type" />
+        AND b.id IN (SELECT bt.book_id FROM book_tags bt WHERE bt.tag_id IN (SELECT ct.tag_id FROM category_tags ct WHERE ct.category_id = #{collectionId}) GROUP BY bt.book_id)
     </select>
 </mapper>

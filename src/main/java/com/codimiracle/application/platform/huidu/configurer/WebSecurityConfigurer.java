@@ -54,7 +54,7 @@ public class WebSecurityConfigurer extends WebSecurityConfigurerAdapter {
                         "/api/electronic-books/**", "/api/audio-books/**", "/api/paper-books/**",
                         "/api/contents/**", "/api/categories/**", "/api/common/**",
                         "/api/reference-data/**", "/api/user/avatar/**", "/api/books/cover/**",
-                        "/api/community/**").permitAll()
+                        "/api/community/**", "/api/search/**").permitAll()
                 .antMatchers("/api/user/**").hasAuthority("frontend-services")
 
                 .antMatchers("/api/backend/creator").hasAuthority("creator")

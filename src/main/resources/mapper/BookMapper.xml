@@ -33,58 +33,63 @@
         <result column="book_episodes" jdbcType="INTEGER" property="episodes"/>
         <result column="book_status" jdbcType="VARCHAR" property="status"/>
         <result column="book_money" jdbcType="INTEGER" property="money"/>
-        <result column="book_metadata_id" jdbcType="INTEGER" property="metadataId" />
-        <result column="owner_id" jdbcType="INTEGER" property="ownerId" />
-        <result column="category_id" jdbcType="INTEGER" property="categoryId" />
+        <result column="book_metadata_id" jdbcType="INTEGER" property="metadataId"/>
+        <result column="book_reads" jdbcType="INTEGER" property="reads"/>
+        <result column="book_plays" jdbcType="INTEGER" property="plays"/>
+        <result column="commodity_id" jdbcType="INTEGER" property="commodityId"/>
+        <result column="owner_id" jdbcType="INTEGER" property="ownerId"/>
+        <result column="category_id" jdbcType="INTEGER" property="categoryId"/>
         <association property="metadata" foreignColumn="book_metadata_id"
                      resultMap="com.codimiracle.application.platform.huidu.mapper.BookMetadataMapper.IntegratedResultMap"/>
         <association property="commodity" foreignColumn="commodity_id"
                      resultMap="com.codimiracle.application.platform.huidu.mapper.CommodityMapper.IntegratedResultMap"/>
     </resultMap>
     <sql id="book_vo_fields">
-        b.id                 book_id,
-               b.title              book_title,
-               b.description        book_description,
-               b.cover              book_cover,
-               b.teller             book_teller,
-               b.publish_year       book_publish_year,
-               b.type               book_type,
-               b.episodes           book_episodes,
-               b.status             book_status,
-               b.money              book_money,
-               ct.id                content_id,
-               ct.owner_id          owner_id,
-               ct.comments          content_comments,
-               ct.rate              content_rate,
-               ct.likes             content_likes,
-               ct.reposts           content_reposts,
-               ct.create_time       content_create_time,
-               ct.update_time       content_update_time,
-               bm.id                book_metadata_id,
-               bm.name              book_metadata_name,
-               bm.cover             book_metadata_cover,
-               bm.description       book_metadata_description,
-               bm.words             book_metadata_words,
-               bm.author            book_metadata_author,
-               c.id                 commodity_id,
-               c.name               commodity_name,
-               c.type               commodity_type,
-               c.picture            commodity_picture,
-               c.introduction       commodity_introduction,
-               c.rate               commodity_rate,
-               c.weight             commodity_weight,
-               c.stock              commodity_stock,
-               c.available_stock    commodity_available_stock,
-               c.sales              commodity_sales,
-               c.shipment           commodity_shipment,
-               c.extra              commodity_extra,
-               c.prices             commodity_prices,
-               c.status             commodity_status,
-               b.category_id        category_id
+        b.id book_id,
+        b.title book_title,
+        b.description book_description,
+        b.cover book_cover,
+        b.teller book_teller,
+        b.publish_year book_publish_year,
+        b.type book_type,
+        b.episodes book_episodes,
+        b.status book_status,
+        b.money book_money,
+        b.reads book_reads,
+        b.plays book_plays,
+        ct.id content_id,
+        ct.owner_id owner_id,
+        ct.comments content_comments,
+        ct.rate content_rate,
+        ct.likes content_likes,
+        ct.reposts content_reposts,
+        ct.create_time content_create_time,
+        ct.update_time content_update_time,
+        bm.id book_metadata_id,
+        bm.name book_metadata_name,
+        bm.cover book_metadata_cover,
+        bm.description book_metadata_description,
+        bm.words book_metadata_words,
+        bm.author book_metadata_author,
+        c.id commodity_id,
+        c.name commodity_name,
+        c.type commodity_type,
+        c.picture commodity_picture,
+        c.introduction commodity_introduction,
+        c.rate commodity_rate,
+        c.weight commodity_weight,
+        c.stock commodity_stock,
+        c.available_stock commodity_available_stock,
+        c.sales commodity_sales,
+        c.shipment commodity_shipment,
+        c.extra commodity_extra,
+        c.prices commodity_prices,
+        c.status commodity_status,
+        b.category_id category_id
     </sql>
     <sql id="select_statement">
         SELECT
-        <include refid="book_vo_fields"/>
+        <include refid="com.codimiracle.application.platform.huidu.mapper.BookMapper.book_vo_fields"/>
         FROM book b
         LEFT JOIN book_metadata bm ON b.metadata_id = bm.id
         LEFT JOIN commodity c ON b.commodity_id = c.id
@@ -94,7 +99,7 @@
     </sql>
     <sql id="select_statement_without_type">
         SELECT
-        <include refid="book_vo_fields"/>
+        <include refid="com.codimiracle.application.platform.huidu.mapper.BookMapper.book_vo_fields"/>
         FROM book b
         LEFT JOIN book_metadata bm ON b.metadata_id = bm.id
         LEFT JOIN commodity c ON b.commodity_id = c.id
@@ -117,13 +122,13 @@
         UPDATE book b
         SET b.`reads` = b.`reads` + 1
         WHERE b.id = #{id}
-          AND b.type = 'electronic-book'
+        AND b.type = 'electronic-book'
     </update>
     <update id="playsIncrement">
         UPDATE book b
         SET b.plays = b.plays + 1
         WHERE b.id = #{id}
-          AND b.type = 'audio-book'
+        AND b.type = 'audio-book'
     </update>
     <select id="selectByIdIntegrally" resultMap="IntegratedResultMap">
         <include refid="select_statement"/>
@@ -132,6 +137,9 @@
     <select id="selectAllIntegrally" resultMap="IntegratedResultMap">
         <include refid="select_statement"/>
         <if test="filter != null">
+            <if test="filter.rate != null and filter.rate.length gt 0">
+                AND ct.rate &gt;= #{filter.rate[0]}
+            </if>
             <if test="filter.ownerId != null and filter.ownerId.length gt 0">
                 AND ct.owner_id = #{filter.ownerId[0]}
             </if>
@@ -157,20 +165,32 @@
                 </foreach>
             </if>
         </if>
-        <if test="sorter != null and sorter.field != null">
-            ORDER BY
-            <if test="sorter.field == 'publish_year'">b.publish_year</if>
-            <if test="sorter.field == 'commodity_prices'">c.prices</if>
-            <if test="sorter.field == 'episodes'">b.episodes</if>
-            <if test="sorter.field == 'reads'">b.reads</if>
-            <if test="sorter.field == 'plays'">b.plays</if>
-            <if test="sorter.order == 'descend'">DESC</if>
+        <if test="sorter != null">
+            <if test="sorter.field == 'publish_year'">ORDER BY b.publish_year
+                <if test="sorter.order == 'descend'">DESC</if>
+            </if>
+            <if test="sorter.field == 'commodity_prices'">ORDER BY c.prices
+                <if test="sorter.order == 'descend'">DESC</if>
+            </if>
+            <if test="sorter.field == 'episodes'">ORDER BY b.episodes
+                <if test="sorter.order == 'descend'">DESC</if>
+            </if>
+            <if test="sorter.field == 'reads'">ORDER BY b.reads
+                <if test="sorter.order == 'descend'">DESC</if>
+            </if>
+            <if test="sorter.field == 'plays'">ORDER BY b.plays
+                <if test="sorter.order == 'descend'">DESC</if>
+            </if>
+            <if test="sorter.field == 'hot_degree'">
+                ORDER BY (ct.likes * 3 + (b.reads + b.plays) * 2 + ct.comments) * ct.rate
+                <if test="sorter.order == 'descend'">DESC</if>
+            </if>
         </if>
     </select>
     <select id="selectByCategoryIdIntegrally" resultMap="IntegratedResultMap">
         <include refid="select_statement_without_type"/>
-        AND cc.id = #{categoryId}
-        AND b.status = 'publish'
+        AND b.category_id = #{categoryId}
+        AND b.status != 'examining'
         <if test="filter != null">
             <if test="filter.publishYear != null and filter.publishYear.length gt 0">
                 AND bm.publishYear = #{filter.publishYear[0]}
@@ -181,6 +201,12 @@
             </if>
         </if>
         GROUP BY b.type
+        <if test="sorter != null">
+            <if test="sorter.field == 'hot_degree'">
+                ORDER BY (ct.likes * 3 + (b.reads + b.plays) * 2 + ct.comments) * ct.rate
+                <if test="sorter.order == 'descend'">DESC</if>
+            </if>
+        </if>
     </select>
     <select id="selectPublishYearsByType" resultType="java.lang.String">
         SELECT DISTINCT b.publish_year
@@ -191,8 +217,10 @@
         AND b.content_id = #{contentId}
     </select>
     <select id="selectAllUsingUserFigureByUserIdIntegrally" resultMap="IntegratedResultMap">
-        <include refid="select_statement_without_type" />
-        AND b.id IN (SELECT bt.book_id FROM book_tags bt LEFT JOIN user_figure uf ON bt.tag_id = uf.tag_id WHERE uf.user_id = #{userId})
+        <include refid="select_statement_without_type"/>
+        AND b.id IN (
+            SELECT bt.book_id FROM book_tags bt LEFT JOIN user_figure uf ON bt.tag_id = uf.tag_id <if test="userId != null">WHERE uf.user_id = #{userId}</if> ORDER BY avg(uf.score) DESC
+        )
         <if test="filter != null">
             <if test="filter.type != null and filter.type.length gt 0">
                 AND b.type = #{filter.type[0]}
@@ -200,16 +228,23 @@
         </if>
         <if test="sorter != null">
             <if test="sorter.field == 'reads'">
-                ORDER BY b.reads <if test="sorter.order =='descend'">DESC</if>
+                ORDER BY b.reads
+                <if test="sorter.order =='descend'">DESC</if>
             </if>
 
             <if test="sorter.field == 'plays'">
-                ORDER BY b.plays <if test="sorter.order =='descend'">DESC</if>
+                ORDER BY b.plays
+                <if test="sorter.order =='descend'">DESC</if>
             </if>
         </if>
     </select>
     <select id="selectAllUsingUserFigureByAvgIntegrally" resultMap="IntegratedResultMap">
-        AND b.id IN (SELECT bt.book_id FROM book_tags bt WHERE bt.tag_id IN (SELECT uf.tag_id FROM user_figure uf GROUP BY tag_id ORDER BY avg(uf.score) DESC))
+        <include refid="select_statement_without_type" />
+        AND b.id IN (
+            SELECT bt.book_id FROM book_tags bt WHERE bt.tag_id IN (
+                SELECT uf.tag_id FROM user_figure uf GROUP BY tag_id ORDER BY avg(uf.score) DESC
+            )
+        )
         <if test="filter != null">
             <if test="filter.type != null and filter.type.length gt 0">
                 AND b.type = #{filter.type[0]}
@@ -217,7 +252,10 @@
         </if>
     </select>
     <select id="selectAllUsingUserFigureByTagId" resultMap="IntegratedResultMap">
-        AND b.id IN (SELECT bt.book_id FROM book_tags bt WHERE bt.tag_id IN (SELECT uf.tag_id from user_figure uf INNER JOIN user_figure uft ON uft.user_id = uf.user_id WHERE uft.tag_id = 15 GROUP BY uf.tag_id ORDER By avg(uf.score)))
+        <include refid="select_statement_without_type"/>
+        AND b.id IN (SELECT bt.book_id FROM book_tags bt WHERE bt.tag_id IN (SELECT uf.tag_id from user_figure uf INNER
+        JOIN user_figure uft ON uft.user_id = uf.user_id WHERE uft.tag_id = 15 GROUP BY uf.tag_id ORDER By avg(uf.score)
+        DESC))
         <if test="filter != null">
             <if test="filter.type != null and filter.type.length gt 0">
                 AND b.type = #{filter.type[0]}
@@ -225,11 +263,51 @@
         </if>
     </select>
     <select id="selectAllUsingUserFigureByCategoryId" resultMap="IntegratedResultMap">
-        AND b.id IN (SELECT bt.book_id FROM book_tags bt WHERE bt.tag_id IN (SELECT uf.tag_id FROM user_figure uf WHERE uf.tag_id IN (SELECT ct.tag_id FROM category_tags ct WHERE ct.category_id = #{categoryId}) GROUP By uf.tag_id ORDER BY uf.score))
+        <include refid="select_statement_without_type"/>
+        AND b.id IN (
+        SELECT bt.book_id FROM book_tags bt WHERE bt.tag_id IN (
+            SELECT uf.tag_id FROM user_figure uf WHERE uf.tag_id IN (
+                SELECT ct.tag_id FROM category_tags ct WHERE ct.category_id = #{categoryId}
+                ) <if test="userId != null">AND uf.user_id = #{userId}</if> GROUP By uf.tag_id ORDER BY avg(uf.score) DESC
+            )
+        )
         <if test="filter != null">
             <if test="filter.type != null and filter.type.length gt 0">
                 AND b.type = #{filter.type[0]}
             </if>
         </if>
+    </select>
+    <select id="selectAllUsingUserFigureByBookId" resultMap="IntegratedResultMap">
+        <include refid="select_statement_without_type"/>
+        AND b.id IN (
+        SELECT bt.book_id FROM book_tags bt WHERE bt.tag_id IN (
+            SELECT uf.tag_id FROM user_figure uf WHERE uf.tag_id IN (
+                SELECT btx.tag_id FROM book_tags btx WHERE btx.book_id = #{bookId}
+            ) <if test="userId != null">AND uf.user_id = #{userId}</if> GROUP By uf.tag_id ORDER BY avg(uf.score) DESC
+        )
+        <if test="filter != null">
+            <if test="filter.type != null and filter.type.length gt 0">
+                AND b.type = #{filter.type[0]}
+            </if>
+        </if>
+    </select>
+    <select id="selectAllUsingUserFigureByBookType" resultMap="IntegratedResultMap">
+        <include refid="select_statement"/>
+        AND b.id IN (
+        SELECT bt.book_id FROM book_tags bt WHERE bt.tag_id IN (
+            SELECT uf.tag_id FROM user_figure uf <if test="userId != null">WHERE uf.user_id = #{userId}</if> GROUP By
+                uf.tag_id ORDER BY avg(uf.score) DESC
+            )
+        )
+    </select>
+    <select id="selectAllUsingUserFigureByHistoryToday" resultMap="IntegratedResultMap">
+        <include refid="select_statement_without_type"/>
+        AND b.id IN (
+            SELECT bt.book_id FROM book_tags bt WHERE bt.tag_id IN (
+                SELECT uf.tag_id FROM user_figure uf WHERE uf.tag_id IN (
+                    SELECT btx.tag_id FROM book_tags btx LEFT JOIN history h ON btx.book_id = h.book_id WHERE DATE(h.read_time) = DATE(NOW()) GROUP BY btx.tag_id
+                ) <if test="userId != null">WHERE uf.user_id = #{userId}</if> GROUP By uf.tag_id ORDER BY avg(uf.score) DESC
+            )
+        )
     </select>
 </mapper>

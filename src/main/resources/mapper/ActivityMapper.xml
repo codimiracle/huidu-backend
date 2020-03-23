@@ -24,7 +24,6 @@
         <association property="book"
                      resultMap="com.codimiracle.application.platform.huidu.mapper.BookMapper.IntegratedResultMap"/>
     </resultMap>
-
     <update id="deleteByIdLogically">
         UPDATE activity
         SET deleted = 1
@@ -37,33 +36,18 @@
         <foreach collection="list" item="item" open="(" close=")" separator=",">#{item}</foreach>
     </update>
     <sql id="select_statement">
-        SELECT a.id           activity_id,
-               a.banner       activity_banner,
-               a.status       activity_status,
-               a.url          activity_url,
-               a.create_time  activity_create_time,
-               a.update_time  activity_update_time,
-               b.id           book_id,
-               b.title        book_title,
-               b.description  book_description,
-               b.cover        book_cover,
-               b.teller       book_teller,
-               b.category_id  category_id,
-               b.publish_year book_publish_year,
-               b.type         book_type,
-               b.episodes     book_episodes,
-               b.status       book_status,
-               b.money        book_money,
-               b.commodity_id book_commodity_id,
-               bm.id          book_metadata_id,
-               bm.name        book_metadata_name,
-               bm.cover       book_metadata_cover,
-               bm.description book_metadata_description,
-               bm.words       book_metadata_words,
-               bm.author      book_metadata_author
+        SELECT a.id activity_id,
+            a.banner activity_banner,
+            a.status activity_status,
+            a.url activity_url,
+            a.create_time activity_create_time,
+            a.update_time activity_update_time,
+        <include refid="com.codimiracle.application.platform.huidu.mapper.BookMapper.book_vo_fields" />
         FROM activity a
-                 LEFT JOIN book b ON a.book_id = b.id
-                 LEFT JOIN book_metadata bm ON bm.id = b.metadata_id
+            LEFT JOIN book b ON b.id = a.book_id
+            LEFT JOIN book_metadata bm ON b.metadata_id = bm.id
+            LEFT JOIN commodity c ON b.commodity_id = c.id
+            LEFT JOIN content ct ON ct.id = b.content_id
         WHERE a.deleted = 0
     </sql>
     <select id="findByIdIntegrally" resultMap="IntegratedResultMap">

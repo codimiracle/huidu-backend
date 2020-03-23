@@ -10,6 +10,9 @@
         <result column="content_id" jdbcType="INTEGER" property="contentId"/>
         <result column="ref_id" jdbcType="VARCHAR" property="refId"/>
     </resultMap>
+    <resultMap id="focusResultMap" type="com.codimiracle.application.platform.huidu.entity.embedded.CommunityFocus">
+        <id column="book_id" property="bookId"/>
+    </resultMap>
     <delete id="deleteByContentId">
         DELETE
         FROM content_reference
@@ -22,10 +25,13 @@
     </delete>
     <select id="findByContentId" resultMap="BaseResultMap">
         SELECT cr.id,
-               cr.type,
-               cr.ref_id,
-               cr.content_id
+        cr.type,
+        cr.ref_id,
+        cr.content_id
         FROM content_reference AS cr
         WHERE cr.content_id = #{contentId}
+    </select>
+    <select id="selectCommunityFocus" resultMap="focusResultMap">
+        SELECT cr.ref_id book_id FROM content_reference cr WHERE type='book' GROUP BY cr.type = 'book', cr.ref_id ORDER BY count(id) DESC
     </select>
 </mapper>

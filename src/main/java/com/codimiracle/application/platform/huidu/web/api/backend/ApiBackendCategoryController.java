@@ -58,10 +58,9 @@ public class ApiBackendCategoryController {
 
     @PutMapping("/{id}")
     public ApiResponse update(@PathVariable String id, @RequestBody CategoryDTO categoryDTO) {
-        Category category = new Category();
+        Category category = Category.from(categoryDTO);
         category.setId(id);
-        BeanUtils.copyProperties(categoryDTO, category);
-        mergeTagList(categoryDTO, category);
+        category.setTags(TagUtil.mutateToPersistent(tagService, Arrays.asList(categoryDTO.getTags())));
         categoryService.update(category);
         return RestfulUtil.entity(categoryService.findByIdIntegrally(id));
     }

@@ -29,6 +29,7 @@ import java.util.List;
 @Data
 public class LogisticsInformationVO {
     private String id;
+    private String userId;
     private String expressNumber;
     private String expressCompany;
     private List<PassingPointVO> passingPoints;

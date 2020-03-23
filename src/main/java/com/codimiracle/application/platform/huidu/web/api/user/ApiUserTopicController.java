@@ -31,6 +31,7 @@ import com.codimiracle.application.platform.huidu.entity.po.ContentReference;
 import com.codimiracle.application.platform.huidu.entity.po.User;
 import com.codimiracle.application.platform.huidu.entity.vo.TopicVO;
 import com.codimiracle.application.platform.huidu.entity.vt.Topic;
+import com.codimiracle.application.platform.huidu.enumeration.ContentStatus;
 import com.codimiracle.application.platform.huidu.service.TopicService;
 import com.codimiracle.application.platform.huidu.util.RestfulUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -56,6 +57,7 @@ public class ApiUserTopicController {
         topic.setOwnerId(user.getId());
         topic.setCreateTime(new Date());
         topic.setUpdateTime(topic.getCreateTime());
+        topic.setStatus(ContentStatus.Examining);
         topicService.save(topic);
         return RestfulUtil.entity(topicService.findByIdIntegrally(topic.getId()));
     }
@@ -104,6 +106,9 @@ public class ApiUserTopicController {
     public ApiResponse collection(@AuthenticationPrincipal User user, @RequestParam("filter") Filter filter, @RequestParam("sorter") Sorter sorter, @ModelAttribute Page page) {
         filter = Objects.isNull(filter) ? new Filter() : filter;
         filter.put("ownerId", new String[]{user.getId()});
+        sorter = Objects.isNull(sorter) ? new Sorter() : sorter;
+        sorter.setField("createTime");
+        sorter.setOrder("descend");
         return RestfulUtil.list(topicService.findAllIntegrally(filter, sorter, page));
     }
 }

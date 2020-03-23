@@ -67,4 +67,9 @@ public class UserCartServiceImpl extends AbstractService<String, CartItem> imple
     public List<CartItemVO> findByIdsIntegrally(List<String> ids) {
         return userCartMapper.selectByIdsIntegrally(ids);
     }
+
+    @Override
+    public void settleByIdLogically(String cartItemId) {
+        userCartMapper.settleByIdLogically(cartItemId);
+    }
 }

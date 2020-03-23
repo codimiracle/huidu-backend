@@ -31,6 +31,7 @@ public class PassingPointVO {
     private String id;
     private String name;
     private String status;
+    private String logisticsInformationId;
     private Date createTime;
     private Date updateTime;
 }

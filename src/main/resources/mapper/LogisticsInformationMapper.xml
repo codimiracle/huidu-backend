@@ -17,17 +17,21 @@
         <collection property="passingPoints"
                     resultMap="com.codimiracle.application.platform.huidu.mapper.PassingPointMapper.IntegratedResultMap"/>
     </resultMap>
-    <select id="selectByIdIntegrally" resultMap="IntegratedResultMap">
+    <sql id="select_statement">
         SELECT li.id              logistics_information_id,
-               li.express_number  logistics_information_express_number,
-               li.express_company logistics_information_express_company,
-               pp.id              passing_point_id,
-               pp.name            passing_point_name,
-               pp.create_time     passing_point_create_time,
-               pp.update_time     passing_point_update_time,
-               pp.status          passing_point_status
-        FROM (SELECT  * FROM logistics_information <if test="page != null">LIMIT #{page.offset}, #{page.limit}</if>) li
-                 LEFT JOIN passing_point pp ON li.id = pp.logistics_infomation_id
-        WHERE li.id = #{id}
+            o.owner_id          logistics_information_user_id,
+            li.express_number  logistics_information_express_number,
+            li.express_company logistics_information_express_company
+        FROM  logistics_information li
+        LEFT JOIN `order` o ON li.id = o.logistics_information_id
+        WHERE 1 = 1
+    </sql>
+    <select id="selectByIdIntegrally" resultMap="IntegratedResultMap">
+        <include refid="select_statement" />
+        AND li.id = #{id}
+    </select>
+    <select id="selectByOrderNumberIntegrally" resultMap="IntegratedResultMap">
+        <include refid="select_statement" />
+        AND o.order_number = #{orderNumber}
     </select>
 </mapper>

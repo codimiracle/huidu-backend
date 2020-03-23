@@ -72,6 +72,9 @@ public class OrderDetails {
      */
     private Money prices;
 
+    @Transient
+    private String cartItemId;
+
     @Column(name = "order_number")
     private String orderNumber;
 

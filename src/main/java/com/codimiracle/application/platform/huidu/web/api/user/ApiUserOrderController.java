@@ -26,21 +26,18 @@ import com.codimiracle.application.platform.huidu.contract.ApiResponse;
 import com.codimiracle.application.platform.huidu.contract.Filter;
 import com.codimiracle.application.platform.huidu.contract.Page;
 import com.codimiracle.application.platform.huidu.contract.Sorter;
-import com.codimiracle.application.platform.huidu.entity.dto.OrderDetailsDTO;
+import com.codimiracle.application.platform.huidu.entity.dto.CommentDTO;
 import com.codimiracle.application.platform.huidu.entity.dto.OrderringDTO;
+import com.codimiracle.application.platform.huidu.entity.dto.ShipmentPredictionDTO;
 import com.codimiracle.application.platform.huidu.entity.po.Order;
 import com.codimiracle.application.platform.huidu.entity.po.User;
-import com.codimiracle.application.platform.huidu.enumeration.OrderStatus;
-import com.codimiracle.application.platform.huidu.enumeration.OrderType;
 import com.codimiracle.application.platform.huidu.service.OrderService;
-import com.codimiracle.application.platform.huidu.util.OrderNumberUtil;
 import com.codimiracle.application.platform.huidu.util.RestfulUtil;
 import com.codimiracle.application.platform.huidu.web.api.base.OrderController;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.util.Date;
 import java.util.Objects;
 
 @CrossOrigin
@@ -52,9 +49,29 @@ public class ApiUserOrderController {
     @Resource
     private OrderService orderService;
 
+    @PostMapping("/shipment")
+    public ApiResponse shipmentPrediction(@RequestBody ShipmentPredictionDTO shipmentPredictionDTO) {
+        return orderController.shipmentPrediction(shipmentPredictionDTO);
+    }
+
     @PostMapping("/orderring")
     public ApiResponse orderring(@AuthenticationPrincipal User user, @RequestBody OrderringDTO orderringDTO) {
         return orderController.orderring(user, orderringDTO);
+    }
+
+    @PostMapping("/{order_number}/evaluate")
+    public ApiResponse evaluate(@AuthenticationPrincipal User user, @PathVariable("order_number") String orderNumber, @RequestBody CommentDTO commentDTO) {
+        return orderController.evaluate(user, orderNumber, commentDTO);
+    }
+
+    @PostMapping("/{order_number}/cancel")
+    public ApiResponse switchToCancel(@AuthenticationPrincipal User user, @PathVariable("order_number") String orderNumber, @RequestParam("status") String status) {
+        return orderController.switchToCancel(user, orderNumber, status);
+    }
+
+    @PostMapping("/{order_number}/receive")
+    public ApiResponse switchToEvaluate(@AuthenticationPrincipal User user, @PathVariable("order_number") String orderNumber, @RequestParam("status") String status) {
+        return orderController.switchToEvaluate(user, orderNumber, status);
     }
 
     @GetMapping("/{order_number}")

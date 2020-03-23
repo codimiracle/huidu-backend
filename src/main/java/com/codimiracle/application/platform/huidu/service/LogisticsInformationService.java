@@ -11,4 +11,6 @@ import com.codimiracle.application.platform.huidu.entity.vo.LogisticsInformation
 public interface LogisticsInformationService extends Service<String, LogisticsInformation> {
 
     LogisticsInformationVO findByIdIntegrally(String id);
+
+    LogisticsInformationVO findByOrderNumberIntegrally(String orderNumber);
 }

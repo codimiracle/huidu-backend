@@ -22,10 +22,7 @@ package com.codimiracle.application.platform.huidu.web.api.user;/*
  * SOFTWARE.
  */
 
-import com.codimiracle.application.platform.huidu.contract.ApiResponse;
-import com.codimiracle.application.platform.huidu.contract.Filter;
-import com.codimiracle.application.platform.huidu.contract.Page;
-import com.codimiracle.application.platform.huidu.contract.PageSlice;
+import com.codimiracle.application.platform.huidu.contract.*;
 import com.codimiracle.application.platform.huidu.entity.po.User;
 import com.codimiracle.application.platform.huidu.entity.vo.ContentVO;
 import com.codimiracle.application.platform.huidu.enumeration.ContentType;
@@ -35,6 +32,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.Objects;
 
 @CrossOrigin
 @RestController
@@ -45,11 +43,14 @@ public class ApiUserDynamicController {
     private ContentService contentService;
 
     @GetMapping
-    public ApiResponse collection(@AuthenticationPrincipal User user, @ModelAttribute Page page) {
-        Filter filter = new Filter();
+    public ApiResponse collection(@AuthenticationPrincipal User user, @RequestParam("filter") Filter filter, @RequestParam("sorter") Sorter sorter, @ModelAttribute Page page) {
+        filter = Objects.isNull(filter) ? new Filter() : filter;
         filter.put("ownerId", new String[] {user.getId()});
         filter.put("type", new String[] {ContentType.Topic.getType(), ContentType.Review.getType()});
-        PageSlice<ContentVO> slice = contentService.findAllIntegrally(filter, null, page);
+        sorter = Objects.isNull(sorter) ? new Sorter() : sorter;
+        sorter.setField("createTime");
+        sorter.setOrder("descend");
+        PageSlice<ContentVO> slice = contentService.findAllIntegrally(filter, sorter, page);
         return RestfulUtil.list(slice);
     }
 }

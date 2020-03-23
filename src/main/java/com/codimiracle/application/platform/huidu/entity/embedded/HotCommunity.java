@@ -22,6 +22,7 @@ package com.codimiracle.application.platform.huidu.entity.embedded;/*
  * SOFTWARE.
  */
 
+import com.codimiracle.application.platform.huidu.entity.vo.ReviewVO;
 import com.codimiracle.application.platform.huidu.entity.vo.TopicVO;
 import com.codimiracle.application.platform.huidu.entity.vo.UserProtectedVO;
 import lombok.Data;
@@ -30,9 +31,7 @@ import java.util.List;
 
 @Data
 public class HotCommunity {
-    private List<TopicVO> topTopics;
-    private List<UserProtectedVO> topParticipants;
     private List<TopicVO> hotTopics;
-    private List<TopicVO> hotReviews;
+    private List<ReviewVO> hotReviews;
     private List<CommunityFocus> focus;
 }

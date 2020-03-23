@@ -55,6 +55,7 @@ public class Category {
         }
         Category category = new Category();
         BeanUtils.copyProperties(collectionDTO, category);
+        category.setType(CategoryType.Collection);
         if (Objects.nonNull(collectionDTO.getExtra())) {
             category.setExtraAsideTitle(collectionDTO.getExtra().getAsideTitle());
             category.setExtraUrl(collectionDTO.getExtra().getUrl());
@@ -68,6 +69,7 @@ public class Category {
         }
         Category category = new Category();
         BeanUtils.copyProperties(categoryDTO, category);
+        category.setType(CategoryType.Category);
         return category;
     }
 }

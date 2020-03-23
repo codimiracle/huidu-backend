@@ -23,9 +23,13 @@ package com.codimiracle.application.platform.huidu.web.api.expose;/*
  */
 
 import com.codimiracle.application.platform.huidu.contract.ApiResponse;
+import com.codimiracle.application.platform.huidu.contract.Page;
 import com.codimiracle.application.platform.huidu.entity.dto.SignInDTO;
+import com.codimiracle.application.platform.huidu.entity.embedded.HotCommunity;
+import com.codimiracle.application.platform.huidu.entity.embedded.PersonalRecommendation;
 import com.codimiracle.application.platform.huidu.entity.po.User;
 import com.codimiracle.application.platform.huidu.entity.po.UserToken;
+import com.codimiracle.application.platform.huidu.entity.vo.CategoryVO;
 import com.codimiracle.application.platform.huidu.entity.vo.RealtimeVO;
 import com.codimiracle.application.platform.huidu.entity.vo.UserTokenVO;
 import com.codimiracle.application.platform.huidu.enumeration.ActivityStatus;
@@ -37,9 +41,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import static com.codimiracle.application.platform.huidu.enumeration.Settings.*;
 
@@ -65,6 +69,23 @@ public class ApiSystemController {
     @Resource
     private CategoryService categoryService;
 
+    @Resource
+    private TopicService topicService;
+
+    @Resource
+    private ReviewService reviewService;
+
+    @Resource
+    private UserFigureService userFigureService;
+
+    @Resource
+    private ContentReferenceService contentReferenceService;
+
+    @GetMapping("/version")
+    public ApiResponse version() {
+        return RestfulUtil.success("huidu-platform-build-20200323");
+    }
+
     @PostMapping("/sign-in")
     public ApiResponse signIn(@RequestBody SignInDTO signInDTO) {
         User user = userService.loadUserByUsername(signInDTO.getUsername());
@@ -86,7 +107,7 @@ public class ApiSystemController {
     }
 
     @GetMapping("realtime")
-    public ApiResponse realtime() {
+    public ApiResponse realtime(@AuthenticationPrincipal User user) {
         RealtimeVO realtimeVO = new RealtimeVO();
         int number = Integer.valueOf(settingsService.retrive(ACTIVITY_NUMBER));
         realtimeVO.setActivities(activityService.findByStatusIntegrally(ActivityStatus.Activated, number));
@@ -94,6 +115,26 @@ public class ApiSystemController {
         realtimeVO.setCategories(categoryService.findByIdsIntegrally(categoryIds));
         List<String> collectionIds = StringifizationUtil.toList(settingsService.retrive(COMPREHENSIVE_PAGE_COLLECTIONS));
         realtimeVO.setSections(categoryService.findByIdsIntegrally(collectionIds));
+        HotCommunity hotCommunity = new HotCommunity();
+        realtimeVO.setCommunity(hotCommunity);
+        hotCommunity.setHotTopics(topicService.findHotIntegrally(null, null, new Page()).getList());
+        hotCommunity.setHotReviews(reviewService.findHotReviewIntegrally(null, null, new Page()).getList());
+        hotCommunity.setFocus(contentReferenceService.findCommunityFocusIntegrally(null, null, new Page()).getList());
+        PersonalRecommendation personalRecommendation = new PersonalRecommendation();
+        realtimeVO.setRecommendations(personalRecommendation);
+        if (Objects.isNull(user)) {
+            List<CategoryVO> similarCategories = userFigureService.findSimilarCategoryByAvgIntegrally();
+            List<CategoryVO> sametasteCategory = userFigureService.findSametasteCategoryByAvgIntegrally();
+            personalRecommendation.setGuessing(similarCategories.get(0));
+            personalRecommendation.setSametaste(sametasteCategory.get(0));
+        } else {
+            List<CategoryVO> similarCategories = userFigureService.findSimilarCategoryByUserIdIntegrally(user.getId());
+            List<CategoryVO> sametasteCategory = userFigureService.findSametasteCategoryByUserIdIntegrally(user.getId());
+            if (similarCategories.size() > 0 && sametasteCategory.size() > 0) {
+                personalRecommendation.setGuessing(similarCategories.get(0));
+                personalRecommendation.setSametaste(sametasteCategory.get(0));
+            }
+        }
         return RestfulUtil.success(realtimeVO);
     }
 }

@@ -103,5 +103,10 @@
                 <foreach collection="filter.type" separator="," open="(" close=")" item="item">#{item}</foreach>
             </if>
         </if>
+        <if test="sorter != null">
+            <if test="sorter.field == 'create_time'">
+                ORDER BY c.create_time <if test="sorter.order == 'descend'">DESC</if>
+            </if>
+        </if>
     </select>
 </mapper>

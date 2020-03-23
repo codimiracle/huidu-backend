@@ -33,7 +33,7 @@ public class LogisticsInformationServiceImpl extends AbstractService<String, Log
         super.save(model);
         Date now = new Date();
         model.getPassingPoints().stream().forEach((e) -> {
-            e.setLogisticsInfomationId(model.getId());
+            e.setLogisticsInformationId(model.getId());
             e.setCreateTime(now);
             e.setUpdateTime(now);
             passingPointService.save(e);
@@ -48,11 +48,11 @@ public class LogisticsInformationServiceImpl extends AbstractService<String, Log
             if (Objects.isNull(e.getId())) {
                 e.setCreateTime(now);
                 e.setUpdateTime(now);
-                e.setLogisticsInfomationId(model.getId());
+                e.setLogisticsInformationId(model.getId());
                 passingPointService.save(e);
             } else {
                 PassingPoint passingPoint = passingPointService.findById(e.getId());
-                if (!Objects.equals(passingPoint.getLogisticsInfomationId(), model.getId())) {
+                if (!Objects.equals(passingPoint.getLogisticsInformationId(), model.getId())) {
                     throw new ServiceException("未知途经点!");
                 }
                 if (passingPoint.getStatus() == e.getStatus()) {
@@ -65,8 +65,21 @@ public class LogisticsInformationServiceImpl extends AbstractService<String, Log
         });
     }
 
+    private void mutate(LogisticsInformationVO logisticsInformationVO) {
+        logisticsInformationVO.setPassingPoints(passingPointService.findByLogisticsInformationId(logisticsInformationVO.getId()));
+    }
+
     @Override
     public LogisticsInformationVO findByIdIntegrally(String id) {
-        return logisticsInformationMapper.selectByIdIntegrally(id);
+        LogisticsInformationVO logisticsInformationVO = logisticsInformationMapper.selectByIdIntegrally(id);
+        mutate(logisticsInformationVO);
+        return logisticsInformationVO;
+    }
+
+    @Override
+    public LogisticsInformationVO findByOrderNumberIntegrally(String orderNumber) {
+        LogisticsInformationVO logisticsInformationVO = logisticsInformationMapper.selectByOrderNumberIntegrally(orderNumber);
+        mutate(logisticsInformationVO);
+        return logisticsInformationVO;
     }
 }

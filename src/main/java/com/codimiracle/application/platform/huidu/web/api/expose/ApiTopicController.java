@@ -56,8 +56,27 @@ public class ApiTopicController {
         return RestfulUtil.entity(topic);
     }
 
+    @GetMapping("/most-likes")
+    public ApiResponse mostLikeCollection(@RequestParam("filter") Filter filter, @RequestParam("sorter") Sorter sorter, @ModelAttribute Page page) {
+        sorter = Objects.isNull(sorter) ? new Sorter() : sorter;
+        sorter.setField("likes");
+        sorter.setOrder("descend");
+        return collection(filter, sorter, page);
+    }
+
+    @GetMapping("/hots")
+    public ApiResponse hotCollection(@RequestParam("filter") Filter filter, @RequestParam("sorter") Sorter sorter, @ModelAttribute Page page) {
+        sorter = Objects.isNull(sorter) ? new Sorter() : sorter;
+        sorter.setOrder("descend");
+        sorter.setField("hotDegree");
+        return collection(filter, sorter, page);
+    }
+
     @GetMapping
     public ApiResponse collection(@RequestParam("filter") Filter filter, @RequestParam("sorter") Sorter sorter, @ModelAttribute Page page) {
+        sorter = Objects.isNull(sorter) ? new Sorter() : sorter;
+        sorter.setField("createTime");
+        sorter.setOrder("descend");
         return RestfulUtil.list(topicService.findAllIntegrally(filter, sorter, page));
     }
 }

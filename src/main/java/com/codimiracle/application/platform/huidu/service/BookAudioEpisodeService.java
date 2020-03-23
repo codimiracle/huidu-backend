@@ -26,4 +26,6 @@ public interface BookAudioEpisodeService extends Service<String, BookAudioEpisod
     BookAudioEpisodeVO findByMediaNumberIntegrally(String bookId, Integer mediaNumber);
 
     List<AudioCatalogs> findCatalogsByBookIdAndStatus(String id, BookAudioEpisodeStatus status);
+
+    BookAudioEpisodeVO findLastPublishedEpisodeByBookId(String bookId);
 }

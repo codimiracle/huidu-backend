@@ -25,6 +25,7 @@ package com.codimiracle.application.platform.huidu.service;/*
 import com.codimiracle.application.platform.huidu.contract.*;
 import com.codimiracle.application.platform.huidu.entity.po.ContentReference;
 import com.codimiracle.application.platform.huidu.entity.vo.ReviewVO;
+import com.codimiracle.application.platform.huidu.entity.vo.TopicVO;
 import com.codimiracle.application.platform.huidu.entity.vt.Review;
 
 import java.util.List;
@@ -36,7 +37,12 @@ public interface ReviewService extends Service<String, Review> {
 
     int deleteByIdLogically(String id);
 
+    PageSlice<ReviewVO> findHotIntegrally(Filter filter, Sorter sorter, Page page);
+
     List<ReviewVO> findAllIntegrally();
 
     PageSlice<ReviewVO> findAllIntegrally(Filter filter, Sorter sorter, Page page);
+
+    PageSlice<ReviewVO> findHotReviewIntegrally(Filter filter, Sorter sorter, Page page);
+
 }

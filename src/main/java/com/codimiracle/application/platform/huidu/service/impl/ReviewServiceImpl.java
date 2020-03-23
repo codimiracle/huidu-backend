@@ -28,6 +28,7 @@ import com.codimiracle.application.platform.huidu.entity.po.ContentArticle;
 import com.codimiracle.application.platform.huidu.entity.po.ContentReference;
 import com.codimiracle.application.platform.huidu.entity.vo.ArticleVO;
 import com.codimiracle.application.platform.huidu.entity.vo.ReviewVO;
+import com.codimiracle.application.platform.huidu.entity.vo.TopicVO;
 import com.codimiracle.application.platform.huidu.entity.vt.Review;
 import com.codimiracle.application.platform.huidu.enumeration.ContentType;
 import com.codimiracle.application.platform.huidu.service.ContentArticleService;
@@ -39,8 +40,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -112,42 +114,54 @@ public class ReviewServiceImpl extends AbstractUnsupportedOperationServiece<Stri
     }
 
     @Override
-    public ReviewVO findByIdIntegrally(String id) {
+    public PageSlice<ReviewVO> findHotIntegrally(Filter filter, Sorter sorter, Page page) {
+        return null;
+    }
+
+    private ReviewVO mutate(ArticleVO articleVO) {
+        if (Objects.isNull(articleVO)) {
+            return null;
+        }
         ReviewVO reviewVO = new ReviewVO();
-        ArticleVO articleVO = contentArticleService.findByIdIntegrally(ContentType.Review, id);
         BeanUtils.copyProperties(articleVO, reviewVO);
-        reviewVO.setReferences(contentReferenceService.findByContentIdIntegrally(id));
+        reviewVO.setReferences(contentReferenceService.findByContentIdIntegrally(articleVO.getContentId()));
         return reviewVO;
+    }
+
+    public PageSlice<ReviewVO> mutate(PageSlice<ArticleVO> slice) {
+        PageSlice<ReviewVO> transformedSlice = new PageSlice<>();
+        transformedSlice.setLimit(slice.getLimit());
+        transformedSlice.setTotal(slice.getTotal());
+        transformedSlice.setPage(slice.getPage());
+        transformedSlice.setList(slice.getList().stream().map(this::mutate).collect(Collectors.toList()));
+        return transformedSlice;
+    }
+
+    @Override
+    public ReviewVO findByIdIntegrally(String id) {
+        ArticleVO articleVO = contentArticleService.findByIdIntegrally(ContentType.Review, id);
+        return mutate(articleVO);
     }
 
     @Override
     public List<ReviewVO> findAllIntegrally() {
-        List<ReviewVO> reviewVOList = new ArrayList<>();
         List<ArticleVO> articleVOList = contentArticleService.findAllIntegrally();
-        for (ArticleVO articleVO : articleVOList) {
-            ReviewVO reviewVO = new ReviewVO();
-            BeanUtils.copyProperties(articleVO, reviewVO);
-            reviewVO.setReferences(contentReferenceService.findByContentIdIntegrally(reviewVO.getContentId()));
-            reviewVOList.add(reviewVO);
-        }
-        return reviewVOList;
+        return articleVOList.stream().map(this::mutate).collect(Collectors.toList());
     }
 
     @Override
     public PageSlice<ReviewVO> findAllIntegrally(Filter filter, Sorter sorter, Page page) {
-        List<ReviewVO> reviewVOList = new ArrayList<>();
         PageSlice<ArticleVO> articleVOList = contentArticleService.findAllIntegrally(ContentType.Review, filter, sorter, page);
-        for (ArticleVO articleVO : articleVOList.getList()) {
-            ReviewVO reviewVO = new ReviewVO();
-            BeanUtils.copyProperties(articleVO, reviewVO);
-            reviewVO.setReferences(contentReferenceService.findByContentIdIntegrally(reviewVO.getContentId()));
-            reviewVOList.add(reviewVO);
-        }
         PageSlice<ReviewVO> slice = new PageSlice<>();
-        slice.setList(reviewVOList);
+        slice.setList(articleVOList.getList().stream().map(this::mutate).collect(Collectors.toList()));
         slice.setPage(articleVOList.getPage());
         slice.setLimit(articleVOList.getLimit());
         slice.setTotal(articleVOList.getTotal());
         return slice;
+    }
+
+    @Override
+    public PageSlice<ReviewVO> findHotReviewIntegrally(Filter filter, Sorter sorter, Page page) {
+        return mutate(contentArticleService.findHotIntegrally(ContentType.Review, filter, sorter, page));
     }
 }

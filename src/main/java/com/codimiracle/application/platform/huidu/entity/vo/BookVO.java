@@ -47,4 +47,8 @@ public class BookVO extends ContentVO {
     private String categoryId;
     private CategoryVO category;
     private List<TagVO> tags;
+    private Integer plays;
+    private Integer reads;
+    private boolean joinedCart;
+    private boolean joinedShelf;
 }

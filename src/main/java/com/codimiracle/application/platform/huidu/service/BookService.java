@@ -32,11 +32,21 @@ public interface BookService extends Service<String, Book> {
 
     BookVO findByContentIdIntegrally(String contentId);
 
+    PageSlice<BookVO> findAllHotIntegrally(BookType type, Filter filter, Sorter sorter, Page page);
+
     PageSlice<BookVO> findAllUsingUserFigureByUserIdIntegrally(String id, Filter filter, Sorter sorter, Page page);
 
     PageSlice<BookVO> findAllUsingUserFigureByAvgIntegrally(Filter filter, Sorter sorter, Page page);
 
-    PageSlice<BookVO> findAllUsingUserFigureByTagId(String tagId, Filter filter, Sorter sorter, Page page);
+    PageSlice<BookVO> findAllUsingUserFigureByTagId(String tagId, String userId, Filter filter, Sorter sorter, Page page);
 
-    PageSlice<BookVO> findAllUsingUserFigureByCategoryId(String categoryId, Filter filter, Sorter sorter, Page page);
+    PageSlice<BookVO> findAllUsingUserFigureByCategoryId(String categoryId, String userId, Filter filter, Sorter sorter, Page page);
+
+    PageSlice<BookVO> findAllUsingUserFigureByBookId(String bookId, String userId, Filter filter, Sorter sorter, Page page);
+
+    PageSlice<BookVO> findAllUsingUserFigureByHistoryToday(String userId, Filter filter, Sorter sorter, Page page);
+
+    Book findByCommodityId(String commodityId);
+
+    PageSlice<BookVO> findAllUsingUserFigureByBookType(BookType type, String userId, Filter filter, Sorter sorter, Page page);
 }

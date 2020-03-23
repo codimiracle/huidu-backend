@@ -19,4 +19,7 @@ public interface UserCartService extends Service<String, CartItem> {
     Integer countByUserId(String id);
 
     List<CartItemVO> findByIdsIntegrally(List<String> ids);
+
+    void settleByIdLogically(String cartItemId);
+
 }

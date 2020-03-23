@@ -52,6 +52,11 @@ public class ApiElectronicBookController {
         return bookController.publishYears(BookType.ElectronicBook);
     }
 
+    @GetMapping("/hots")
+    public ApiResponse hotCollection(@RequestParam("filter") Filter filter, @RequestParam("sorter") Sorter sorter, @ModelAttribute Page page) {
+        return bookController.hotCollection(BookType.ElectronicBook, filter, sorter, page);
+    }
+
     @GetMapping
     public ApiResponse collection(@RequestParam("filter") Filter filter, @RequestParam("sorter") Sorter sorter, @ModelAttribute Page page) {
         filter = Objects.isNull(filter) ? new Filter() : filter;

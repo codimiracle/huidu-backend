@@ -1,15 +1,12 @@
 package com.codimiracle.application.platform.huidu.service.impl;
 
 import com.codimiracle.application.platform.huidu.contract.*;
-import com.codimiracle.application.platform.huidu.entity.po.Address;
-import com.codimiracle.application.platform.huidu.entity.po.Commodity;
-import com.codimiracle.application.platform.huidu.entity.po.Order;
-import com.codimiracle.application.platform.huidu.entity.po.OrderDetails;
+import com.codimiracle.application.platform.huidu.entity.po.*;
 import com.codimiracle.application.platform.huidu.entity.vo.OrderVO;
+import com.codimiracle.application.platform.huidu.entity.vt.Comment;
 import com.codimiracle.application.platform.huidu.enumeration.CommodityStatus;
 import com.codimiracle.application.platform.huidu.enumeration.OrderStatus;
 import com.codimiracle.application.platform.huidu.enumeration.OrderType;
-import com.codimiracle.application.platform.huidu.enumeration.PaymentType;
 import com.codimiracle.application.platform.huidu.helper.ShipmentCalculator;
 import com.codimiracle.application.platform.huidu.mapper.OrderMapper;
 import com.codimiracle.application.platform.huidu.service.*;
@@ -21,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -42,6 +39,9 @@ public class OrderServiceImpl extends AbstractService<String, Order> implements 
     private LogisticsInformationService logisticsInformationService;
 
     @Resource
+    private UserCartService userCartService;
+
+    @Resource
     private UserAccountService userAccountService;
 
     @Resource
@@ -50,8 +50,18 @@ public class OrderServiceImpl extends AbstractService<String, Order> implements 
     @Resource
     private AddressService addressService;
 
+    @Resource
+    private BookService bookService;
+
+    @Resource
+    private CommentService commentService;
+
     @Autowired
     private ShipmentCalculator shipmentCalculator;
+
+    private void settleCartItem(String cartItemId) {
+        userCartService.settleByIdLogically(cartItemId);
+    }
 
     private void obtainingAndSetOrderDetails(Order order, OrderDetails orderDetails) {
         //商品处理
@@ -68,6 +78,10 @@ public class OrderServiceImpl extends AbstractService<String, Order> implements 
         //库存不足
         if (commodity.getAvailableStock() < orderDetails.getQuantity()) {
             throw new ServiceException("库存不足!");
+        }
+        //删除购物车
+        if (Objects.nonNull(orderDetails.getCartItemId())) {
+            settleCartItem(orderDetails.getCartItemId());
         }
         //冗余商品数据
         orderDetails.setCommodityName(commodity.getName());
@@ -155,18 +169,73 @@ public class OrderServiceImpl extends AbstractService<String, Order> implements 
     }
 
     @Override
+    public Money shipmentPrediction(String addressId, List<OrderDetails> orderDetails) {
+        Address address = addressService.findById(addressId);
+        BigDecimal[] weight = new BigDecimal[]{BigDecimal.ZERO};
+        orderDetails.forEach((orderDetail) -> {
+            Commodity commodity = commodityService.findById(orderDetail.getCommodityId());
+            if (Objects.nonNull(commodity)) {
+                weight[0] = weight[0].add(BigDecimal.valueOf(commodity.getWeight()).multiply(BigDecimal.valueOf(orderDetail.getQuantity())));
+            }
+        });
+        return shipmentCalculator.calculate(weight[0], address.getRegion(), address.getAddress());
+    }
+
+    @Override
+    public void cancel(String userId, String orderNumber, OrderStatus from) {
+        changeStatus(userId, orderNumber, from, OrderStatus.Canceled);
+    }
+
+    @Override
+    public void complete(String user, String orderNumber, OrderStatus valueOfCode) {
+
+    }
+
+    @Override
+    public void evaluate(String userId, String orderNumber, Comment comment) {
+        Order order = orderMapper.selectByPrimaryKey(orderNumber);
+        order.getDetailsList().forEach((e) -> {
+            Book book = bookService.findByCommodityId(e.getCommodityId());
+            if (Objects.nonNull(book)) {
+                comment.setOwnerId(userId);
+                comment.setTargetContentId(book.getContentId());
+                commentService.save(comment);
+                // 复用同一条评论
+                comment.setId(null);
+            }
+        });
+        //完成交易
+        changeStatus(userId, orderNumber, OrderStatus.AwaitingEvaluation, OrderStatus.Completed);
+    }
+
+    @Override
+    public void changeStatus(String userId, String orderNumber, OrderStatus from, OrderStatus to) {
+        Order order = orderMapper.selectByPrimaryKey(orderNumber);
+        if (Objects.isNull(order) || !Objects.equals(order.getOrderNumber(), orderNumber)) {
+            throw new ServiceException("找不到订单！");
+        }
+        orderMapper.changeStatus(orderNumber, from, to);
+    }
+
+    @Override
     public OrderVO findByOrderNumberIntegrally(String orderNumber) {
         OrderVO orderVO = orderMapper.selectByOrderNumberIntegrally(orderNumber);
+        mutate(orderVO);
+        return orderVO;
+    }
+
+    private void mutate(OrderVO orderVO) {
         if (Objects.nonNull(orderVO.getLogisticsInformationId())) {
             orderVO.setLogisticsInformation(logisticsInformationService.findByIdIntegrally(orderVO.getLogisticsInformationId()));
         }
-        orderVO.setDetailsList(orderDetailsService.findByOrderNumberIntegrally(orderNumber));
-        return orderVO;
+        orderVO.setDetailsList(orderDetailsService.findByOrderNumberIntegrally(orderVO.getOrderNumber()));
     }
 
     @Override
     public PageSlice<OrderVO> findAllIntegrally(Filter filter, Sorter sorter, Page page) {
-        return extractPageSlice(orderMapper.selectAllIntegrally(filter, sorter, page));
+        PageSlice<OrderVO> slice = extractPageSlice(orderMapper.selectAllIntegrally(filter, sorter, page));
+        slice.getList().forEach(this::mutate);
+        return slice;
     }
 
 }

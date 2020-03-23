@@ -35,5 +35,4 @@ public class RealtimeVO {
     private List<ActivityVO> activities;
     private List<CategoryVO> categories;
     private List<CategoryVO> sections;
-
 }

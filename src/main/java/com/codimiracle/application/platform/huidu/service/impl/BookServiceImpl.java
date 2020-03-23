@@ -1,7 +1,6 @@
 package com.codimiracle.application.platform.huidu.service.impl;
 
 import com.codimiracle.application.platform.huidu.contract.*;
-import com.codimiracle.application.platform.huidu.elasticsearch.repository.BookRepository;
 import com.codimiracle.application.platform.huidu.entity.po.Book;
 import com.codimiracle.application.platform.huidu.entity.po.BookTags;
 import com.codimiracle.application.platform.huidu.entity.po.Content;
@@ -26,8 +25,6 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class BookServiceImpl extends AbstractService<String, Book> implements BookService {
-
-    private BookRepository bookRepository;
     @Resource
     private BookMapper bookMapper;
     @Resource
@@ -95,10 +92,13 @@ public class BookServiceImpl extends AbstractService<String, Book> implements Bo
         bookTagsList.forEach(bookTagsService::save);
     }
 
-    private void paddingAssociation(BookVO bookVO) {
+    private void mutate(BookVO bookVO) {
         if (Objects.nonNull(bookVO)) {
             if (Objects.nonNull(bookVO.getCategoryId())) {
                 bookVO.setCategory(categoryService.findByIdIntegrally(bookVO.getCategoryId()));
+            }
+            if (Objects.nonNull(bookVO.getCommodityId())) {
+                bookVO.setCommodity(commodityService.findByIdIntegrally(bookVO.getCommodityId()));
             }
             bookVO.setTags(bookTagsService.findByBookIdItegrally(bookVO.getId()));
         }
@@ -107,18 +107,20 @@ public class BookServiceImpl extends AbstractService<String, Book> implements Bo
     @Override
     public BookVO findByIdIntegrally(BookType type, String id) {
         BookVO bookVO = bookMapper.selectByIdIntegrally(type, id);
-        paddingAssociation(bookVO);
+        mutate(bookVO);
         return bookVO;
     }
+
     @Override
     public BookVO findByIdIntegrally(String id) {
         return findByIdIntegrally(null, id);
     }
+
     @Override
     public PageSlice<BookVO> findAllIntegrally(BookType type, Filter filter, Sorter sorter, Page page) {
         PageSlice<BookVO> slice = extractPageSlice(bookMapper.selectAllIntegrally(type, filter, sorter, page));
         List<BookVO> list = slice.getList();
-        list.forEach(this::paddingAssociation);
+        list.forEach(this::mutate);
         return slice;
     }
 
@@ -158,6 +160,14 @@ public class BookServiceImpl extends AbstractService<String, Book> implements Bo
     }
 
     @Override
+    public PageSlice<BookVO> findAllHotIntegrally(BookType type, Filter filter, Sorter sorter, Page page) {
+        sorter = Objects.isNull(sorter) ? new Sorter() : sorter;
+        sorter.setField("hotDegree");
+        sorter.setOrder("descend");
+        return findAllIntegrally(type, filter, sorter, page);
+    }
+
+    @Override
     public PageSlice<BookVO> findAllUsingUserFigureByUserIdIntegrally(String userId, Filter filter, Sorter sorter, Page page) {
         return extractPageSlice(bookMapper.selectAllUsingUserFigureByUserIdIntegrally(userId, filter, sorter, page));
     }
@@ -168,13 +178,33 @@ public class BookServiceImpl extends AbstractService<String, Book> implements Bo
     }
 
     @Override
-    public PageSlice<BookVO> findAllUsingUserFigureByTagId(String tagId, Filter filter, Sorter sorter, Page page) {
-        return extractPageSlice(bookMapper.selectAllUsingUserFigureByTagId(tagId, filter, sorter, page));
+    public PageSlice<BookVO> findAllUsingUserFigureByTagId(String tagId, String userId, Filter filter, Sorter sorter, Page page) {
+        return extractPageSlice(bookMapper.selectAllUsingUserFigureByTagId(tagId, userId, filter, sorter, page));
     }
 
     @Override
-    public PageSlice<BookVO> findAllUsingUserFigureByCategoryId(String categoryId, Filter filter, Sorter sorter, Page page) {
-        return extractPageSlice(bookMapper.selectAllUsingUserFigureByCategoryId(categoryId, filter, sorter, page));
+    public PageSlice<BookVO> findAllUsingUserFigureByCategoryId(String categoryId, String userId, Filter filter, Sorter sorter, Page page) {
+        return extractPageSlice(bookMapper.selectAllUsingUserFigureByCategoryId(categoryId, userId, filter, sorter, page));
+    }
+
+    @Override
+    public PageSlice<BookVO> findAllUsingUserFigureByBookId(String bookId, String userId, Filter filter, Sorter sorter, Page page) {
+        return extractPageSlice(bookMapper.selectAllUsingUserFigureByBookId(bookId, userId, filter, sorter, page));
+    }
+
+    @Override
+    public PageSlice<BookVO> findAllUsingUserFigureByHistoryToday(String userId, Filter filter, Sorter sorter, Page page) {
+        return extractPageSlice(bookMapper.selectAllUsingUserFigureByHistoryToday(userId, filter, sorter, page));
+    }
+
+    @Override
+    public Book findByCommodityId(String commodityId) {
+        return findBy("commodityId", commodityId);
+    }
+
+    @Override
+    public PageSlice<BookVO> findAllUsingUserFigureByBookType(BookType type, String userId, Filter filter, Sorter sorter, Page page) {
+        return extractPageSlice(bookMapper.selectAllUsingUserFigureByBookType(type, userId, filter, sorter, page));
     }
 
 }

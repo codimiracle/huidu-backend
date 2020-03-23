@@ -3,15 +3,20 @@ package com.codimiracle.application.platform.huidu.web.api.expose;
 import com.codimiracle.application.platform.huidu.contract.*;
 import com.codimiracle.application.platform.huidu.entity.po.User;
 import com.codimiracle.application.platform.huidu.entity.vo.BookVO;
+import com.codimiracle.application.platform.huidu.entity.vo.DiscoverVO;
 import com.codimiracle.application.platform.huidu.enumeration.BookStatus;
 import com.codimiracle.application.platform.huidu.enumeration.BookType;
+import com.codimiracle.application.platform.huidu.enumeration.CategoryType;
 import com.codimiracle.application.platform.huidu.service.BookService;
+import com.codimiracle.application.platform.huidu.service.CategoryService;
 import com.codimiracle.application.platform.huidu.service.UserFigureService;
 import com.codimiracle.application.platform.huidu.util.RestfulUtil;
+import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.Objects;
 
 /**
@@ -24,6 +29,9 @@ public class ApiRecommendationController {
 
     @Resource
     private BookService bookService;
+
+    @Resource
+    private CategoryService categoryService;
 
     @Resource
     private UserFigureService userFigureService;
@@ -52,14 +60,53 @@ public class ApiRecommendationController {
     }
 
     @GetMapping("/by-category")
-    public ApiResponse recommendsByCategory(@RequestParam("category_id") String categoryId, @RequestParam("filter") Filter filter, @RequestParam("sorter") Sorter sorter, @ModelAttribute Page page) {
-        PageSlice<BookVO> slice = bookService.findAllUsingUserFigureByCategoryId(categoryId, filter, sorter, page);
+    public ApiResponse recommendsByCategory(@AuthenticationPrincipal User user, @RequestParam("category_id") String categoryId, @RequestParam("filter") Filter filter, @RequestParam("sorter") Sorter sorter, @ModelAttribute Page page) {
+        PageSlice<BookVO> slice = bookService.findAllUsingUserFigureByCategoryId(categoryId, Objects.nonNull(user) ? user.getId() : null, filter, sorter, page);
+        return RestfulUtil.list(slice);
+    }
+
+    @GetMapping("/by-book")
+    public ApiResponse recommendsByBook(@AuthenticationPrincipal User user, @RequestParam("book_id") String bookId, @RequestParam("filter") Filter filter, @RequestParam("sorter") Sorter sorter, @ModelAttribute Page page) {
+        PageSlice<BookVO> slice = bookService.findAllUsingUserFigureByBookId(bookId, Objects.nonNull(user) ? user.getId() : null, filter, sorter, page);
+        return RestfulUtil.list(slice);
+    }
+
+    @GetMapping("/by-book-type")
+    public ApiResponse recommendsByBookType(@AuthenticationPrincipal User user, @RequestParam("type") String type, @RequestParam("filter") Filter filter, @RequestParam("sorter") Sorter sorter, @ModelAttribute Page page) {
+        PageSlice<BookVO> slice = bookService.findAllUsingUserFigureByBookType(BookType.valueOfCode(type), Objects.nonNull(user) ? user.getId() : null, filter, sorter, page);
         return RestfulUtil.list(slice);
     }
 
     @GetMapping("/by-tag")
-    public ApiResponse recommendsByTag(@RequestParam("tag_id") String tagId, @RequestParam("filter") Filter filter, @RequestParam("sorter") Sorter sorter, @ModelAttribute Page page) {
-        PageSlice<BookVO> slice = bookService.findAllUsingUserFigureByTagId(tagId, filter, sorter, page);
+    public ApiResponse recommendsByTag(@AuthenticationPrincipal User user, @RequestParam("tag_id") String tagId, @RequestParam("filter") Filter filter, @RequestParam("sorter") Sorter sorter, @ModelAttribute Page page) {
+        PageSlice<BookVO> slice = bookService.findAllUsingUserFigureByTagId(tagId, Objects.nonNull(user) ? user.getId() : null, filter, sorter, page);
         return RestfulUtil.list(slice);
+    }
+
+    @GetMapping("/by-today")
+    public ApiResponse recommendsByToday(@AuthenticationPrincipal User user, @RequestParam("filter") Filter filter, @RequestParam("sorter") Sorter sorter, @ModelAttribute Page page) {
+        PageSlice<BookVO> slice = bookService.findAllUsingUserFigureByHistoryToday(Objects.nonNull(user) ? user.getId() : null, filter, sorter, page);
+        return RestfulUtil.list(slice);
+    }
+
+    @GetMapping("/discover")
+    public ApiResponse recommendsForDiscover(@AuthenticationPrincipal User user) {
+        DiscoverVO discoverVO = new DiscoverVO();
+        Page firstPage = new Page();
+        discoverVO.setCategories(categoryService.findAllIntegrally(CategoryType.Collection, null, null, firstPage).getList());
+        discoverVO.setHotBooks(bookService.findAllHotIntegrally(null, null, null, firstPage).getList());
+        discoverVO.setMaybeLikes(bookService.findAllUsingUserFigureByAvgIntegrally(null, null, firstPage).getList());
+        Filter thisYears = new Filter();
+        thisYears.put("years", new String[]{DateFormatUtils.format(new Date(), "yyyy")});
+        discoverVO.setNewBooks(bookService.findAllIntegrally(null, thisYears, null, firstPage).getList());
+        Sorter sorter = new Sorter();
+        sorter.setField("sales");
+        sorter.setOrder("descend");
+        discoverVO.setSalesBooks(bookService.findAllIntegrally(BookType.PaperBook, null, sorter, firstPage).getList());
+        Filter fiveStar = new Filter();
+        fiveStar.put("rate", new String[]{"4.0"});
+        discoverVO.setStarsBooks(bookService.findAllIntegrally(null, fiveStar, sorter, firstPage).getList());
+        discoverVO.setTodayBooks(bookService.findAllUsingUserFigureByHistoryToday(Objects.nonNull(user) ? user.getId() : null, null, null, firstPage).getList());
+        return RestfulUtil.success(discoverVO);
     }
 }

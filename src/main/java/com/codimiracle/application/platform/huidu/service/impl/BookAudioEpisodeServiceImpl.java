@@ -69,4 +69,9 @@ public class BookAudioEpisodeServiceImpl extends AbstractService<String, BookAud
     public List<AudioCatalogs> findCatalogsByBookIdAndStatus(String id, BookAudioEpisodeStatus status) {
         return bookAudioEpisodeMapper.selectCatalogsByBookIdAndStatus(id, status);
     }
+
+    @Override
+    public BookAudioEpisodeVO findLastPublishedEpisodeByBookId(String bookId) {
+        return bookAudioEpisodeMapper.selectLastPublishedEpisodeByBookId(bookId);
+    }
 }

@@ -5,6 +5,7 @@ import com.codimiracle.application.platform.huidu.entity.po.Category;
 import com.codimiracle.application.platform.huidu.entity.po.CategoryTags;
 import com.codimiracle.application.platform.huidu.entity.po.Tag;
 import com.codimiracle.application.platform.huidu.entity.vo.CategoryVO;
+import com.codimiracle.application.platform.huidu.entity.vo.CollectionStatisticsVO;
 import com.codimiracle.application.platform.huidu.enumeration.BookType;
 import com.codimiracle.application.platform.huidu.enumeration.CategoryType;
 import com.codimiracle.application.platform.huidu.mapper.CategoryMapper;
@@ -65,17 +66,25 @@ public class CategoryServiceImpl extends AbstractService<String, Category> imple
     }
 
     @Override
+    public PageSlice<CollectionStatisticsVO> findCollectionStatisticsByCollectionId(String collectionId, Filter filter, Sorter sorter, Page page) {
+        return extractPageSlice(categoryMapper.selectCollectionStatisticsByCollectionId(collectionId, filter, sorter, page));
+    }
+
+    private void mutate(CategoryVO categoryVO) {
+        categoryVO.setTags(categoryTagsService.findTagByCategoryId(categoryVO.getId()));
+    }
+
+    @Override
     public CategoryVO findByIdIntegrally(String id) {
-        return categoryMapper.selectByIdIntegrally(id);
+        CategoryVO categoryVO = categoryMapper.selectByIdIntegrally(id);
+        mutate(categoryVO);
+        return categoryVO;
     }
 
     @Override
     public PageSlice<CategoryVO> findAllIntegrally(CategoryType type, Filter filter, Sorter sorter, Page page) {
         PageSlice<CategoryVO> slice = extractPageSlice(categoryMapper.selectAllIntegrally(type, filter, sorter, page));
-        List<CategoryVO> list = slice.getList();
-        list.forEach((categoryVO -> {
-            categoryVO.setTags(categoryTagsService.findTagByCategoryId(categoryVO.getId()));
-        }));
+        slice.getList().stream().forEach(this::mutate);
         return slice;
     }
 

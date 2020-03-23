@@ -137,4 +137,7 @@ public class BookController {
         return RestfulUtil.success(bookService.retrivePublishYearsByType(bookType));
     }
 
+    public ApiResponse hotCollection(BookType type, Filter filter, Sorter sorter, Page page) {
+        return RestfulUtil.list(bookService.findAllHotIntegrally(type, filter, sorter, page));
+    }
 }

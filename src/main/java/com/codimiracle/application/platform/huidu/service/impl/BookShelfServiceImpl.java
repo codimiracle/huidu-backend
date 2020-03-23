@@ -4,10 +4,12 @@ import com.codimiracle.application.platform.huidu.contract.AbstractService;
 import com.codimiracle.application.platform.huidu.entity.po.BookShelf;
 import com.codimiracle.application.platform.huidu.entity.po.BookShelfCell;
 import com.codimiracle.application.platform.huidu.entity.po.History;
+import com.codimiracle.application.platform.huidu.enumeration.SubscribeType;
 import com.codimiracle.application.platform.huidu.mapper.BookShelfMapper;
 import com.codimiracle.application.platform.huidu.service.BookShelfCellService;
 import com.codimiracle.application.platform.huidu.service.BookShelfService;
 import com.codimiracle.application.platform.huidu.service.HistoryService;
+import com.codimiracle.application.platform.huidu.service.SubscribeService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +31,9 @@ public class BookShelfServiceImpl extends AbstractService<String, BookShelf> imp
     private HistoryService historyService;
 
     @Resource
+    private SubscribeService subscribeService;
+
+    @Resource
     private BookShelfCellService bookShelfCellService;
 
     @Override
@@ -44,11 +49,16 @@ public class BookShelfServiceImpl extends AbstractService<String, BookShelf> imp
             defaultShelf = bookShelves.get(0);
         }
         BookShelfCell cell = bookShelfCellService.findByShelfIdAndBookId(defaultShelf.getId(), bookId);
+        // 未放到书架
         if (Objects.isNull(cell)) {
             cell = new BookShelfCell();
             cell.setShelfId(defaultShelf.getId());
             cell.setBookId(bookId);
             bookShelfCellService.save(cell);
+
+            //订阅图书更新
+            subscribeService.subscribe(userId, bookId, SubscribeType.BookUpdated);
         }
+        //已经放到书架
     }
 }

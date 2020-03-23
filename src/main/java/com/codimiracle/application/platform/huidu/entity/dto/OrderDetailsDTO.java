@@ -28,4 +28,5 @@ import lombok.Data;
 public class OrderDetailsDTO {
     private String commodityId;
     private Integer quantity;
+    private String cartItemId;
 }

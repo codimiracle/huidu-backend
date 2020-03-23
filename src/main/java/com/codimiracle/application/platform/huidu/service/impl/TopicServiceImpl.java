@@ -41,6 +41,8 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -111,13 +113,29 @@ public class TopicServiceImpl extends AbstractUnsupportedOperationServiece<Strin
         return contentService.deleteByIdLogically(id);
     }
 
+    private TopicVO mutate(ArticleVO articleVO) {
+        if (Objects.isNull(articleVO)) {
+            return null;
+        }
+        TopicVO topicVO = new TopicVO();
+        BeanUtils.copyProperties(articleVO, topicVO);
+        topicVO.setReferences(contentReferenceService.findByContentIdIntegrally(articleVO.getContentId()));
+        return topicVO;
+    }
+
+    private PageSlice<TopicVO> mutate(PageSlice<ArticleVO> slice) {
+        PageSlice<TopicVO> mutateSlice = new PageSlice<>();
+        mutateSlice.setList(slice.getList().stream().map(this::mutate).collect(Collectors.toList()));
+        mutateSlice.setPage(slice.getPage());
+        mutateSlice.setLimit(slice.getLimit());
+        mutateSlice.setTotal(slice.getTotal());
+        return mutateSlice;
+    }
+
     @Override
     public TopicVO findByIdIntegrally(String id) {
-        TopicVO topicVO = new TopicVO();
         ArticleVO articleVO = contentArticleService.findByIdIntegrally(ContentType.Topic, id);
-        BeanUtils.copyProperties(articleVO, topicVO);
-        topicVO.setReferences(contentReferenceService.findByContentIdIntegrally(id));
-        return topicVO;
+        return mutate(articleVO);
     }
 
     @Override
@@ -135,21 +153,23 @@ public class TopicServiceImpl extends AbstractUnsupportedOperationServiece<Strin
 
     @Override
     public PageSlice<TopicVO> findAllIntegrally(Filter filter, Sorter sorter, Page page) {
-        List<TopicVO> topicVOList = new ArrayList<>();
-        PageSlice<ArticleVO> articleVOList = contentArticleService.findAllIntegrally(ContentType.Topic, filter, sorter, page);
-        for (ArticleVO articleVO : articleVOList.getList()) {
-            TopicVO topicVO = new TopicVO();
-            BeanUtils.copyProperties(articleVO, topicVO);
-            topicVO.setReferences(contentReferenceService.findByContentIdIntegrally(topicVO.getContentId()));
-            topicVOList.add(topicVO);
-        }
-        PageSlice<TopicVO> slice = new PageSlice<>();
-        slice.setList(topicVOList);
-        slice.setPage(articleVOList.getPage());
-        slice.setLimit(articleVOList.getLimit());
-        slice.setTotal(articleVOList.getTotal());
-        return slice;
+        PageSlice<ArticleVO> slice = contentArticleService.findAllIntegrally(ContentType.Topic, filter, sorter, page);
+        return mutate(slice);
     }
 
+    @Override
+    public PageSlice<TopicVO> findHotIntegrally(Filter filter, Sorter sorter, Page page) {
+        return mutate(contentArticleService.findHotIntegrally(ContentType.Topic, filter, sorter, page));
+    }
 
+    @Override
+    public PageSlice<TopicVO> findTopIntegrally(Filter filter, Sorter sorter, Page page) {
+        return findHotIntegrally(filter, sorter, page);
+    }
+
+    @Override
+    public PageSlice<TopicVO> findFocusTopicByReferenceIdIntegrally(String bookId, Filter filter, Sorter sorter, Page page) {
+        PageSlice<ArticleVO> slice = contentArticleService.findFocusArticleByTypeAndReferenceId("book", bookId, filter, sorter, page);
+        return mutate(slice);
+    }
 }
