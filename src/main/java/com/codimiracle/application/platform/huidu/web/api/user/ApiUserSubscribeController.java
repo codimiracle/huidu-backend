@@ -29,7 +29,6 @@ import com.codimiracle.application.platform.huidu.entity.vo.SubscribeVO;
 import com.codimiracle.application.platform.huidu.enumeration.SubscribeType;
 import com.codimiracle.application.platform.huidu.service.SubscribeService;
 import com.codimiracle.application.platform.huidu.util.RestfulUtil;
-import org.elasticsearch.rest.RestUtils;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 

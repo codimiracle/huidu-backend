@@ -2,7 +2,6 @@ package com.codimiracle.application.platform.huidu.service.impl;
 
 import com.codimiracle.application.platform.huidu.contract.AbstractService;
 import com.codimiracle.application.platform.huidu.entity.po.BookTags;
-import com.codimiracle.application.platform.huidu.entity.po.Tag;
 import com.codimiracle.application.platform.huidu.entity.vo.TagVO;
 import com.codimiracle.application.platform.huidu.mapper.BookTagsMapper;
 import com.codimiracle.application.platform.huidu.service.BookTagsService;

@@ -22,9 +22,6 @@ package com.codimiracle.application.platform.huidu.contract;/*
  * SOFTWARE.
  */
 
-import org.springframework.beans.TypeConverter;
-
-import java.beans.PropertyEditor;
 import java.util.HashMap;
 /**
  * @author Codimiracle

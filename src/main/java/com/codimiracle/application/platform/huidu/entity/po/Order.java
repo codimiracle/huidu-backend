@@ -1,13 +1,10 @@
 package com.codimiracle.application.platform.huidu.entity.po;
 
 import com.codimiracle.application.platform.huidu.entity.dto.OrderringDTO;
-import com.codimiracle.application.platform.huidu.entity.dto.RechargeDTO;
 import com.codimiracle.application.platform.huidu.enumeration.OrderStatus;
 import com.codimiracle.application.platform.huidu.enumeration.OrderType;
 import com.codimiracle.application.platform.huidu.enumeration.PaymentType;
-import com.codimiracle.application.platform.huidu.util.CodeUtil;
 import com.codimiracle.application.platform.huidu.util.HuiduMoneyUtil;
-import com.codimiracle.application.platform.huidu.util.OrderNumberUtil;
 import lombok.Data;
 import org.joda.money.Money;
 import org.springframework.beans.BeanUtils;

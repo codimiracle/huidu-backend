@@ -23,13 +23,7 @@ package com.codimiracle.application.platform.huidu.entity.dto;/*
  */
 
 import com.codimiracle.application.platform.huidu.entity.embedded.ContentSource;
-import com.codimiracle.application.platform.huidu.entity.po.ContentReference;
-import com.codimiracle.application.platform.huidu.enumeration.ContentStatus;
-import com.codimiracle.application.platform.huidu.enumeration.ContentType;
 import lombok.Data;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Data
 public class TopicDTO {

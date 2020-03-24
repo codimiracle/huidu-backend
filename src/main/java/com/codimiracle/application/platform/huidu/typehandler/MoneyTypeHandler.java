@@ -28,12 +28,10 @@ import org.apache.ibatis.type.MappedTypes;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 
-import java.math.BigDecimal;
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Optional;
 
 @MappedTypes({
         Money.class

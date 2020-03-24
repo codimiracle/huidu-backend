@@ -3,7 +3,6 @@ package com.codimiracle.application.platform.huidu.service.impl;
 import com.codimiracle.application.platform.huidu.contract.AbstractService;
 import com.codimiracle.application.platform.huidu.entity.po.BookShelf;
 import com.codimiracle.application.platform.huidu.entity.po.BookShelfCell;
-import com.codimiracle.application.platform.huidu.entity.po.History;
 import com.codimiracle.application.platform.huidu.enumeration.SubscribeType;
 import com.codimiracle.application.platform.huidu.mapper.BookShelfMapper;
 import com.codimiracle.application.platform.huidu.service.BookShelfCellService;

@@ -22,8 +22,6 @@ package com.codimiracle.application.platform.huidu.enumeration;/*
  * SOFTWARE.
  */
 
-import com.codimiracle.application.platform.huidu.entity.po.PassingPoint;
-
 import java.util.Objects;
 
 public enum PassingPointStatus {

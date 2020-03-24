@@ -23,17 +23,11 @@ package com.codimiracle.application.platform.huidu.converter;/*
  */
 
 import com.codimiracle.application.platform.huidu.contract.Filter;
-import com.codimiracle.application.platform.huidu.contract.Sorter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.TypeConverter;
-import org.springframework.beans.TypeMismatchException;
 import org.springframework.boot.context.properties.ConfigurationPropertiesBinding;
-import org.springframework.core.MethodParameter;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
-
-import java.lang.reflect.Field;
 
 @Component
 @ConfigurationPropertiesBinding

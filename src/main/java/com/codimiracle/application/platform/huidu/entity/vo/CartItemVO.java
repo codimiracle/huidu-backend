@@ -2,7 +2,6 @@ package com.codimiracle.application.platform.huidu.entity.vo;
 
 import lombok.Data;
 
-import javax.persistence.Column;
 import java.util.Date;
 
 @Data

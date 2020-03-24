@@ -6,7 +6,6 @@ import com.codimiracle.application.platform.huidu.entity.po.OrderDetails;
 import com.codimiracle.application.platform.huidu.entity.vo.OrderVO;
 import com.codimiracle.application.platform.huidu.entity.vt.Comment;
 import com.codimiracle.application.platform.huidu.enumeration.OrderStatus;
-import com.codimiracle.application.platform.huidu.enumeration.PaymentType;
 import org.joda.money.Money;
 
 import java.util.List;

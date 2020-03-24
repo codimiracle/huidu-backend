@@ -1,7 +1,5 @@
 package com.codimiracle.application.platform.huidu;
 
-import com.codimiracle.application.platform.huidu.security.HuiduTokenAuthenticationFilter;
-import com.codimiracle.application.platform.huidu.security.HuiduTokenAuthenticationProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;

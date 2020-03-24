@@ -4,9 +4,6 @@ import com.codimiracle.application.platform.huidu.entity.embedded.ContentSource;
 import com.codimiracle.application.platform.huidu.entity.embedded.Dommark;
 import lombok.Data;
 
-import javax.persistence.Column;
-import java.util.Date;
-
 @Data
 public class BookNotesDTO {
     private Integer bookId;

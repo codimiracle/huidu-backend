@@ -6,8 +6,6 @@ import com.codimiracle.application.platform.huidu.entity.po.BookNotes;
 import com.codimiracle.application.platform.huidu.entity.vo.BookNotesVO;
 import com.codimiracle.application.platform.huidu.entity.vt.BookNoteCollection;
 
-import java.util.List;
-
 
 /**
  * @author Codimiracle

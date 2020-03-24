@@ -2,23 +2,14 @@ package com.codimiracle.application.platform.huidu.web.api;
 
 import com.codimiracle.application.platform.huidu.entity.dto.BookDTO;
 import com.codimiracle.application.platform.huidu.entity.dto.BookMetadataDTO;
-import com.codimiracle.application.platform.huidu.entity.dto.ElectronicBookDTO;
-import com.codimiracle.application.platform.huidu.entity.dto.PaperBookDTO;
-import com.codimiracle.application.platform.huidu.entity.po.BookMetadata;
 import com.codimiracle.application.platform.huidu.entity.po.User;
 import com.codimiracle.application.platform.huidu.enumeration.BookStatus;
 import com.codimiracle.application.platform.huidu.enumeration.BookType;
-import com.codimiracle.application.platform.huidu.web.api.backend.ApiBackendElectronicBookController;
 import com.codimiracle.application.platform.huidu.web.api.base.BookController;
-import com.codimiracle.application.platform.huidu.web.api.creator.ApiCreatorElectronicBookController;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.annotation.Resource;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 /*
  * MIT License

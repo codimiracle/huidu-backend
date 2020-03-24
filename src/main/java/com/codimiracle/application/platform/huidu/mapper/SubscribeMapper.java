@@ -1,6 +1,9 @@
 package com.codimiracle.application.platform.huidu.mapper;
 
-import com.codimiracle.application.platform.huidu.contract.*;
+import com.codimiracle.application.platform.huidu.contract.Filter;
+import com.codimiracle.application.platform.huidu.contract.Mapper;
+import com.codimiracle.application.platform.huidu.contract.Page;
+import com.codimiracle.application.platform.huidu.contract.Sorter;
 import com.codimiracle.application.platform.huidu.entity.po.Subscribe;
 import com.codimiracle.application.platform.huidu.entity.vo.SubscribeVO;
 import com.codimiracle.application.platform.huidu.enumeration.SubscribeType;

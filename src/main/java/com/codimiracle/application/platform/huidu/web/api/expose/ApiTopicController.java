@@ -26,20 +26,14 @@ import com.codimiracle.application.platform.huidu.contract.ApiResponse;
 import com.codimiracle.application.platform.huidu.contract.Filter;
 import com.codimiracle.application.platform.huidu.contract.Page;
 import com.codimiracle.application.platform.huidu.contract.Sorter;
-import com.codimiracle.application.platform.huidu.entity.dto.TopicDTO;
-import com.codimiracle.application.platform.huidu.entity.po.ContentReference;
-import com.codimiracle.application.platform.huidu.entity.po.User;
 import com.codimiracle.application.platform.huidu.entity.vo.TopicVO;
-import com.codimiracle.application.platform.huidu.entity.vt.Topic;
 import com.codimiracle.application.platform.huidu.service.TopicService;
 import com.codimiracle.application.platform.huidu.util.RestfulUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Objects;
 
 @CrossOrigin
 @RestController

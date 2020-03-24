@@ -3,8 +3,6 @@ package com.codimiracle.application.platform.huidu.util;
 import com.codimiracle.application.platform.huidu.enumeration.OrderType;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 /*
  * MIT License
  *

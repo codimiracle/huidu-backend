@@ -18,7 +18,6 @@ import com.codimiracle.application.platform.huidu.service.OrderService;
 import com.codimiracle.application.platform.huidu.util.HuiduMoneyUtil;
 import com.codimiracle.application.platform.huidu.util.OrderNumberUtil;
 import com.codimiracle.application.platform.huidu.util.RestfulUtil;
-import org.joda.money.Money;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;

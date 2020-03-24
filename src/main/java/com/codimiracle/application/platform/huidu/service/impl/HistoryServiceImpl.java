@@ -9,7 +9,6 @@ import com.codimiracle.application.platform.huidu.entity.vo.HistoryVO;
 import com.codimiracle.application.platform.huidu.enumeration.BookType;
 import com.codimiracle.application.platform.huidu.mapper.HistoryMapper;
 import com.codimiracle.application.platform.huidu.service.*;
-import com.codimiracle.application.platform.huidu.util.RestfulUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

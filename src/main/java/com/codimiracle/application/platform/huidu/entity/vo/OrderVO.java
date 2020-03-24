@@ -23,12 +23,9 @@ package com.codimiracle.application.platform.huidu.entity.vo;
  * SOFTWARE.
  */
 
-import com.codimiracle.application.platform.huidu.enumeration.OrderType;
-import com.codimiracle.application.platform.huidu.enumeration.PaymentType;
 import lombok.Data;
 import org.joda.money.Money;
 
-import javax.persistence.Column;
 import java.util.Date;
 import java.util.List;
 

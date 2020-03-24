@@ -12,7 +12,10 @@ import com.codimiracle.application.platform.huidu.util.RestfulUtil;
 import javazoom.spi.mpeg.sampled.file.MpegAudioFileReader;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.annotation.Resource;
 import javax.sound.sampled.AudioFileFormat;

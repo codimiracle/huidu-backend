@@ -4,7 +4,6 @@ import com.codimiracle.application.platform.huidu.entity.dto.BookEpisodeDTO;
 import com.codimiracle.application.platform.huidu.enumeration.ContentStatus;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
-import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
 import java.util.Date;

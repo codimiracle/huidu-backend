@@ -24,10 +24,6 @@ package com.codimiracle.application.platform.huidu.entity.vo;/*
 
 import lombok.Data;
 
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import java.util.Date;
 
 @Data

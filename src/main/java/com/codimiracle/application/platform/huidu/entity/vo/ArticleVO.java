@@ -23,7 +23,6 @@ package com.codimiracle.application.platform.huidu.entity.vo;/*
  */
 
 import com.codimiracle.application.platform.huidu.entity.embedded.ContentSource;
-import com.codimiracle.application.platform.huidu.enumeration.ContentStatus;
 import lombok.Data;
 
 import java.util.List;

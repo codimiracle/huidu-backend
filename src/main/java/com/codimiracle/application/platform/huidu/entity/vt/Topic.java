@@ -26,7 +26,6 @@ import com.codimiracle.application.platform.huidu.entity.dto.TopicDTO;
 import com.codimiracle.application.platform.huidu.entity.po.ContentReference;
 import com.codimiracle.application.platform.huidu.enumeration.ContentStatus;
 import com.codimiracle.application.platform.huidu.enumeration.ContentType;
-import lombok.Builder;
 import lombok.Data;
 
 import javax.persistence.Column;

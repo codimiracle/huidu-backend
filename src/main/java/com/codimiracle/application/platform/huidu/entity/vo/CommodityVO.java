@@ -22,10 +22,7 @@ package com.codimiracle.application.platform.huidu.entity.vo;/*
  * SOFTWARE.
  */
 
-import com.codimiracle.application.platform.huidu.enumeration.CommodityStatus;
-import com.codimiracle.application.platform.huidu.enumeration.CommodityType;
 import com.fasterxml.jackson.annotation.JsonRawValue;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Data;
 import org.joda.money.Money;
 

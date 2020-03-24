@@ -28,17 +28,18 @@ import com.codimiracle.application.platform.huidu.contract.Page;
 import com.codimiracle.application.platform.huidu.contract.Sorter;
 import com.codimiracle.application.platform.huidu.entity.dto.ReviewDTO;
 import com.codimiracle.application.platform.huidu.entity.po.ContentReference;
-import com.codimiracle.application.platform.huidu.entity.po.User;
 import com.codimiracle.application.platform.huidu.entity.vo.ReviewVO;
 import com.codimiracle.application.platform.huidu.entity.vt.Review;
 import com.codimiracle.application.platform.huidu.service.ReviewService;
 import com.codimiracle.application.platform.huidu.util.RestfulUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @CrossOrigin

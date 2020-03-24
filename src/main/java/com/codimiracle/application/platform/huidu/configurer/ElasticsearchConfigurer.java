@@ -23,7 +23,6 @@ package com.codimiracle.application.platform.huidu.configurer;/*
  */
 
 import org.elasticsearch.client.RestHighLevelClient;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.data.elasticsearch.client.ClientConfiguration;
 import org.springframework.data.elasticsearch.client.RestClients;
 import org.springframework.data.elasticsearch.config.AbstractElasticsearchConfiguration;

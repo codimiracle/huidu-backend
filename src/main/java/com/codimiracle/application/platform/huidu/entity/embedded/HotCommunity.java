@@ -24,7 +24,6 @@ package com.codimiracle.application.platform.huidu.entity.embedded;/*
 
 import com.codimiracle.application.platform.huidu.entity.vo.ReviewVO;
 import com.codimiracle.application.platform.huidu.entity.vo.TopicVO;
-import com.codimiracle.application.platform.huidu.entity.vo.UserProtectedVO;
 import lombok.Data;
 
 import java.util.List;

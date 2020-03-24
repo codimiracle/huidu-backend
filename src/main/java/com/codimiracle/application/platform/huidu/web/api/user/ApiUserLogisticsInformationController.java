@@ -1,10 +1,6 @@
 package com.codimiracle.application.platform.huidu.web.api.user;
 
 import com.codimiracle.application.platform.huidu.contract.ApiResponse;
-import com.codimiracle.application.platform.huidu.contract.Page;
-import com.codimiracle.application.platform.huidu.contract.PageSlice;
-import com.codimiracle.application.platform.huidu.entity.dto.LogisticsInformationDTO;
-import com.codimiracle.application.platform.huidu.entity.po.LogisticsInformation;
 import com.codimiracle.application.platform.huidu.entity.po.User;
 import com.codimiracle.application.platform.huidu.entity.vo.LogisticsInformationVO;
 import com.codimiracle.application.platform.huidu.service.LogisticsInformationService;

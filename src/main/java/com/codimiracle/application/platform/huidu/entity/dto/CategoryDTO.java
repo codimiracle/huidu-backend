@@ -22,7 +22,6 @@ package com.codimiracle.application.platform.huidu.entity.dto;/*
  * SOFTWARE.
  */
 
-import com.codimiracle.application.platform.huidu.entity.embedded.CategoryExtra;
 import com.codimiracle.application.platform.huidu.enumeration.CategoryType;
 import lombok.Data;
 

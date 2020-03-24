@@ -22,7 +22,6 @@ package com.codimiracle.application.platform.huidu.entity.dto;/*
  * SOFTWARE.
  */
 
-import com.codimiracle.application.platform.huidu.enumeration.ActivityStatus;
 import lombok.Data;
 
 /**

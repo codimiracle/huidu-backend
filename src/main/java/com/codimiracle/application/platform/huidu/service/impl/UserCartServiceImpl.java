@@ -6,7 +6,6 @@ import com.codimiracle.application.platform.huidu.entity.vo.CartItemVO;
 import com.codimiracle.application.platform.huidu.mapper.UserCartMapper;
 import com.codimiracle.application.platform.huidu.service.CommodityService;
 import com.codimiracle.application.platform.huidu.service.UserCartService;
-import org.h2.util.ScriptReader;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Condition;

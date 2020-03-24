@@ -1,11 +1,8 @@
 package com.codimiracle.application.platform.huidu.entity.po;
 
-import com.codimiracle.application.platform.huidu.entity.dto.FigureTagsDTO;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.util.List;
-import java.util.Objects;
 
 @Data
 @Table(name = "user_figure")

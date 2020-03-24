@@ -29,7 +29,6 @@ import com.codimiracle.application.platform.huidu.contract.Sorter;
 import com.codimiracle.application.platform.huidu.entity.dto.ReviewDTO;
 import com.codimiracle.application.platform.huidu.entity.po.ContentReference;
 import com.codimiracle.application.platform.huidu.entity.po.User;
-import com.codimiracle.application.platform.huidu.entity.vo.ReviewVO;
 import com.codimiracle.application.platform.huidu.entity.vt.Review;
 import com.codimiracle.application.platform.huidu.enumeration.ContentStatus;
 import com.codimiracle.application.platform.huidu.service.ReviewService;

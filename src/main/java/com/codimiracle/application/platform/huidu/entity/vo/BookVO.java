@@ -22,8 +22,6 @@ package com.codimiracle.application.platform.huidu.entity.vo;/*
  * SOFTWARE.
  */
 
-import com.codimiracle.application.platform.huidu.enumeration.BookStatus;
-import com.codimiracle.application.platform.huidu.enumeration.BookType;
 import lombok.Data;
 
 import java.util.List;
