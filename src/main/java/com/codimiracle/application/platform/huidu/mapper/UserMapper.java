@@ -25,4 +25,8 @@ public interface UserMapper extends Mapper<User> {
     UserProtectedVO selectByIdProtectly(String userId);
 
     User selectById(String id);
+
+    boolean existsUsername(String username);
+
+    boolean existsNickname(String nickname);
 }

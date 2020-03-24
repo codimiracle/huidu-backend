@@ -30,4 +30,7 @@ public interface UserService extends Service<String, User>, UserDetailsService {
     User loadUserByUsername(String username) throws UsernameNotFoundException;
 
     User loadUserById(String id);
+
+    boolean existsUsername(String username);
+    boolean existsNickname(String username);
 }

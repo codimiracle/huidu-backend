@@ -36,11 +36,20 @@ import com.codimiracle.application.platform.huidu.enumeration.ActivityStatus;
 import com.codimiracle.application.platform.huidu.service.*;
 import com.codimiracle.application.platform.huidu.util.RestfulUtil;
 import com.codimiracle.application.platform.huidu.util.StringifizationUtil;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -83,7 +92,15 @@ public class ApiSystemController {
 
     @GetMapping("/version")
     public ApiResponse version() {
-        return RestfulUtil.success("huidu-platform-build-20200323");
+        if (Files.exists(Paths.get("./version"))) {
+            try {
+                return RestfulUtil.success(FileUtils.readFileToString(new File("./version"), StandardCharsets.UTF_8));
+            } catch (IOException e) {
+                e.printStackTrace();
+                return RestfulUtil.fail("读取 version 文件失败！");
+            }
+        }
+        return RestfulUtil.fail("没有找到 version 文件！");
     }
 
     @PostMapping("/sign-in")
@@ -104,6 +121,30 @@ public class ApiSystemController {
         updatingUserToken.setId(original.getId());
         userTokenService.update(updatingUserToken);
         return RestfulUtil.success();
+    }
+
+    @GetMapping("/username-exists")
+    public ApiResponse usernameExists(@RequestParam("username") String username) {
+        if (StringUtils.isEmpty(username)) {
+            return RestfulUtil.fail("用户名无效!");
+        }
+        if (userService.existsUsername(username)) {
+            return RestfulUtil.success();
+        } else {
+            return RestfulUtil.fail("用户名不存在!");
+        }
+    }
+
+    @GetMapping("/nickname-exists")
+    public ApiResponse nicknameExists(@RequestParam("nickname") String nickname) {
+        if (StringUtils.isEmpty(nickname)) {
+            return RestfulUtil.fail("昵称无效!");
+        }
+        if (userService.existsNickname(nickname)) {
+            return RestfulUtil.success();
+        } else {
+            return RestfulUtil.fail("用户名不存在!");
+        }
     }
 
     @GetMapping("realtime")

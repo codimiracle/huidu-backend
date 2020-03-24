@@ -162,4 +162,11 @@
         <include refid="select_statement_for_system"/>
         AND u.id = #{id}
     </select>
+    <select id="existsUsername" resultType="java.lang.Boolean">
+        SELECT 1 FROM user u WHERE u.username = #{username}
+    </select>
+
+    <select id="existsNickname" resultType="java.lang.Boolean">
+        SELECT 1 FROM user u WHERE u.nickname = #{nickname}
+    </select>
 </mapper>

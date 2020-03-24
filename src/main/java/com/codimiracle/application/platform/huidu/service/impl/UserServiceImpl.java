@@ -85,6 +85,16 @@ public class UserServiceImpl extends AbstractService<String, User> implements Us
     }
 
     @Override
+    public boolean existsUsername(String username) {
+        return userMapper.existsUsername(username);
+    }
+
+    @Override
+    public boolean existsNickname(String nickname) {
+        return userMapper.existsNickname(nickname);
+    }
+
+    @Override
     public void deleteByIdLogically(String id) {
         userMapper.deleteByIdLogically(id);
     }

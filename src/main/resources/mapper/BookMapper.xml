@@ -253,9 +253,11 @@
     </select>
     <select id="selectAllUsingUserFigureByTagId" resultMap="IntegratedResultMap">
         <include refid="select_statement_without_type"/>
-        AND b.id IN (SELECT bt.book_id FROM book_tags bt WHERE bt.tag_id IN (SELECT uf.tag_id from user_figure uf INNER
-        JOIN user_figure uft ON uft.user_id = uf.user_id WHERE uft.tag_id = 15 GROUP BY uf.tag_id ORDER By avg(uf.score)
-        DESC))
+        AND b.id IN (
+            SELECT bt.book_id FROM book_tags bt WHERE bt.tag_id IN (
+                SELECT uf.tag_id from user_figure uf INNER JOIN user_figure uft ON uft.user_id = uf.user_id WHERE uft.tag_id = 15 GROUP BY uf.tag_id ORDER By avg(uf.score) DESC
+            )
+        )
         <if test="filter != null">
             <if test="filter.type != null and filter.type.length gt 0">
                 AND b.type = #{filter.type[0]}
@@ -265,10 +267,10 @@
     <select id="selectAllUsingUserFigureByCategoryId" resultMap="IntegratedResultMap">
         <include refid="select_statement_without_type"/>
         AND b.id IN (
-        SELECT bt.book_id FROM book_tags bt WHERE bt.tag_id IN (
-            SELECT uf.tag_id FROM user_figure uf WHERE uf.tag_id IN (
-                SELECT ct.tag_id FROM category_tags ct WHERE ct.category_id = #{categoryId}
-                ) <if test="userId != null">AND uf.user_id = #{userId}</if> GROUP By uf.tag_id ORDER BY avg(uf.score) DESC
+            SELECT bt.book_id FROM book_tags bt WHERE bt.tag_id IN (
+                SELECT uf.tag_id FROM user_figure uf WHERE uf.tag_id IN (
+                    SELECT ct.tag_id FROM category_tags ct WHERE ct.category_id = #{categoryId}
+                )  <if test="userId != null">AND uf.user_id = #{userId}</if> GROUP By uf.tag_id ORDER BY avg(uf.score) DESC
             )
         )
         <if test="filter != null">
@@ -306,7 +308,7 @@
             SELECT bt.book_id FROM book_tags bt WHERE bt.tag_id IN (
                 SELECT uf.tag_id FROM user_figure uf WHERE uf.tag_id IN (
                     SELECT btx.tag_id FROM book_tags btx LEFT JOIN history h ON btx.book_id = h.book_id WHERE DATE(h.read_time) = DATE(NOW()) GROUP BY btx.tag_id
-                ) <if test="userId != null">WHERE uf.user_id = #{userId}</if> GROUP By uf.tag_id ORDER BY avg(uf.score) DESC
+                ) <if test="userId != null">AND uf.user_id = #{userId}</if> GROUP By uf.tag_id ORDER BY avg(uf.score) DESC
             )
         )
     </select>
