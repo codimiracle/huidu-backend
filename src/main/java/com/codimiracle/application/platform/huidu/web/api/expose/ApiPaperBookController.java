@@ -32,6 +32,6 @@ public class ApiPaperBookController {
 
     @GetMapping
     public ApiResponse collection(@RequestParam("filter") Filter filter, @RequestParam("sorter") Sorter sorter, @ModelAttribute Page page) {
-        return bookController.collection(BookType.PaperBook, filter, sorter, page);
+        return bookController.publishCollection(BookType.PaperBook, filter, sorter, page);
     }
 }

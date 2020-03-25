@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.codimiracle.application</groupId>
     <artifactId>huidu-web-backend</artifactId>
-    <version>0.5.1-SNAPSHOT</version>
+    <version>0.5.3-SNAPSHOT</version>
     <name>huidu-web-backend</name>
     <description>Demo project for Spring Boot</description>
 
@@ -147,12 +147,6 @@
                     <artifactId>junit-vintage-engine</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <version>1.4.200</version>
-            <scope>compile</scope>
         </dependency>
     </dependencies>
 

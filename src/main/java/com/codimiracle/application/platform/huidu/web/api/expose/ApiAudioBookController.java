@@ -57,6 +57,6 @@ public class ApiAudioBookController {
 
     @GetMapping
     public ApiResponse collection(@RequestParam("filter") Filter filter, @RequestParam("sorter") Sorter sorter, @ModelAttribute Page page) {
-        return bookController.collection(BookType.AudioBook, filter, sorter, page);
+        return bookController.publishCollection(BookType.AudioBook, filter, sorter, page);
     }
 }

@@ -34,7 +34,11 @@ public class ApiBookEpisodeController {
 
     @GetMapping("/last-read")
     public ApiResponse entity(@AuthenticationPrincipal User user, @PathVariable("book_id") String bookId) {
-        HistoryVO historyVO = historyService.findByUserIdAndBookIdIntegrallyOrFirstEpisode(user.getId(), bookId);
+        //尚未登录
+        HistoryVO historyVO = null;
+        if (Objects.nonNull(user)) {
+            historyVO = historyService.findByUserIdAndBookIdIntegrallyOrFirstEpisode(user.getId(), bookId);
+        }
         return RestfulUtil.entity(historyVO);
     }
 

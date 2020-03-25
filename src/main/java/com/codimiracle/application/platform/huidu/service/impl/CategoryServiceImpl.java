@@ -71,7 +71,9 @@ public class CategoryServiceImpl extends AbstractService<String, Category> imple
     }
 
     private void mutate(CategoryVO categoryVO) {
-        categoryVO.setTags(categoryTagsService.findTagByCategoryId(categoryVO.getId()));
+        if (Objects.nonNull(categoryVO)) {
+            categoryVO.setTags(categoryTagsService.findTagByCategoryId(categoryVO.getId()));
+        }
     }
 
     @Override

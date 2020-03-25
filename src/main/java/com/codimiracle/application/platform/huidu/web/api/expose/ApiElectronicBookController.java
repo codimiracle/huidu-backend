@@ -58,8 +58,6 @@ public class ApiElectronicBookController {
 
     @GetMapping
     public ApiResponse collection(@RequestParam("filter") Filter filter, @RequestParam("sorter") Sorter sorter, @ModelAttribute Page page) {
-        filter = Objects.isNull(filter) ? new Filter() : filter;
-        filter.put("status", new String[] {BookStatus.Serializing.toString(), BookStatus.Ended.toString(), BookStatus.Paused.toString()});
-        return bookController.collection(BookType.ElectronicBook, filter, sorter, page);
+        return bookController.publishCollection(BookType.ElectronicBook, filter, sorter, page);
     }
 }

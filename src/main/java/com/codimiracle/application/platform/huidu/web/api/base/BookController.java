@@ -9,10 +9,7 @@ import com.codimiracle.application.platform.huidu.entity.po.User;
 import com.codimiracle.application.platform.huidu.entity.vo.BookVO;
 import com.codimiracle.application.platform.huidu.entity.vt.AudioCatalogs;
 import com.codimiracle.application.platform.huidu.entity.vt.Catalogs;
-import com.codimiracle.application.platform.huidu.enumeration.BookAudioEpisodeStatus;
-import com.codimiracle.application.platform.huidu.enumeration.BookType;
-import com.codimiracle.application.platform.huidu.enumeration.ContentStatus;
-import com.codimiracle.application.platform.huidu.enumeration.ContentType;
+import com.codimiracle.application.platform.huidu.enumeration.*;
 import com.codimiracle.application.platform.huidu.service.*;
 import com.codimiracle.application.platform.huidu.util.RestfulUtil;
 import com.codimiracle.application.platform.huidu.util.TagUtil;
@@ -111,6 +108,12 @@ public class BookController {
     public ApiResponse collection(BookType type, Filter filter, Sorter sorter, Page page) {
         PageSlice<BookVO> slice = bookService.findAllIntegrally(type, filter, sorter, page);
         return RestfulUtil.list(slice);
+    }
+    
+    public ApiResponse publishCollection(BookType type, Filter filter, Sorter sorter, Page page) {
+        filter = Objects.nonNull(filter) ? filter : new Filter();
+        filter.put("status", new String[]{BookStatus.Serializing.toString(), BookStatus.Paused.toString(), BookStatus.Ended.toString()});
+        return collection(type, filter, sorter, page);
     }
 
     public ApiResponse catalogs(String id) {

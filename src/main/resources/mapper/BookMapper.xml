@@ -200,7 +200,7 @@
                 WHERE t.name = 'sdfa')
             </if>
         </if>
-        GROUP BY b.type
+        GROUP BY b.type,b.id
         <if test="sorter != null">
             <if test="sorter.field == 'hot_degree'">
                 ORDER BY (ct.likes * 3 + (b.reads + b.plays) * 2 + ct.comments) * ct.rate

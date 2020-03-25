@@ -5,6 +5,7 @@ import com.codimiracle.application.platform.huidu.entity.po.Book;
 import com.codimiracle.application.platform.huidu.entity.po.BookTags;
 import com.codimiracle.application.platform.huidu.entity.po.Content;
 import com.codimiracle.application.platform.huidu.entity.vo.BookVO;
+import com.codimiracle.application.platform.huidu.enumeration.BookStatus;
 import com.codimiracle.application.platform.huidu.enumeration.BookType;
 import com.codimiracle.application.platform.huidu.mapper.BookMapper;
 import com.codimiracle.application.platform.huidu.service.*;
@@ -159,41 +160,58 @@ public class BookServiceImpl extends AbstractService<String, Book> implements Bo
         return bookMapper.selectByContentIdIntegrally(contentId);
     }
 
-    @Override
-    public PageSlice<BookVO> findAllHotIntegrally(BookType type, Filter filter, Sorter sorter, Page page) {
+    private Filter ensurePublish(Filter filter) {
+        filter = Objects.nonNull(filter) ? filter : new Filter();
+        filter.put("status", new String[]{BookStatus.Serializing.toString(), BookStatus.Paused.toString(), BookStatus.Ended.toString()});
+        return filter;
+    }
+    private Sorter orderByHotDegree(Sorter sorter) {
         sorter = Objects.isNull(sorter) ? new Sorter() : sorter;
         sorter.setField("hotDegree");
         sorter.setOrder("descend");
+        return sorter;
+    }
+
+    @Override
+    public PageSlice<BookVO> findAllHotIntegrally(BookType type, Filter filter, Sorter sorter, Page page) {
+        filter = ensurePublish(filter);
+        sorter = orderByHotDegree(sorter);
         return findAllIntegrally(type, filter, sorter, page);
     }
 
     @Override
     public PageSlice<BookVO> findAllUsingUserFigureByUserIdIntegrally(String userId, Filter filter, Sorter sorter, Page page) {
+        filter = ensurePublish(filter);
         return extractPageSlice(bookMapper.selectAllUsingUserFigureByUserIdIntegrally(userId, filter, sorter, page));
     }
 
     @Override
     public PageSlice<BookVO> findAllUsingUserFigureByAvgIntegrally(Filter filter, Sorter sorter, Page page) {
+        filter = ensurePublish(filter);
         return extractPageSlice(bookMapper.selectAllUsingUserFigureByAvgIntegrally(filter, sorter, page));
     }
 
     @Override
     public PageSlice<BookVO> findAllUsingUserFigureByTagId(String tagId, String userId, Filter filter, Sorter sorter, Page page) {
+        filter = ensurePublish(filter);
         return extractPageSlice(bookMapper.selectAllUsingUserFigureByTagId(tagId, userId, filter, sorter, page));
     }
 
     @Override
     public PageSlice<BookVO> findAllUsingUserFigureByCategoryId(String categoryId, String userId, Filter filter, Sorter sorter, Page page) {
+        filter = ensurePublish(filter);
         return extractPageSlice(bookMapper.selectAllUsingUserFigureByCategoryId(categoryId, userId, filter, sorter, page));
     }
 
     @Override
     public PageSlice<BookVO> findAllUsingUserFigureByBookId(String bookId, String userId, Filter filter, Sorter sorter, Page page) {
+        filter = ensurePublish(filter);
         return extractPageSlice(bookMapper.selectAllUsingUserFigureByBookId(bookId, userId, filter, sorter, page));
     }
 
     @Override
     public PageSlice<BookVO> findAllUsingUserFigureByHistoryToday(String userId, Filter filter, Sorter sorter, Page page) {
+        filter = ensurePublish(filter);
         return extractPageSlice(bookMapper.selectAllUsingUserFigureByHistoryToday(userId, filter, sorter, page));
     }
 
@@ -204,6 +222,7 @@ public class BookServiceImpl extends AbstractService<String, Book> implements Bo
 
     @Override
     public PageSlice<BookVO> findAllUsingUserFigureByBookType(BookType type, String userId, Filter filter, Sorter sorter, Page page) {
+        filter = ensurePublish(filter);
         return extractPageSlice(bookMapper.selectAllUsingUserFigureByBookType(type, userId, filter, sorter, page));
     }
 
