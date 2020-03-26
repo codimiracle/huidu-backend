@@ -58,7 +58,7 @@ public class UserTokenServiceImpl extends AbstractService<String, UserToken> imp
     @Override
     public UserTokenVO findByIdIntegrally(String id) {
         UserTokenVO userTokenVO = userTokenMapper.selectByIdIntegrally(id);
-        userTokenVO.setUser(userService‬.findByIdIntegrally(id));
+        userTokenVO.setUser(userService‬.findByIdIntegrally(userTokenVO.getUserId()));
         return userTokenVO;
     }
 
