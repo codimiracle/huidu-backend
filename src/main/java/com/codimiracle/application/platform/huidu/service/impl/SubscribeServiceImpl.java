@@ -49,24 +49,30 @@ public class SubscribeServiceImpl extends AbstractService<String, Subscribe> imp
         return slice;
     }
 
+    private Subscribe ensureNotNull(Subscribe subscribe) {
+        if (Objects.isNull(subscribe)) {
+            return new Subscribe();
+        }
+        return subscribe;
+    }
+
     @Override
     public void subscribe(String subscriberId, String targetId, SubscribeType type) {
         Subscribe subscribe = null;
         if (SubscribeType.BookUpdated == type) {
+            subscribe = ensureNotNull(findBySubscriberIdAndBookId(subscriberId, targetId));
             subscribe.setBookId(targetId);
-            subscribe = findBySubscriberIdAndBookId(subscriberId, targetId);
         } else if (SubscribeType.CommodityPutOnSale == type) {
+            subscribe = ensureNotNull(findBySubscriberIdAndCommodityId(subscriberId, targetId));
             subscribe.setCommodityId(targetId);
-            subscribe = findBySubscriberIdAndCommodityId(subscriberId, targetId);
         } else if (SubscribeType.ContentCommented == type) {
+            subscribe = ensureNotNull(findBySubscriberIdAndContentId(subscriberId, targetId));
             subscribe.setContentId(targetId);
-            subscribe = findBySubscriberIdAndContentId(subscriberId, targetId);
         } else if (SubscribeType.ContentReplay == type) {
+            subscribe = ensureNotNull(findBySubscriberIdAndContentId(subscriberId, targetId));
             subscribe.setContentId(targetId);
-            subscribe = findBySubscriberIdAndContentId(subscriberId, targetId);
         }
         if (Objects.isNull(subscribe)) {
-            subscribe = new Subscribe();
             subscribe.setSubscriberId(subscriberId);
             subscribe.setCreateTime(new Date());
             subscribe.setUpdateTime(subscribe.getCreateTime());
