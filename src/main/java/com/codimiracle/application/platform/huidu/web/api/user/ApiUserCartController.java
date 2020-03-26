@@ -38,6 +38,12 @@ public class ApiUserCartController {
         return RestfulUtil.success();
     }
 
+    @DeleteMapping
+    public ApiResponse deleteBulk(@RequestParam String ids) {
+        userCartService.deleteByIdsLogically(StringifizationUtil.toList(ids));
+        return RestfulUtil.success();
+    }
+
     @PutMapping("/{id}")
     public ApiResponse update(@AuthenticationPrincipal User user, @PathVariable String id, @RequestBody CartItemDTO cartItemDTO) {
         CartItem updatingCartItem = CartItem.from(cartItemDTO);
