@@ -20,4 +20,7 @@ public interface UserCartMapper extends Mapper<CartItem> {
     List<CartItemVO> selectAllIntegrally(@Param("filter") Filter filter, @Param("sorter") Sorter sorter, @Param("page") Page page);
 
     List<CartItemVO> selectByIdsIntegrally(@Param("ids") List<String> ids);
+
+    void deleteByIdsLogically(@Param("ids") List<String> ids);
+
 }

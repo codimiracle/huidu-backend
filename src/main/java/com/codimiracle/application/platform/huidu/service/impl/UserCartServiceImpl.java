@@ -71,4 +71,9 @@ public class UserCartServiceImpl extends AbstractService<String, CartItem> imple
     public void settleByIdLogically(String cartItemId) {
         userCartMapper.settleByIdLogically(cartItemId);
     }
+
+    @Override
+    public void deleteByIdsLogically(List<String> ids) {
+        userCartMapper.deleteByIdsLogically(ids);
+    }
 }

@@ -28,6 +28,10 @@
     <update id="settleByIdLogically">
         UPDATE user_cart uc SET uc.deleted = 1, uc.settled = 1 WHERE uc.id = #{id}
     </update>
+    <update id="deleteByIdsLogically">
+        UPDATE user_cart uc SET uc.deleted = 1 WHERE uc.id IN
+        <foreach collection="ids" separator="," item="item" open="(" close=")">#{item}</foreach>
+    </update>
     <sql id="select_statement">
         SELECT
         uc.id cart_item_id,
@@ -66,6 +70,7 @@
     </select>
     <select id="selectByIdsIntegrally" resultMap="IntegratedResultMap">
         <include refid="select_statement"/>
-        AND uc.id IN <foreach collection="ids" open="(" close=")" separator="," item="item">#{item}</foreach>
+        AND uc.id IN
+        <foreach collection="ids" open="(" close=")" separator="," item="item">#{item}</foreach>
     </select>
 </mapper>
