@@ -3,19 +3,16 @@ package com.codimiracle.application.platform.huidu.web.api.backend;
 import com.codimiracle.application.platform.huidu.contract.*;
 import com.codimiracle.application.platform.huidu.entity.dto.CategoryDTO;
 import com.codimiracle.application.platform.huidu.entity.po.Category;
-import com.codimiracle.application.platform.huidu.entity.po.Tag;
 import com.codimiracle.application.platform.huidu.entity.vo.CategoryVO;
 import com.codimiracle.application.platform.huidu.enumeration.CategoryType;
 import com.codimiracle.application.platform.huidu.service.CategoryService;
 import com.codimiracle.application.platform.huidu.service.TagService;
 import com.codimiracle.application.platform.huidu.util.RestfulUtil;
 import com.codimiracle.application.platform.huidu.util.TagUtil;
-import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * @author Codimiracle
@@ -33,15 +30,8 @@ public class ApiBackendCategoryController {
     public ApiResponse create(@RequestBody CategoryDTO categoryDTO) {
         Category category = Category.from(categoryDTO);
         category.setTags(TagUtil.mutateToPersistent(tagService, Arrays.asList(categoryDTO.getTags())));
-        BeanUtils.copyProperties(categoryDTO, category);
         categoryService.save(category);
         return RestfulUtil.entity(categoryService.findByIdIntegrally(category.getId()));
-    }
-
-    private void mergeTagList(CategoryDTO categoryDTO, Category category) {
-        List<Tag> tagList = tagService.findByTagNames(Arrays.asList(categoryDTO.getTags()));
-        tagList = TagUtil.merge(tagList, Arrays.asList(categoryDTO.getTags()), Tag::getName, Tag::new);
-        category.setTags(tagList);
     }
 
     @DeleteMapping("/{id}")
