@@ -40,7 +40,7 @@ public class CategoryServiceImpl extends AbstractService<String, Category> imple
         if (Objects.nonNull(model.getTags())) {
             model.getTags().stream().filter((t) -> Objects.isNull(t.getId())).forEach(tagService::save);
             List<CategoryTags> categoryTagsList = model.getTags().stream().map((t) -> CategoryTags.valueOf(model, t)).collect(Collectors.toList());
-            categoryTagsService.save(categoryTagsList);
+            categoryTagsList.forEach(categoryTagsService::save);
         }
         super.save(model);
     }
@@ -112,6 +112,7 @@ public class CategoryServiceImpl extends AbstractService<String, Category> imple
             }
         }));
         List<CategoryTags> newCategoryTagsList = newTags.stream().map((tag) -> CategoryTags.valueOf(model, tag)).collect(Collectors.toList());
+        //更新旧关联
         categoryTagsList.forEach(categoryTagsService::update);
         //保存新的关联
         newCategoryTagsList.forEach(categoryTagsService::save);
