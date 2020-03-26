@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Objects;
 
 
 /**
@@ -60,11 +61,18 @@ public class BookNotesServiceImpl extends AbstractService<String, BookNotes> imp
 
     @Override
     public boolean isDommarkExists(Dommark dommark) {
+        if (Objects.isNull(dommark.getStartDom()) || Objects.isNull(dommark.getEndDom())) {
+            throw new ServiceException("Dommark 无效！");
+        }
         int posOfStartTextNode = dommark.getStartDom().lastIndexOf("text()");
         String mainStartPath = dommark.getStartDom().substring(0, posOfStartTextNode);
         int posOfEndTextNode = dommark.getEndDom().lastIndexOf("text()");
         String mainEndPath = dommark.getEndDom().substring(0, posOfEndTextNode);
-        return bookNotesMapper.existsWithMainDommarkPath(mainStartPath, mainEndPath);
+        Boolean result = bookNotesMapper.existsWithMainDommarkPath(mainStartPath, mainEndPath);
+        if (Objects.isNull(result)) {
+            return false;
+        }
+        return result;
     }
 
     public List<BookNoteCollection> findBookNotesCollectionByUserId(String id) {

@@ -23,7 +23,7 @@ public interface BookNotesMapper extends Mapper<BookNotes> {
     List<BookNoteCollection> selectAllBookNotesCollectionByUserId(@Param("userId") String userId);
     BookNoteCollection selectBookNotesCollectionByBookIdAndUserId(@Param("bookId") String bookId, @Param("userId") String userId);
 
-    boolean existsWithMainDommarkPath(@Param("mainStartPath") String mainStartPath, @Param("mainEndPath") String mainEndPath);
+    Boolean existsWithMainDommarkPath(@Param("mainStartPath") String mainStartPath, @Param("mainEndPath") String mainEndPath);
 
     List<BookNoteCollection> selectAllCollectionIntegrally(@Param("filter") Filter filter, @Param("sorter") Sorter sorter, @Param("page") Page page);
 }

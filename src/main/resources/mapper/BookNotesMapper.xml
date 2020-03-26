@@ -132,7 +132,7 @@
         AND bn.user_id = #{userId}
     </select>
     <select id="existsWithMainDommarkPath" resultType="java.lang.Boolean">
-        SELECT true FROM book_notes bn WHERE bn.deleted = 0 AND (bn.dommark_start_dom LIKE concat(#{mainStartPath}, '%')
+        SELECT 1 FROM book_notes bn WHERE bn.deleted = 0 AND (bn.dommark_start_dom LIKE concat(#{mainStartPath}, '%')
         OR bn.dommark_end_dom LIKE concat(#{mainEndPath}, '%')) LIMIT 0, 1
     </select>
     <select id="selectAllCollectionIntegrally" resultMap="CollectionIntegratedResultMap">
