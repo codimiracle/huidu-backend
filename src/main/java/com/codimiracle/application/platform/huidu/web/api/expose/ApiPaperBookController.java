@@ -30,6 +30,11 @@ public class ApiPaperBookController {
         return bookController.publishYears(BookType.AudioBook);
     }
 
+    @GetMapping("/hots")
+    public ApiResponse hotCollection(@RequestParam("filter") Filter filter, @RequestParam("sorter") Sorter sorter, @ModelAttribute Page page) {
+        return bookController.hotCollection(BookType.PaperBook, filter, sorter, page);
+    }
+
     @GetMapping
     public ApiResponse collection(@RequestParam("filter") Filter filter, @RequestParam("sorter") Sorter sorter, @ModelAttribute Page page) {
         return bookController.publishCollection(BookType.PaperBook, filter, sorter, page);
