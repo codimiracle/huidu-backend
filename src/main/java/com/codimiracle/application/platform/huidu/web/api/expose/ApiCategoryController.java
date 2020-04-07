@@ -36,9 +36,28 @@ public class ApiCategoryController {
     @GetMapping("/{id}/items")
     public ApiResponse items(@PathVariable("id") String categoryId, @RequestParam("filter") Filter filter, @RequestParam("sorter") Sorter sorter, @ModelAttribute Page page) {
         filter = Objects.isNull(filter) ? new Filter() : filter;
-        filter.put("status", new String[] {BookStatus.Serializing.toString(), BookStatus.Ended.toString(), BookStatus.Paused.toString()});
+        filter.put("status", new String[]{BookStatus.Serializing.toString(), BookStatus.Ended.toString(), BookStatus.Paused.toString()});
         PageSlice<BookVO> slice = bookService.findByCategoryIdIntegrally(categoryId, filter, sorter, page);
         return RestfulUtil.list(slice);
+    }
+
+    @GetMapping("/{id}/album")
+    public ApiResponse album(@PathVariable("id") String categoryId, @RequestParam("filter") Filter filter, @RequestParam("sorter") Sorter sorter, @ModelAttribute Page page) {
+        filter = Objects.isNull(filter) ? new Filter() : filter;
+        filter.put("status", new String[]{BookStatus.Serializing.toString(), BookStatus.Ended.toString(), BookStatus.Paused.toString()});
+        PageSlice<BookVO> slice = bookService.findByCollectionIdIntegrally(categoryId, filter, sorter, page);
+        return RestfulUtil.list(slice);
+    }
+
+    @GetMapping("/{id}/album/most-read")
+    public ApiResponse albumMostRead(@PathVariable("id") String categoryId) {
+        Page page = new Page();
+        page.setLimit(10);
+        page.setPage(1);
+        Sorter sorter = new Sorter();
+        sorter.setField("hotDegree");
+        sorter.setOrder("descend");
+        return album(categoryId, null, sorter, page);
     }
 
     @GetMapping("/{id}/items/most-read")

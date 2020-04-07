@@ -12,6 +12,7 @@ import com.codimiracle.application.platform.huidu.util.TagUtil;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 import java.util.Arrays;
 
 /**
@@ -27,7 +28,7 @@ public class ApiBackendCategoryController {
     private TagService tagService;
 
     @PostMapping
-    public ApiResponse create(@RequestBody CategoryDTO categoryDTO) {
+    public ApiResponse create(@Valid @RequestBody CategoryDTO categoryDTO) {
         Category category = Category.from(categoryDTO);
         category.setTags(TagUtil.mutateToPersistent(tagService, Arrays.asList(categoryDTO.getTags())));
         categoryService.save(category);
@@ -47,7 +48,7 @@ public class ApiBackendCategoryController {
     }
 
     @PutMapping("/{id}")
-    public ApiResponse update(@PathVariable String id, @RequestBody CategoryDTO categoryDTO) {
+    public ApiResponse update(@PathVariable String id, @Valid @RequestBody CategoryDTO categoryDTO) {
         Category category = Category.from(categoryDTO);
         category.setId(id);
         category.setTags(TagUtil.mutateToPersistent(tagService, Arrays.asList(categoryDTO.getTags())));
