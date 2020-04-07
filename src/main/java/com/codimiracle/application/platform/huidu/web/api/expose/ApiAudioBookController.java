@@ -55,6 +55,13 @@ public class ApiAudioBookController {
         return bookController.hotCollection(BookType.AudioBook, filter, sorter, page);
     }
 
+    @GetMapping("/search")
+    public ApiResponse searchCollection(@RequestParam("q") String query) {
+        Filter filter = new Filter();
+        filter.put("title", new String[]{query});
+        return collection(filter, null, new Page());
+    }
+
     @GetMapping
     public ApiResponse collection(@RequestParam("filter") Filter filter, @RequestParam("sorter") Sorter sorter, @ModelAttribute Page page) {
         return bookController.publishCollection(BookType.AudioBook, filter, sorter, page);

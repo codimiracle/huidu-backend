@@ -20,6 +20,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 import java.util.Date;
 import java.util.Objects;
 
@@ -39,7 +40,7 @@ public class ApiCreatorAudioBookController {
     private BookService bookService;
 
     @PostMapping
-    public ApiResponse create(@AuthenticationPrincipal User user, @RequestBody AudioBookDTO audioBookDTO) {
+    public ApiResponse create(@AuthenticationPrincipal User user, @Valid @RequestBody AudioBookDTO audioBookDTO) {
         audioBookDTO.setPublishYear(DateFormatUtils.format(new Date(), "yyyy"));
         audioBookDTO.setTeller(user.getNickname());
         audioBookDTO.setStatus(BookAudioEpisodeStatus.Examining.toString());
@@ -63,7 +64,7 @@ public class ApiCreatorAudioBookController {
     }
 
     @PutMapping("/{id}")
-    public ApiResponse update(@AuthenticationPrincipal User user, @PathVariable String id, @RequestBody AudioBookDTO audioBookDTO) {
+    public ApiResponse update(@AuthenticationPrincipal User user, @PathVariable String id, @Valid @RequestBody AudioBookDTO audioBookDTO) {
         Book book = bookService.findById(id);
         Content content = contentService.findById(book.getContentId());
         if (Objects.equals(user.getId(), content.getOwnerId())) {

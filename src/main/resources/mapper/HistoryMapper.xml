@@ -30,7 +30,8 @@
                h.book_id          history_book_id,
                h.episode_id       history_episode_id,
                h.audio_episode_id history_audio_episode_id,
-               h.read_time        history_read_time
+               h.read_time        history_read_time,
+               h.progress         history_progress
         FROM history h
         WHERE h.deleted = 0
     </sql>
@@ -39,12 +40,14 @@
         SET h.deleted = 1
         WHERE h.id = #{id}
     </update>
-    <select id="selectByUserIdAndBookIdIntegrally" resultMap="IntegratedResultMap">
+    <select id="selectLastReadByUserIdAndBookIdIntegrally" resultMap="IntegratedResultMap">
         <include refid="select_statement"/>
         AND h.user_id = #{userId}
         AND h.book_id = #{bookId}
+        ORDER BY h.read_time DESC
+        LIMIT 1
     </select>
-    <select id="selectByUserIdAndBookId" resultMap="BaseResultMap">
+    <select id="selectLastReadByUserIdAndBookId" resultMap="BaseResultMap">
         SELECT h.id,
                h.user_id,
                h.book_id,
@@ -56,6 +59,8 @@
         WHERE h.deleted = 0
           AND h.user_id = #{userId}
           AND h.book_id = #{bookId}
+        ORDER BY h.read_time DESC
+        LIMIT 1
     </select>
     <select id="selectByIdIntegrally" resultMap="IntegratedResultMap">
         <include refid="select_statement"/>
@@ -72,5 +77,22 @@
                 AND h.user_id = #{filter.userId[0]}
             </if>
         </if>
+    </select>
+    <select id="selectByUserIdAndBookIdIntegrally" resultMap="IntegratedResultMap">
+        <include refid="select_statement"/>
+        AND h.user_id = #{userId}
+        AND h.book_id = #{bookId}
+    </select>
+    <select id="selectLastReadByUserIdAndBookIdAndEpisodeIdIntegrally" resultMap="IntegratedResultMap">
+        <include refid="select_statement" />
+        AND h.user_id = #{userId}
+        AND h.book_id = #{bookId}
+        AND h.episode_id = #{episodeId}
+    </select>
+    <select id="selectLastReadByUserIdAndBookIdAndAudioEpisodeIdIntegrally" resultMap="IntegratedResultMap">
+        <include refid="select_statement" />
+        AND h.user_id = #{userId}
+        AND h.book_id = #{bookId}
+        AND h.audio_episode_id = #{audioEpisodeId}
     </select>
 </mapper>

@@ -11,6 +11,7 @@ import com.codimiracle.application.platform.huidu.web.api.base.OrderController;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 
 /**
  * @author Codimiracle
@@ -34,7 +35,7 @@ public class ApiBackendOrderController {
     }
 
     @PostMapping("/{order_number}/logistics-information")
-    public ApiResponse updateLogisticsInformation(@PathVariable("order_number") String orderNumber, @RequestBody LogisticsInformationDTO logisticsInformationDTO) {
+    public ApiResponse updateLogisticsInformation(@PathVariable("order_number") String orderNumber, @Valid @RequestBody LogisticsInformationDTO logisticsInformationDTO) {
         return orderController.updateLogisticsInformation(orderNumber, logisticsInformationDTO);
     }
 

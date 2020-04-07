@@ -4,7 +4,6 @@ import com.codimiracle.application.platform.huidu.contract.ApiResponse;
 import com.codimiracle.application.platform.huidu.contract.Filter;
 import com.codimiracle.application.platform.huidu.contract.Page;
 import com.codimiracle.application.platform.huidu.contract.Sorter;
-import com.codimiracle.application.platform.huidu.enumeration.BookStatus;
 import com.codimiracle.application.platform.huidu.enumeration.BookType;
 import com.codimiracle.application.platform.huidu.service.BookEpisodeService;
 import com.codimiracle.application.platform.huidu.util.RestfulUtil;
@@ -41,6 +40,10 @@ public class ApiElectronicBookController {
         return RestfulUtil.entity(bookEpisodeService.findLastPublishedEpisodeByBookId(bookId));
     }
 
+    @GetMapping("/{id}/review-stars")
+    public ApiResponse reviewStars(@PathVariable("id") String bookId) {
+        return bookController.reviewStars(bookId);
+    }
     @GetMapping("/{id}/catalogs")
     public ApiResponse catalogs(@PathVariable("id") String id) {
         return bookController.publishedCatalogs(id);
@@ -54,6 +57,13 @@ public class ApiElectronicBookController {
     @GetMapping("/hots")
     public ApiResponse hotCollection(@RequestParam("filter") Filter filter, @RequestParam("sorter") Sorter sorter, @ModelAttribute Page page) {
         return bookController.hotCollection(BookType.ElectronicBook, filter, sorter, page);
+    }
+
+    @GetMapping("/search")
+    public ApiResponse searchCollection(@RequestParam("q") String query) {
+        Filter filter = new Filter();
+        filter.put("name", new String[]{query});
+        return collection(filter, null, new Page());
     }
 
     @GetMapping

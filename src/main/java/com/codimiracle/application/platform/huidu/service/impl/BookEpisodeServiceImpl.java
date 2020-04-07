@@ -7,6 +7,9 @@ import com.codimiracle.application.platform.huidu.entity.vt.Catalogs;
 import com.codimiracle.application.platform.huidu.enumeration.ContentStatus;
 import com.codimiracle.application.platform.huidu.mapper.BookEpisodeMapper;
 import com.codimiracle.application.platform.huidu.service.BookEpisodeService;
+import com.codimiracle.application.platform.huidu.service.BookService;
+import com.codimiracle.application.platform.huidu.service.CategoryService;
+import com.codimiracle.application.platform.huidu.service.CommodityService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,14 +27,36 @@ public class BookEpisodeServiceImpl extends AbstractService<String, BookEpisode>
     @Resource
     private BookEpisodeMapper bookEpisodeMapper;
 
+    @Resource
+    private BookService bookService;
+
+    @Resource
+    private CommodityService commodityService;
+    @Resource
+    private CategoryService categoryService;
+
+    private BookEpisodeVO mutate(BookEpisodeVO episodeVO) {
+        if (Objects.nonNull(episodeVO)) {
+            episodeVO.setBook(bookService.findByIdIntegrally(episodeVO.getBookId()));
+            episodeVO.setCommodity(commodityService.findByIdIntegrally(episodeVO.getCommodityId()));
+            episodeVO.setNext(bookEpisodeMapper.selectEpisodeIdByEpisodeNumber(episodeVO.getBookId(), episodeVO.getEpisodeNumber() + 1));
+        }
+        return episodeVO;
+    }
+
+    private PageSlice<BookEpisodeVO> mutate(PageSlice<BookEpisodeVO> slice) {
+        slice.getList().forEach(this::mutate);
+        return slice;
+    }
+
     @Override
     public BookEpisodeVO findByIdIntegrally(String id) {
-        return bookEpisodeMapper.selectByIdIntegrally(id);
+        return mutate(bookEpisodeMapper.selectByIdIntegrally(id));
     }
 
     @Override
     public PageSlice<BookEpisodeVO> findAllIntegrally(String bookId, Filter filter, Sorter sorter, Page page) {
-        return extractPageSlice(bookEpisodeMapper.selectAllIntegrally(bookId, filter, sorter, page));
+        return mutate(extractPageSlice(bookEpisodeMapper.selectAllIntegrally(bookId, filter, sorter, page)));
     }
 
     @Override
@@ -46,23 +71,23 @@ public class BookEpisodeServiceImpl extends AbstractService<String, BookEpisode>
 
     @Override
     public BookEpisodeVO findLastUpdateEpisodeByBookIdIntegrally(String id) {
-        return bookEpisodeMapper.selectLastUpdateEpisodeIntegrally(id);
+        return mutate(bookEpisodeMapper.selectLastUpdateEpisodeIntegrally(id));
     }
 
     @Override
     public BookEpisodeVO findLastEpisodeByBookId(String id) {
-        return bookEpisodeMapper.selectLastEpisodeIntegrally(id);
+        return mutate(bookEpisodeMapper.selectLastEpisodeIntegrally(id));
     }
 
     @Override
-    public Integer findLastEpisodeNumberByBookId(String id) {
-        BookEpisodeVO bookEpisodeVO = bookEpisodeMapper.selectLastEpisodeIntegrally(id);
+    public Integer findLastEpisodeNumberByBookId(String bookId) {
+        BookEpisodeVO bookEpisodeVO = bookEpisodeMapper.selectLastEpisodeIntegrally(bookId);
         return Objects.nonNull(bookEpisodeVO) ? bookEpisodeVO.getEpisodeNumber() : 0;
     }
 
     @Override
     public BookEpisodeVO findByEpisodeNumberIntegrally(String bookId, Integer episodeNumber) {
-        return bookEpisodeMapper.selectByEpisodeNumberIntegrally(bookId, episodeNumber);
+        return mutate(bookEpisodeMapper.selectByEpisodeNumberIntegrally(bookId, episodeNumber));
     }
 
     @Override
@@ -72,6 +97,6 @@ public class BookEpisodeServiceImpl extends AbstractService<String, BookEpisode>
 
     @Override
     public BookEpisodeVO findLastPublishedEpisodeByBookId(String bookId) {
-        return bookEpisodeMapper.selectLastPublishedEpisodeByBookId(bookId);
+        return mutate(bookEpisodeMapper.selectLastPublishedEpisodeByBookId(bookId));
     }
 }

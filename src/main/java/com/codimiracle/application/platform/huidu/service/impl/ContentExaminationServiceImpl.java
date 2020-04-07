@@ -2,6 +2,7 @@ package com.codimiracle.application.platform.huidu.service.impl;
 
 import com.codimiracle.application.platform.huidu.contract.AbstractService;
 import com.codimiracle.application.platform.huidu.entity.po.ContentExamination;
+import com.codimiracle.application.platform.huidu.entity.vo.ExaminationVO;
 import com.codimiracle.application.platform.huidu.mapper.ContentExaminationMapper;
 import com.codimiracle.application.platform.huidu.service.ContentExaminationService;
 import org.springframework.stereotype.Service;
@@ -16,4 +17,8 @@ public class ContentExaminationServiceImpl extends AbstractService<String, Conte
     @Resource
     private ContentExaminationMapper contentExaminationMapper;
 
+    @Override
+    public ExaminationVO findLastExaminationByContentId(String contentId) {
+        return contentExaminationMapper.selectLastExaminationByContentId(contentId);
+    }
 }

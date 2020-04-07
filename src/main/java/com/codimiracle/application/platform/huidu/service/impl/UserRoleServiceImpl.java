@@ -40,4 +40,9 @@ public class UserRoleServiceImpl extends AbstractService<String, UserRole> imple
     public PageSlice<UserRoleVO> findAllIntegrally(Filter filter, Sorter sorter, Page page) {
         return extractPageSlice(userRoleMapper.selectAllIntegrally(filter, sorter, page));
     }
+
+    @Override
+    public UserRole findByRoleName(String name) {
+        return findBy("name", name);
+    }
 }

@@ -75,4 +75,10 @@ public class ApiControllerAdvice {
         log.error("security: ", e);
         return RestfulUtil.fail("权限访问失败！");
     }
+
+    @ExceptionHandler(Throwable.class)
+    public ApiResponse handleOtherException(Throwable e) {
+        log.error("unknown exception:", e);
+        return RestfulUtil.fail(e.getMessage());
+    }
 }

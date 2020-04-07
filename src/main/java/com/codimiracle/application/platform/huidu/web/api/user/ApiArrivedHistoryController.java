@@ -1,6 +1,9 @@
 package com.codimiracle.application.platform.huidu.web.api.user;
 
 import com.codimiracle.application.platform.huidu.contract.ApiResponse;
+import com.codimiracle.application.platform.huidu.contract.Filter;
+import com.codimiracle.application.platform.huidu.contract.Page;
+import com.codimiracle.application.platform.huidu.contract.Sorter;
 import com.codimiracle.application.platform.huidu.entity.dto.ArrivingDTO;
 import com.codimiracle.application.platform.huidu.entity.po.ArrivedHistory;
 import com.codimiracle.application.platform.huidu.entity.po.User;
@@ -16,6 +19,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -39,12 +43,15 @@ public class ApiArrivedHistoryController {
     private UserService userService;
 
     @PostMapping("/signin")
-    public ApiResponse signin(@AuthenticationPrincipal User user, @RequestBody ArrivingDTO arrivingDTO) {
+    public ApiResponse signin(@AuthenticationPrincipal User user,
+                              @Valid @RequestBody ArrivingDTO arrivingDTO) {
         LocalDate nowDate = LocalDate.now();
-        LocalDate signedDate = LocalDate.parse(DateFormatUtils.format(arrivingDTO.getDate(), "yyyy-MM-dd"));
+        LocalDate signedDate = LocalDate.parse(DateFormatUtils.format(arrivingDTO.getDate(),
+                "yyyy-MM-dd"));
         if (nowDate.compareTo(signedDate) == 0) {
             //当天签到
-            ArrivedHistory signed = arrivedHistoryService.signin(user.getId(), arrivingDTO.getDate());
+            ArrivedHistory signed = arrivedHistoryService.signin(user.getId(),
+                    arrivingDTO.getMotto(), arrivingDTO.getDate());
             return RestfulUtil.entity(signed);
         } else if (nowDate.compareTo(signedDate) < 0) {
             return RestfulUtil.fail("不能进行未来签到！");
@@ -59,8 +66,8 @@ public class ApiArrivedHistoryController {
         ArrivedHistoryVO arrivedHistoryVO = arrivedHistoryService.findByThatDayIntegrally(user.getId(), now);
         if (Objects.isNull(arrivedHistoryVO)) {
             arrivedHistoryVO = new ArrivedHistoryVO();
+            arrivedHistoryVO.setMotto("每天读书，每天快乐！");
             arrivedHistoryVO.setDays(0);
-            arrivedHistoryVO.setMotto(mottoService.randomMotto());
             arrivedHistoryVO.setToday(now);
             arrivedHistoryVO.setUser(userService.findByIdProtectly(user.getId()));
         }
@@ -72,5 +79,12 @@ public class ApiArrivedHistoryController {
         }
         arrivedHistoryVO.setHistory(historyMap);
         return RestfulUtil.entity(arrivedHistoryVO);
+    }
+
+    @GetMapping
+    public ApiResponse collection(@AuthenticationPrincipal User user, Filter filter, Sorter sorter, Page page) {
+        filter = Objects.nonNull(filter) ? filter : new Filter();
+        filter.put("userId", new String[]{user.getId()});
+        return RestfulUtil.list(arrivedHistoryService.findAllIntegrally(filter, sorter, page));
     }
 }

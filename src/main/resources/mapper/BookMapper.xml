@@ -130,6 +130,10 @@
         WHERE b.id = #{id}
         AND b.type = 'audio-book'
     </update>
+    <select id="avgReviewRate" resultType="java.lang.Float">
+        SELECT avg(rate) FROM
+
+    </select>
     <select id="selectByIdIntegrally" resultMap="IntegratedResultMap">
         <include refid="select_statement"/>
         AND b.id = #{id}
@@ -142,6 +146,9 @@
             </if>
             <if test="filter.ownerId != null and filter.ownerId.length gt 0">
                 AND ct.owner_id = #{filter.ownerId[0]}
+            </if>
+            <if test="filter.keyword != null and filter.keyword.length gt 0">
+                AND b.title LIKE concat('%', #{filter.keyword[0]}, '%') OR bm.name LIKE concat('%', #{filter.keyword[0]}, '%')
             </if>
             <if test="filter.title != null and filter.title.length gt 0">
                 AND b.title LIKE concat('%', #{filter.title[0]}, '%')
@@ -190,17 +197,18 @@
     <select id="selectByCategoryIdIntegrally" resultMap="IntegratedResultMap">
         <include refid="select_statement_without_type"/>
         AND b.category_id = #{categoryId}
-        AND b.status != 'examining'
         <if test="filter != null">
             <if test="filter.publishYear != null and filter.publishYear.length gt 0">
                 AND bm.publishYear = #{filter.publishYear[0]}
             </if>
             <if test="filter.tagName != null and filter.tagName.length gt 0">
                 AND b.id IN (SELECT bt.book_id FROM book_tags bt LEFT JOIN tag t ON bt.tag_id = t.id AND bt.deleted = 0
-                WHERE t.name = 'sdfa')
+                WHERE t.name = #{filter.tagName[0]})
+            </if>
+            <if test="filter.type != null and filter.type.length gt 0">
+                AND b.type = #{filter.type[0]}
             </if>
         </if>
-        GROUP BY b.type,b.id
         <if test="sorter != null">
             <if test="sorter.field == 'hot_degree'">
                 ORDER BY (ct.likes * 3 + (b.reads + b.plays) * 2 + ct.comments) * ct.rate
@@ -208,6 +216,29 @@
             </if>
         </if>
     </select>
+
+    <select id="selectByCollectionIdIntegrally" resultMap="IntegratedResultMap">
+        <include refid="select_statement_without_type"/>
+        <if test="filter != null">
+            <if test="filter.publishYear != null and filter.publishYear.length gt 0">
+                AND bm.publishYear = #{filter.publishYear[0]}
+            </if>
+            <if test="filter.tagName != null and filter.tagName.length gt 0">
+                AND b.id IN (SELECT bt.book_id FROM book_tags bt LEFT JOIN tag t ON bt.tag_id = t.id AND bt.deleted = 0
+                WHERE t.name = #{filter.tagName[0]})
+            </if>
+            <if test="filter.type != null and filter.type.length gt 0">
+                AND b.type = #{filter.type[0]}
+            </if>
+        </if>
+        <if test="sorter != null">
+            <if test="sorter.field == 'hot_degree'">
+                ORDER BY (ct.likes * 3 + (b.reads + b.plays) * 2 + ct.comments) * ct.rate
+                <if test="sorter.order == 'descend'">DESC</if>
+            </if>
+        </if>
+    </select>
+
     <select id="selectPublishYearsByType" resultType="java.lang.String">
         SELECT DISTINCT b.publish_year
         FROM book b
@@ -224,6 +255,9 @@
         <if test="filter != null">
             <if test="filter.type != null and filter.type.length gt 0">
                 AND b.type = #{filter.type[0]}
+            </if>
+            <if test="filter.status != null and filter.status.length gt 0">
+                AND b.status IN <foreach collection="filter.status" open="(" close=")" item="item">#{item}</foreach>
             </if>
         </if>
         <if test="sorter != null">
@@ -249,6 +283,9 @@
             <if test="filter.type != null and filter.type.length gt 0">
                 AND b.type = #{filter.type[0]}
             </if>
+            <if test="filter.status != null and filter.status.length gt 0">
+                AND b.status IN <foreach collection="filter.status" open="(" close=")" item="item">#{item}</foreach>
+            </if>
         </if>
     </select>
     <select id="selectAllUsingUserFigureByTagId" resultMap="IntegratedResultMap">
@@ -262,8 +299,12 @@
             <if test="filter.type != null and filter.type.length gt 0">
                 AND b.type = #{filter.type[0]}
             </if>
+            <if test="filter.status != null and filter.status.length gt 0">
+                AND b.status IN <foreach collection="filter.status" open="(" close=")" item="item">#{item}</foreach>
+            </if>
         </if>
     </select>
+
     <select id="selectAllUsingUserFigureByCategoryId" resultMap="IntegratedResultMap">
         <include refid="select_statement_without_type"/>
         AND b.id IN (
@@ -276,6 +317,9 @@
         <if test="filter != null">
             <if test="filter.type != null and filter.type.length gt 0">
                 AND b.type = #{filter.type[0]}
+            </if>
+            <if test="filter.status != null and filter.status.length gt 0">
+                AND b.status IN <foreach collection="filter.status" open="(" close=")" item="item">#{item}</foreach>
             </if>
         </if>
     </select>
@@ -291,8 +335,12 @@
             <if test="filter.type != null and filter.type.length gt 0">
                 AND b.type = #{filter.type[0]}
             </if>
+            <if test="filter.status != null and filter.status.length gt 0">
+                AND b.status IN <foreach collection="filter.status" open="(" close=")" item="item">#{item}</foreach>
+            </if>
         </if>
     </select>
+
     <select id="selectAllUsingUserFigureByBookType" resultMap="IntegratedResultMap">
         <include refid="select_statement"/>
         AND b.id IN (
@@ -301,6 +349,11 @@
                 uf.tag_id ORDER BY avg(uf.score) DESC
             )
         )
+        <if test="filter != null">
+            <if test="filter.status != null and filter.status.length gt 0">
+                AND b.status IN <foreach collection="filter.status" open="(" close=")" item="item">#{item}</foreach>
+            </if>
+        </if>
     </select>
     <select id="selectAllUsingUserFigureByHistoryToday" resultMap="IntegratedResultMap">
         <include refid="select_statement_without_type"/>
@@ -311,5 +364,10 @@
                 ) <if test="userId != null">AND uf.user_id = #{userId}</if> GROUP By uf.tag_id ORDER BY avg(uf.score) DESC
             )
         )
+        <if test="filter != null">
+            <if test="filter.status != null and filter.status.length gt 0">
+                AND b.status IN <foreach collection="filter.status" open="(" close=")" item="item">#{item}</foreach>
+            </if>
+        </if>
     </select>
 </mapper>

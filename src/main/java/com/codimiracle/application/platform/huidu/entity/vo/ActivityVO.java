@@ -34,5 +34,6 @@ public class ActivityVO {
     private String status;
     private Date createTime;
     private Date updateTime;
+    private String bookId;
     private BookVO book;
 }

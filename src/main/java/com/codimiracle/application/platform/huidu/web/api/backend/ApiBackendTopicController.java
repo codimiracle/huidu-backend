@@ -26,11 +26,10 @@ import com.codimiracle.application.platform.huidu.contract.ApiResponse;
 import com.codimiracle.application.platform.huidu.contract.Filter;
 import com.codimiracle.application.platform.huidu.contract.Page;
 import com.codimiracle.application.platform.huidu.contract.Sorter;
-import com.codimiracle.application.platform.huidu.entity.dto.TopicDTO;
-import com.codimiracle.application.platform.huidu.entity.po.ContentReference;
+import com.codimiracle.application.platform.huidu.entity.dto.ExaminationDTO;
 import com.codimiracle.application.platform.huidu.entity.po.User;
 import com.codimiracle.application.platform.huidu.entity.vo.TopicVO;
-import com.codimiracle.application.platform.huidu.entity.vt.Topic;
+import com.codimiracle.application.platform.huidu.service.ContentArticleService;
 import com.codimiracle.application.platform.huidu.service.TopicService;
 import com.codimiracle.application.platform.huidu.util.RestfulUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -38,8 +37,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.util.*;
-import java.util.stream.Collectors;
+import javax.validation.Valid;
 
 @CrossOrigin
 @RestController
@@ -48,16 +46,10 @@ import java.util.stream.Collectors;
 public class ApiBackendTopicController {
 
     @Resource
-    TopicService topicService;
+    private TopicService topicService;
 
-    @PostMapping
-    public ApiResponse create(@RequestBody TopicDTO topicDTO, @AuthenticationPrincipal User user) {
-        Topic topic = Topic.from(topicDTO);
-        topic.setCreateTime(new Date());
-        topic.setUpdateTime(topic.getCreateTime());
-        topicService.save(topic);
-        return RestfulUtil.entity(topicService.findByIdIntegrally(topic.getId()));
-    }
+    @Resource
+    private ContentArticleService contentArticleService;
 
     @GetMapping("/{id}")
     public ApiResponse entity(@PathVariable String id) {
@@ -65,34 +57,21 @@ public class ApiBackendTopicController {
         return RestfulUtil.entity(topic);
     }
 
-    @PutMapping("/{id}")
-    public ApiResponse update(@PathVariable String id, @RequestBody TopicDTO topicDTO) {
-        Topic topic = topicService.findById(id);
-        Topic updatingTopic = Topic.from(topicDTO);
-        updatingTopic.setId(id);
-        Objects.requireNonNull(updatingTopic);
-        List<ContentReference> oldReferences = topic.getReferenceList();
-        List<ContentReference> newReferences = updatingTopic.getReferenceList();
-        List<ContentReference> needToDelete = new ArrayList<>();
-        //映射已有对象
-        Map<String, ContentReference> validatedMap = newReferences.stream().collect(Collectors.toMap(ContentReference::getRefId, (e) -> e));
-        for (ContentReference reference : oldReferences) {
-            if (validatedMap.containsKey(reference.getRefId())) {
-                //不做任何操作
-                validatedMap.remove(reference.getRefId());
-            } else {
-                //放入待删除列表
-                needToDelete.add(reference);
-            }
-        }
-        updatingTopic.setReferenceList(new ArrayList<>(validatedMap.values()));
-        topicService.update(updatingTopic, needToDelete);
-        return RestfulUtil.entity(topicService.findByIdIntegrally(id));
-    }
-
     @DeleteMapping("/{id}")
     public ApiResponse delete(@PathVariable String id) {
         topicService.deleteByIdLogically(id);
+        return RestfulUtil.success();
+    }
+
+    @PostMapping("/{id}/accept")
+    public ApiResponse accept(@AuthenticationPrincipal User user, @PathVariable("id") String topicId, @Valid @RequestBody ExaminationDTO examinationDTO) {
+        contentArticleService.passExamination(topicId, examinationDTO.getReason(), user.getId());
+        return RestfulUtil.success();
+    }
+
+    @PostMapping("/{id}/reject")
+    public ApiResponse reject(@AuthenticationPrincipal User user, @PathVariable("id") String topicId, @Valid @RequestBody ExaminationDTO examinationDTO) {
+        contentArticleService.rejectExamination(topicId, examinationDTO.getReason(), user.getId());
         return RestfulUtil.success();
     }
 

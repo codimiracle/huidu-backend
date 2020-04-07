@@ -9,6 +9,7 @@ import com.codimiracle.application.platform.huidu.util.RestfulUtil;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 import java.util.Arrays;
 
 /**
@@ -22,7 +23,7 @@ public class ApiCommodityController {
     private CommodityService commodityService;
 
     @PostMapping
-    public ApiResponse create(@RequestBody CommodityDTO commodityDTO) {
+    public ApiResponse create(@Valid @RequestBody CommodityDTO commodityDTO) {
         Commodity commodity = Commodity.from(commodityDTO);
         commodityService.save(commodity);
         return RestfulUtil.success();
@@ -41,7 +42,7 @@ public class ApiCommodityController {
     }
 
     @PutMapping("/{id}")
-    public ApiResponse update(@PathVariable String id, @RequestBody CommodityDTO commodityDTO) {
+    public ApiResponse update(@PathVariable String id, @Valid @RequestBody CommodityDTO commodityDTO) {
         Commodity commodity = Commodity.from(commodityDTO);
         commodity.setId(id);
         commodityService.update(commodity);

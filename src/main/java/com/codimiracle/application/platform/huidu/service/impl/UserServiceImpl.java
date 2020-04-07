@@ -51,8 +51,6 @@ public class UserServiceImpl extends AbstractService<String, User> implements Us
         super.save(model);
         UserInfo userInfo = model.getExtra();
         userInfo.setUserId(model.getId());
-        UserRole role = userRoleService.findById(model.getRoleId());
-        model.setRole(role);
         UserAccount userAccount = new UserAccount();
         userAccount.setUserId(model.getId());
         userAccountService.save(userAccount);
@@ -86,12 +84,14 @@ public class UserServiceImpl extends AbstractService<String, User> implements Us
 
     @Override
     public boolean existsUsername(String username) {
-        return userMapper.existsUsername(username);
+        Boolean result = userMapper.existsUsername(username);
+        return Objects.nonNull(result) && result;
     }
 
     @Override
     public boolean existsNickname(String nickname) {
-        return userMapper.existsNickname(nickname);
+        Boolean result = userMapper.existsNickname(nickname);
+        return Objects.nonNull(result) && result;
     }
 
     @Override

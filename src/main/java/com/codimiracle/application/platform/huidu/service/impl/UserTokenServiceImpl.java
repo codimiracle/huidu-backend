@@ -29,7 +29,7 @@ public class UserTokenServiceImpl extends AbstractService<String, UserToken> imp
     public UserToken findByToken(String token) {
         UserToken userToken = findBy("token", token);
         if (Objects.nonNull(userToken)) {
-            userToken.setUser(userService‬.loadUserById(userToken.getId()));
+            userToken.setUser(userService‬.loadUserById(userToken.getUserId()));
         }
         return userToken;
     }

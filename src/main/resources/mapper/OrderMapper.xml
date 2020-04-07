@@ -65,7 +65,7 @@
         o.address_receiver_name,
         o.address_receiver_phone,
         o.address_postcode
-        FROM `order`  o
+        FROM `order` o
         LEFT JOIN user u ON o.owner_id = u.id
         WHERE 1 = 1
     </sql>
@@ -92,6 +92,9 @@
             <if test="filter.status != null and filter.status.length gt 0">
                 AND o.status IN
                 <foreach collection="filter.status" open="(" separator="," close=")" item="item">#{item}</foreach>
+            </if>
+            <if test="filter.ownerId != null and filter.ownerId.length gt 0">
+                AND o.owner_id = #{filter.ownerId[0]}
             </if>
         </if>
         <if test="sorter != null and sorter.field == 'total_money'">

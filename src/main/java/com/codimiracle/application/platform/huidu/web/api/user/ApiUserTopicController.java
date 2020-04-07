@@ -27,8 +27,8 @@ import com.codimiracle.application.platform.huidu.contract.Filter;
 import com.codimiracle.application.platform.huidu.contract.Page;
 import com.codimiracle.application.platform.huidu.contract.Sorter;
 import com.codimiracle.application.platform.huidu.entity.dto.TopicDTO;
-import com.codimiracle.application.platform.huidu.entity.po.ContentReference;
 import com.codimiracle.application.platform.huidu.entity.po.User;
+import com.codimiracle.application.platform.huidu.entity.vo.TopicVO;
 import com.codimiracle.application.platform.huidu.entity.vt.Topic;
 import com.codimiracle.application.platform.huidu.enumeration.ContentStatus;
 import com.codimiracle.application.platform.huidu.service.TopicService;
@@ -38,8 +38,9 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.util.*;
-import java.util.stream.Collectors;
+import javax.validation.Valid;
+import java.util.Date;
+import java.util.Objects;
 
 @CrossOrigin
 @RestController
@@ -51,43 +52,30 @@ public class ApiUserTopicController {
     TopicService topicService;
 
     @PostMapping
-    public ApiResponse create(@AuthenticationPrincipal User user, @RequestBody TopicDTO topicDTO) {
+    public ApiResponse create(@AuthenticationPrincipal User user, @Valid @RequestBody TopicDTO topicDTO) {
         Topic topic = Topic.from(topicDTO);
         topic.setOwnerId(user.getId());
         topic.setCreateTime(new Date());
         topic.setUpdateTime(topic.getCreateTime());
-        topic.setStatus(ContentStatus.Examining);
+        topic.setStatus(ContentStatus.Draft);
         topicService.save(topic);
         return RestfulUtil.entity(topicService.findByIdIntegrally(topic.getId()));
     }
 
     @PutMapping("/{id}")
-    public ApiResponse update(@AuthenticationPrincipal User user, @PathVariable String id, @RequestBody TopicDTO topicDTO) {
+    public ApiResponse update(@AuthenticationPrincipal User user, @PathVariable String id, @Valid @RequestBody TopicDTO topicDTO) {
         Topic topic = topicService.findById(id);
         if (Objects.isNull(topic) || !Objects.equals(topic.getOwnerId(), user.getId())) {
             return RestfulUtil.fail("权限不足!");
         }
         Topic updatingTopic = Topic.from(topicDTO);
+        Objects.requireNonNull(updatingTopic);
         updatingTopic.setId(id);
+        updatingTopic.setContentId(id);
         //不更新内容类型
         updatingTopic.setType(null);
-        Objects.requireNonNull(updatingTopic);
-        List<ContentReference> oldReferences = topic.getReferenceList();
-        List<ContentReference> newReferences = updatingTopic.getReferenceList();
-        List<ContentReference> needToDelete = new ArrayList<>();
-        //映射已有对象
-        Map<String, ContentReference> validatedMap = newReferences.stream().collect(Collectors.toMap(ContentReference::getRefId, (e) -> e));
-        for (ContentReference reference : oldReferences) {
-            if (validatedMap.containsKey(reference.getRefId())) {
-                //不做任何操作
-                validatedMap.remove(reference.getRefId());
-            } else {
-                //放入待删除列表
-                needToDelete.add(reference);
-            }
-        }
-        updatingTopic.setReferenceList(new ArrayList<>(validatedMap.values()));
-        topicService.update(updatingTopic, needToDelete);
+        updatingTopic.setUpdateTime(new Date());
+        topicService.update(updatingTopic);
         return RestfulUtil.entity(topicService.findByIdIntegrally(id));
     }
 
@@ -99,6 +87,15 @@ public class ApiUserTopicController {
         }
         topicService.deleteByIdLogically(id);
         return RestfulUtil.success();
+    }
+
+    @GetMapping("/{id}")
+    public ApiResponse entity(@AuthenticationPrincipal User user, @PathVariable("id") String id) {
+        TopicVO topicVO = topicService.findByIdIntegrally(id);
+        if (Objects.isNull(topicVO) || !Objects.equals(topicVO.getOwner().getId(), user.getId())) {
+            return RestfulUtil.fail("找不到对应的话题！");
+        }
+        return RestfulUtil.entity(topicVO);
     }
 
     @GetMapping

@@ -7,9 +7,11 @@ import com.codimiracle.application.platform.huidu.entity.vo.ReferenceVO;
 import com.codimiracle.application.platform.huidu.enumeration.ContentType;
 import com.codimiracle.application.platform.huidu.mapper.ContentReferenceMapper;
 import com.codimiracle.application.platform.huidu.service.*;
+import org.apache.ibatis.exceptions.TooManyResultsException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tk.mybatis.mapper.entity.Condition;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -80,5 +82,19 @@ public class ContentReferenceServiceImpl extends AbstractService<String, Content
         PageSlice<CommunityFocus> slice = extractPageSlice(contentReferenceMapper.selectCommunityFocus(filter, sorter, page));
         slice.getList().forEach(this::mutate);
         return slice;
+}
+
+    @Override
+    public ContentReference findByRefIdAndType(String contentId, String refId, ContentType type) {
+        Condition condition = Conditioner.conditionOf(ContentReference.class);
+        condition.and().andEqualTo("contentId", contentId).andEqualTo("refId", refId).andEqualTo("type", type);
+        List<ContentReference> contentReferences = contentReferenceMapper.selectByCondition(condition);
+        if (contentReferences.size() == 1) {
+            return contentReferences.get(0);
+        } else if (contentReferences.size() > 0) {
+            throw new TooManyResultsException();
+        } else {
+            return null;
+        }
     }
 }

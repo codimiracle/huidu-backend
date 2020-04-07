@@ -5,7 +5,7 @@ import com.codimiracle.application.platform.huidu.entity.po.ContentTags;
 
 
 /**
- * Created by CodeGenerator on 2020/02/29.
+ * @author Codimiracle
  */
 public interface ContentTagsService extends Service<String, ContentTags> {
 

@@ -22,10 +22,7 @@ package com.codimiracle.application.platform.huidu.web.api.expose;/*
  * SOFTWARE.
  */
 
-import com.codimiracle.application.platform.huidu.contract.ApiResponse;
-import com.codimiracle.application.platform.huidu.contract.Filter;
-import com.codimiracle.application.platform.huidu.contract.Page;
-import com.codimiracle.application.platform.huidu.contract.PageSlice;
+import com.codimiracle.application.platform.huidu.contract.*;
 import com.codimiracle.application.platform.huidu.entity.dto.CommentDTO;
 import com.codimiracle.application.platform.huidu.entity.po.User;
 import com.codimiracle.application.platform.huidu.entity.vo.CommentVO;
@@ -36,11 +33,11 @@ import com.codimiracle.application.platform.huidu.service.CommentService;
 import com.codimiracle.application.platform.huidu.service.SettingsService;
 import com.codimiracle.application.platform.huidu.util.RestfulUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 import java.util.Date;
 import java.util.Objects;
 
@@ -59,23 +56,27 @@ public class ApiCommentController {
     @Autowired
     private CommentExaminator commentExaminator;
 
-    @PreAuthorize("hasAuthority('User')")
     @PostMapping
-    public ApiResponse create(@AuthenticationPrincipal User user, @PathVariable("content_id") String contentId, @RequestBody CommentDTO commentDTO) {
+    public ApiResponse create(@AuthenticationPrincipal User user,
+                              @PathVariable("content_id") String contentId,
+                              @Valid @RequestBody CommentDTO commentDTO) {
+        // 创建评论
         Comment comment = Comment.from(commentDTO);
         comment.setTargetContentId(contentId);
         comment.setStatus(ContentStatus.Examining);
         comment.setOwnerId(user.getId());
         comment.setCreateTime(new Date());
         comment.setUpdateTime(comment.getCreateTime());
+        // 自动评审
         boolean isAutoExamination = Objects.equals(settingsService.retrive(COMMENT_EXAMINATION), "auto");
         if (isAutoExamination && commentExaminator.isApproval(comment)) {
             comment.setStatus(ContentStatus.Publish);
         } else {
             comment.setStatus(ContentStatus.Rejected);
         }
+        //保存评论
         commentService.save(comment);
-        return RestfulUtil.success();
+        return RestfulUtil.entity(commentService.findByIdIntegrally(comment.getId()));
     }
 
     @DeleteMapping("/{id}")
@@ -91,10 +92,13 @@ public class ApiCommentController {
     }
 
     @GetMapping
-    public ApiResponse collection(@AuthenticationPrincipal User user, @PathVariable("content_id") String contentId, @ModelAttribute Page page) {
+    public ApiResponse collection(@PathVariable("content_id") String contentId, @ModelAttribute Page page) {
         Filter filter = new Filter();
         filter.put("targetContentId", new String[]{contentId});
-        PageSlice<CommentVO> slice = commentService.findAllIntegrally(Objects.nonNull(user) ? user.getId() : null, filter, null, page);
+        Sorter sorter = new Sorter();
+        sorter.setField("createTime");
+        sorter.setOrder("descend");
+        PageSlice<CommentVO> slice = commentService.findAllIntegrally(filter, sorter, page);
         return RestfulUtil.list(slice);
     }
 }

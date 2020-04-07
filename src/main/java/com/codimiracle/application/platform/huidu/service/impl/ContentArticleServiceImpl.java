@@ -3,17 +3,21 @@ package com.codimiracle.application.platform.huidu.service.impl;
 import com.codimiracle.application.platform.huidu.contract.*;
 import com.codimiracle.application.platform.huidu.entity.po.ContentArticle;
 import com.codimiracle.application.platform.huidu.entity.po.ContentExamination;
+import com.codimiracle.application.platform.huidu.entity.po.User;
 import com.codimiracle.application.platform.huidu.entity.vo.ArticleVO;
 import com.codimiracle.application.platform.huidu.enumeration.ContentStatus;
 import com.codimiracle.application.platform.huidu.enumeration.ContentType;
 import com.codimiracle.application.platform.huidu.mapper.ContentArticleMapper;
 import com.codimiracle.application.platform.huidu.service.ContentArticleService;
 import com.codimiracle.application.platform.huidu.service.ContentExaminationService;
+import com.codimiracle.application.platform.huidu.service.ContentLikesService;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.List;
+import java.util.Date;
+import java.util.Objects;
 
 
 /**
@@ -26,11 +30,14 @@ public class ContentArticleServiceImpl extends AbstractService<String, ContentAr
     private ContentArticleMapper contentArticleMapper;
 
     @Resource
+    private ContentLikesService contentLikesService;
+
+    @Resource
     private ContentExaminationService contentExaminationService;
 
     private void examinate(String id, String reason, String userId, ContentStatus status) {
         ContentArticle contentArticle = findById(id);
-        if (contentArticle.getStatus() == ContentStatus.Examining) {
+        if (contentArticle.getStatus() != ContentStatus.Examining) {
             throw new ServiceException("无法审查该内容");
         }
         ContentExamination examination = new ContentExamination();
@@ -39,12 +46,13 @@ public class ContentArticleServiceImpl extends AbstractService<String, ContentAr
         examination.setTargetContentId(id);
         examination.setReason(reason);
         examination.setUserId(userId);
+        examination.setExamineTime(new Date());
         contentExaminationService.save(examination);
 
         ContentArticle updatingContentArticle = new ContentArticle();
         updatingContentArticle.setContentId(id);
         updatingContentArticle.setStatus(status);
-        update(contentArticle);
+        update(updatingContentArticle);
     }
 
     @Override
@@ -60,27 +68,58 @@ public class ContentArticleServiceImpl extends AbstractService<String, ContentAr
 
     @Override
     public ArticleVO findByIdIntegrally(ContentType type, String id) {
-        return contentArticleMapper.selectByIdIntegrally(type, id);
+        return inflateContentExamination(inflateLikedState(contentArticleMapper.selectByIdIntegrally(type, id)));
+    }
+
+    private ArticleVO inflateContentExamination(ArticleVO articleVO) {
+        if (Objects.isNull(articleVO)) {
+            return null;
+        }
+        articleVO.setExamination(contentExaminationService.findLastExaminationByContentId(articleVO.getContentId()));
+        return articleVO;
+    }
+
+    private ArticleVO inflateLikedState(ArticleVO articleVO) {
+        if (Objects.isNull(articleVO)) {
+            return null;
+        }
+        Object pricipal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (pricipal instanceof User) {
+            User user = (User) pricipal;
+            articleVO.setLiked(contentLikesService.isLiked(user.getId(), articleVO.getContentId()));
+        }
+        return articleVO;
+    }
+
+    private PageSlice<ArticleVO> inflateLikedState(PageSlice<ArticleVO> slice) {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (principal instanceof User) {
+            User user = (User) principal;
+            slice.getList().forEach((e) -> {
+                e.setLiked(contentLikesService.isLiked(user.getId(), e.getContentId()));
+            });
+        }
+        return slice;
     }
 
     @Override
-    public List<ArticleVO> findAllIntegrally() {
-        return contentArticleMapper.selectAllIntegrally();
+    public PageSlice<ArticleVO> findAllIntegrally(Filter filter, Sorter sorter, Page page) {
+        return inflateLikedState(extractPageSlice(contentArticleMapper.selectAllIntegrally(null, filter, sorter, page)));
     }
 
     @Override
     public PageSlice<ArticleVO> findAllIntegrally(ContentType type, Filter filter, Sorter sorter, Page page) {
-        return extractPageSlice(contentArticleMapper.selectAllIntegrally(type, filter, sorter, page));
+        return inflateLikedState(extractPageSlice(contentArticleMapper.selectAllIntegrally(type, filter, sorter, page)));
     }
 
     @Override
     public PageSlice<ArticleVO> findHotIntegrally(ContentType type, Filter filter, Sorter sorter, Page page) {
-        return extractPageSlice(contentArticleMapper.selectHotIntegrally(type, filter, sorter, page));
+        return inflateLikedState(extractPageSlice(contentArticleMapper.selectHotIntegrally(type, filter, sorter, page)));
     }
 
     @Override
-    public PageSlice<ArticleVO> findFocusArticleByTypeAndReferenceId(String type, String bookId, Filter filter, Sorter sorter, Page page) {
-        return extractPageSlice(contentArticleMapper.selectFocusArticleByTypeAndReferenceId(type, bookId, filter, sorter, page));
+    public PageSlice<ArticleVO> findFocusArticleByTypeAndReferenceId(ContentType type, String referenceType, String bookId, Filter filter, Sorter sorter, Page page) {
+        return inflateLikedState(extractPageSlice(contentArticleMapper.selectFocusArticleByTypeAndReferenceId(type, referenceType, bookId, filter, sorter, page)));
     }
 
 }

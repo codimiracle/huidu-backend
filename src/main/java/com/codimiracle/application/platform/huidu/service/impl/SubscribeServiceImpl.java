@@ -1,9 +1,11 @@
 package com.codimiracle.application.platform.huidu.service.impl;
 
 import com.codimiracle.application.platform.huidu.contract.*;
+import com.codimiracle.application.platform.huidu.entity.po.Notification;
 import com.codimiracle.application.platform.huidu.entity.po.Subscribe;
 import com.codimiracle.application.platform.huidu.entity.vo.SubscribeVO;
 import com.codimiracle.application.platform.huidu.enumeration.SubscribeType;
+import com.codimiracle.application.platform.huidu.helper.NotificationTemplate;
 import com.codimiracle.application.platform.huidu.mapper.SubscribeMapper;
 import com.codimiracle.application.platform.huidu.service.*;
 import org.springframework.stereotype.Service;
@@ -31,10 +33,16 @@ public class SubscribeServiceImpl extends AbstractService<String, Subscribe> imp
     private CommodityService commodityService;
 
     @Resource
+    private NotificationService notificationService;
+
+    @Resource
     private BookService bookService;
 
     @Resource
     private CommentService commentService;
+
+    @Resource
+    private NotificationTemplate notificationTemplate;
 
     private void paddingAssociation(SubscribeVO subscribeVO) {
         if (Objects.equals(subscribeVO.getType(), SubscribeType.BookUpdated.getType())) {
@@ -59,6 +67,7 @@ public class SubscribeServiceImpl extends AbstractService<String, Subscribe> imp
     @Override
     public void subscribe(String subscriberId, String targetId, SubscribeType type) {
         Subscribe subscribe = null;
+        // 处理订阅
         if (SubscribeType.BookUpdated == type) {
             subscribe = ensureNotNull(findBySubscriberIdAndBookId(subscriberId, targetId));
             subscribe.setBookId(targetId);
@@ -71,21 +80,31 @@ public class SubscribeServiceImpl extends AbstractService<String, Subscribe> imp
         } else if (SubscribeType.ContentReplay == type) {
             subscribe = ensureNotNull(findBySubscriberIdAndContentId(subscriberId, targetId));
             subscribe.setContentId(targetId);
+        } else {
+            throw new ServiceException("未知订阅！");
         }
-        if (Objects.isNull(subscribe)) {
+
+        if (Objects.isNull(subscribe.getSubscriberId())) {
+            subscribe.setType(type);
             subscribe.setSubscriberId(subscriberId);
             subscribe.setCreateTime(new Date());
             subscribe.setUpdateTime(subscribe.getCreateTime());
             save(subscribe);
         } else {
             subscribe.setUpdateTime(new Date());
+            subscribe.setDeleted(false);
             update(subscribe);
         }
+        // 发出通知
+        Notification notification = notificationTemplate.generateBy(type, subscriberId, targetId);
+        notificationService.notify(notification);
     }
 
     @Override
     public void deleteByIdLogically(String subscribeId) {
+        Subscribe subscribe = subscribeMapper.selectByPrimaryKey(subscribeId);
         subscribeMapper.deleteByIdLogically(subscribeId);
+        notificationTemplate.generateCancelBy(subscribe);
     }
 
     private List<Subscribe> findBySubscriberIdAndType(String subscriberId, SubscribeType type) {

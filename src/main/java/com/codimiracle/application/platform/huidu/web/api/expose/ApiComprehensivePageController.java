@@ -33,6 +33,7 @@ import com.codimiracle.application.platform.huidu.util.StringifizationUtil;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 import java.util.Arrays;
 import java.util.List;
 
@@ -49,7 +50,7 @@ public class ApiComprehensivePageController {
     @Resource
     private SettingsService settingsService;
     @PostMapping("/api/backend/comprehensive-page")
-    public ApiResponse comprehensivePage(@RequestBody ComprehensivePageDTO comprehensivePageDTO) {
+    public ApiResponse comprehensivePage(@Valid @RequestBody ComprehensivePageDTO comprehensivePageDTO) {
         settingsService.save(COMPREHENSIVE_PAGE_CATEGORIES, StringifizationUtil.toString(Arrays.asList(comprehensivePageDTO.getCategoryIds())));
         settingsService.save(COMPREHENSIVE_PAGE_COLLECTIONS, StringifizationUtil.toString(Arrays.asList(comprehensivePageDTO.getCollectionIds())));
         return RestfulUtil.success();

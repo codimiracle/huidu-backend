@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.Objects;
 
 /**
@@ -27,7 +28,7 @@ public class ApiBackendPaperBookController {
     private BookController bookController;
 
     @PostMapping
-    public ApiResponse create(@AuthenticationPrincipal User user, @RequestBody PaperBookDTO paperBookDTO) {
+    public ApiResponse create(@AuthenticationPrincipal User user, @Valid @RequestBody PaperBookDTO paperBookDTO) {
         if (Objects.nonNull(paperBookDTO.getCommodity())) {
             paperBookDTO.getCommodity().setType(CommodityType.MaterialObject.getType());
         }
@@ -46,7 +47,7 @@ public class ApiBackendPaperBookController {
     }
 
     @PutMapping("/{id}")
-    public ApiResponse update(@PathVariable String id, @RequestBody PaperBookDTO paperBookDTO) {
+    public ApiResponse update(@PathVariable String id, @Valid @RequestBody PaperBookDTO paperBookDTO) {
         return bookController.update(id, paperBookDTO.toBookDTO());
     }
 

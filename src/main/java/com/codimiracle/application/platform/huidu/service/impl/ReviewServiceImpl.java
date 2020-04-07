@@ -30,16 +30,15 @@ import com.codimiracle.application.platform.huidu.entity.vo.ArticleVO;
 import com.codimiracle.application.platform.huidu.entity.vo.ReviewVO;
 import com.codimiracle.application.platform.huidu.entity.vt.Review;
 import com.codimiracle.application.platform.huidu.enumeration.ContentType;
-import com.codimiracle.application.platform.huidu.service.ContentArticleService;
-import com.codimiracle.application.platform.huidu.service.ContentReferenceService;
-import com.codimiracle.application.platform.huidu.service.ContentService;
-import com.codimiracle.application.platform.huidu.service.ReviewService;
+import com.codimiracle.application.platform.huidu.service.*;
+import com.codimiracle.application.platform.huidu.util.ReferenceUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -47,32 +46,71 @@ import java.util.stream.Collectors;
 @Transactional
 public class ReviewServiceImpl extends AbstractUnsupportedOperationServiece<String, Review> implements ReviewService {
     @Resource
-    ContentService contentService;
+    private ContentService contentService;
     @Resource
-    ContentArticleService contentArticleService;
+    private CommentService commentService;
     @Resource
-    ContentReferenceService contentReferenceService;
+    private ContentArticleService contentArticleService;
+    @Resource
+    private ContentReferenceService contentReferenceService;
 
-    @Override
-    public void save(Review entity) {
+    private void saveContentPart(Review review) {
         Content content = new Content();
-        BeanUtils.copyProperties(entity, content);
+        BeanUtils.copyProperties(review, content);
         contentService.save(content);
-        BeanUtils.copyProperties(content, entity);
+        BeanUtils.copyProperties(content, review);
+    }
+
+    private void saveArticlePart(Review review) {
         ContentArticle article = new ContentArticle();
-        BeanUtils.copyProperties(entity, article);
-        article.setContentId(content.getId());
+        BeanUtils.copyProperties(review, article);
+        article.setContentId(review.getId());
         contentArticleService.save(article);
-        BeanUtils.copyProperties(article, entity);
-        entity.getReferenceList().forEach((r) -> {
-            r.setContentId(content.getId());
+        BeanUtils.copyProperties(article, review);
+    }
+
+    private void saveReferences(Review review) {
+        review.getReferenceList().forEach((r) -> {
+            r.setContentId(review.getId());
             contentReferenceService.save(r);
         });
     }
 
     @Override
+    public void save(Review entity) {
+        saveContentPart(entity);
+        saveArticlePart(entity);
+        saveReferences(entity);
+    }
+
+    @Override
     public void save(List<Review> entities) {
         entities.forEach(this::save);
+    }
+
+    private void updateReferences(Review review) {
+        // 找出已有引用
+        List<ContentReference> allContentReference = contentReferenceService.findByContentId(review.getId());
+        ReferenceUtil.mutateToPersistent(contentReferenceService, review.getId(), review.getReferenceList());
+        // 新引用
+        List<ContentReference> newContentReference = review.getReferenceList().stream().filter(contentReference -> Objects.isNull(contentReference.getId())).collect(Collectors.toList());
+        //重用旧引用
+        Map<String, ContentReference> reusingContentReferenceMap = review.getReferenceList().stream().collect(Collectors.toMap(contentReference -> String.format("%s-%s", contentReference.getType(), contentReference.getRefId()), c -> c));
+        allContentReference.forEach(r -> {
+            String key = String.format("%s-%s", r.getType(), r.getRefId());
+            if (!reusingContentReferenceMap.containsKey(key)) {
+                r.setDeleted(true);
+            } else {
+                r.setDeleted(false);
+            }
+        });
+        //保存新应用
+        newContentReference.forEach((r) -> {
+            r.setContentId(review.getId());
+            contentReferenceService.save(r);
+        });
+        //更新旧引用
+        allContentReference.forEach(contentReferenceService::update);
     }
 
     @Override
@@ -83,10 +121,7 @@ public class ReviewServiceImpl extends AbstractUnsupportedOperationServiece<Stri
         ContentArticle article = new ContentArticle();
         BeanUtils.copyProperties(entity, article);
         contentArticleService.update(article);
-        entity.getReferenceList().forEach((r) -> {
-            r.setContentId(content.getId());
-            contentReferenceService.save(r);
-        });
+        updateReferences(entity);
     }
 
     @Override
@@ -99,12 +134,6 @@ public class ReviewServiceImpl extends AbstractUnsupportedOperationServiece<Stri
         BeanUtils.copyProperties(article, review);
         review.setReferenceList(references);
         return review;
-    }
-
-    @Override
-    public void update(Review review, List<ContentReference> oldRefers) {
-        oldRefers.stream().map(ContentReference::getId).reduce((a, b) -> a + ',' + b).ifPresent(contentReferenceService::deleteByIds);
-        update(review);
     }
 
     @Override
@@ -123,6 +152,9 @@ public class ReviewServiceImpl extends AbstractUnsupportedOperationServiece<Stri
         }
         ReviewVO reviewVO = new ReviewVO();
         BeanUtils.copyProperties(articleVO, reviewVO);
+        Filter filter = new Filter();
+        filter.put("targetContentId", new String[]{reviewVO.getContentId()});
+        reviewVO.setHotCommentList(commentService.findHotIntegrally(filter, null, new Page(1, 1)).getList());
         reviewVO.setReferences(contentReferenceService.findByContentIdIntegrally(articleVO.getContentId()));
         return reviewVO;
     }
@@ -140,12 +172,6 @@ public class ReviewServiceImpl extends AbstractUnsupportedOperationServiece<Stri
     public ReviewVO findByIdIntegrally(String id) {
         ArticleVO articleVO = contentArticleService.findByIdIntegrally(ContentType.Review, id);
         return mutate(articleVO);
-    }
-
-    @Override
-    public List<ReviewVO> findAllIntegrally() {
-        List<ArticleVO> articleVOList = contentArticleService.findAllIntegrally();
-        return articleVOList.stream().map(this::mutate).collect(Collectors.toList());
     }
 
     @Override

@@ -142,6 +142,7 @@ public class Review {
             return null;
         }
         Review review = new Review();
+        review.setRate(reviewDTO.getRate());
         review.setType(ContentType.Review);
         review.setTitle(reviewDTO.getTitle());
         review.setContentSource(reviewDTO.getContent().getSource());
@@ -153,7 +154,7 @@ public class Review {
             reference.setRefId(bookId);
             reference.setType(ContentType.Book);
             return reference;
-        }).collect(Collectors.toList()));
+        }).limit(1).collect(Collectors.toList()));
         return review;
     }
 }

@@ -10,4 +10,6 @@ public interface BookTagsService extends Service<String, BookTags> {
     void deleteByIdLogically(String id);
 
     List<TagVO> findByBookIdItegrally(String id);
+
+    List<BookTags> findByBookId(String bookId);
 }

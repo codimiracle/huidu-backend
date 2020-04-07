@@ -1,6 +1,6 @@
 package com.codimiracle.application.platform.huidu.service.impl;
 
-import com.codimiracle.application.platform.huidu.contract.AbstractService;
+import com.codimiracle.application.platform.huidu.contract.*;
 import com.codimiracle.application.platform.huidu.entity.po.ArrivedHistory;
 import com.codimiracle.application.platform.huidu.entity.vo.ArrivedHistoryVO;
 import com.codimiracle.application.platform.huidu.mapper.ArrivedHistoryMapper;
@@ -24,11 +24,14 @@ public class ArrivedHistoryServiceImpl extends AbstractService<String, ArrivedHi
     private ArrivedHistoryMapper arrivedHistoryMapper;
 
     @Override
-    public ArrivedHistory signin(String signerId, Date signingDate) {
+    public ArrivedHistory signin(String signerId, String motto, Date signingDate) {
         ArrivedHistory arrivedHistory = findLastArrivedHistory(signerId, signingDate);
         if (Objects.nonNull(arrivedHistory)) {
-            LocalDate signingLocalDate = LocalDate.from(signingDate.toInstant());
-            LocalDate lastSignedLocalDate = LocalDate.from(arrivedHistory.getSignTime().toInstant());
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(signingDate.getTime());
+            LocalDate signingLocalDate = LocalDate.of(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_YEAR));
+            calendar.setTimeInMillis(arrivedHistory.getSignTime().getTime());
+            LocalDate lastSignedLocalDate = LocalDate.of(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_YEAR));
             if (signingLocalDate.compareTo(lastSignedLocalDate) == 0) {
                 //已经签到了
                 return arrivedHistory;
@@ -36,10 +39,11 @@ public class ArrivedHistoryServiceImpl extends AbstractService<String, ArrivedHi
                 ArrivedHistory arrive = new ArrivedHistory();
                 arrive.setSignTime(signingDate);
                 arrive.setUserId(signerId);
-                arrive.setMotto("Test motto");
+                arrive.setMotto(motto);
                 //前一天已经签到
                 if (lastSignedLocalDate.plusDays(1).compareTo(signingLocalDate) == 0) {
-                    arrive.setDays(arrivedHistory.getDays());
+                    //续签
+                    arrive.setDays(arrivedHistory.getDays() + 1);
                 } else {
                     //断签
                     arrive.setDays(1);
@@ -50,6 +54,7 @@ public class ArrivedHistoryServiceImpl extends AbstractService<String, ArrivedHi
         }
         ArrivedHistory thatDayArrived = new ArrivedHistory();
         thatDayArrived.setSignTime(signingDate);
+        thatDayArrived.setMotto(motto);
         thatDayArrived.setDays(1);
         thatDayArrived.setUserId(signerId);
         save(thatDayArrived);
@@ -72,6 +77,11 @@ public class ArrivedHistoryServiceImpl extends AbstractService<String, ArrivedHi
         Map<String, Boolean> map = new HashMap<>();
         mapList.forEach((m) -> map.put(DateFormatUtils.format((Date) m.get("key"), "yyyy-MM-dd"), Objects.equals(m.get("value"), 1L)));
         return map;
+    }
+
+    @Override
+    public PageSlice<ArrivedHistoryVO> findAllIntegrally(Filter filter, Sorter sorter, Page page) {
+        return extractPageSlice(arrivedHistoryMapper.selectAllIntegrally(filter, sorter, page));
     }
 
     private ArrivedHistory findLastArrivedHistory(String signerId, Date signingDate) {

@@ -27,4 +27,7 @@ import java.util.HashMap;
  * @author Codimiracle
  */
 public class Filter extends HashMap<String, String[]> {
+    public void filter(String field, String... values) {
+        put(field, values);
+    }
 }

@@ -27,6 +27,7 @@ import com.codimiracle.application.platform.huidu.contract.Filter;
 import com.codimiracle.application.platform.huidu.contract.Page;
 import com.codimiracle.application.platform.huidu.contract.Sorter;
 import com.codimiracle.application.platform.huidu.entity.vo.TopicVO;
+import com.codimiracle.application.platform.huidu.enumeration.ContentStatus;
 import com.codimiracle.application.platform.huidu.service.TopicService;
 import com.codimiracle.application.platform.huidu.util.RestfulUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -68,6 +69,8 @@ public class ApiTopicController {
 
     @GetMapping
     public ApiResponse collection(@RequestParam("filter") Filter filter, @RequestParam("sorter") Sorter sorter, @ModelAttribute Page page) {
+        filter = Objects.isNull(filter) ? new Filter() : filter;
+        filter.filter("status", ContentStatus.Publish.toString());
         sorter = Objects.isNull(sorter) ? new Sorter() : sorter;
         sorter.setField("createTime");
         sorter.setOrder("descend");

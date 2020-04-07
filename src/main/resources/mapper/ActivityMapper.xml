@@ -19,6 +19,7 @@
         <result column="activity_banner" jdbcType="VARCHAR" property="banner"/>
         <result column="activity_url" jdbcType="VARCHAR" property="url"/>
         <result column="activity_status" jdbcType="VARCHAR" property="status"/>
+        <result column="activity_book_id" jdbcType="INTEGER" property="bookId" />
         <result column="activity_create_time" jdbcType="TIMESTAMP" property="createTime"/>
         <result column="activity_update_time" jdbcType="TIMESTAMP" property="updateTime"/>
         <association property="book"
@@ -40,14 +41,10 @@
             a.banner activity_banner,
             a.status activity_status,
             a.url activity_url,
+            a.book_id activity_book_id,
             a.create_time activity_create_time,
-            a.update_time activity_update_time,
-        <include refid="com.codimiracle.application.platform.huidu.mapper.BookMapper.book_vo_fields" />
+            a.update_time activity_update_time
         FROM activity a
-            LEFT JOIN book b ON b.id = a.book_id
-            LEFT JOIN book_metadata bm ON b.metadata_id = bm.id
-            LEFT JOIN commodity c ON b.commodity_id = c.id
-            LEFT JOIN content ct ON ct.id = b.content_id
         WHERE a.deleted = 0
     </sql>
     <select id="findByIdIntegrally" resultMap="IntegratedResultMap">

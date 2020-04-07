@@ -9,6 +9,7 @@ import com.codimiracle.application.platform.huidu.util.RestfulUtil;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 import java.util.Arrays;
 
 /**
@@ -22,7 +23,7 @@ public class ApiTagController {
     private TagService tagService;
 
     @PostMapping
-    public ApiResponse create(@RequestBody TagDTO tagDTO) {
+    public ApiResponse create(@Valid @RequestBody TagDTO tagDTO) {
         Tag tag = new Tag(tagDTO.getName());
         tagService.save(tag);
         return RestfulUtil.success();
@@ -41,7 +42,7 @@ public class ApiTagController {
     }
 
     @PutMapping("/{id}")
-    public ApiResponse update(@PathVariable String id, @RequestBody TagDTO tagDTO) {
+    public ApiResponse update(@PathVariable String id, @Valid @RequestBody TagDTO tagDTO) {
         Tag tag = new Tag(tagDTO.getName());
         tag.setId(id);
         tagService.update(tag);

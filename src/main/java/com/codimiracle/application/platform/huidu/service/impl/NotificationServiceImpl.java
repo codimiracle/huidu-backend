@@ -5,10 +5,12 @@ import com.codimiracle.application.platform.huidu.entity.po.Notification;
 import com.codimiracle.application.platform.huidu.entity.vo.NotificationVO;
 import com.codimiracle.application.platform.huidu.mapper.NotificationMapper;
 import com.codimiracle.application.platform.huidu.service.NotificationService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -19,8 +21,21 @@ import java.util.Objects;
 @Service
 @Transactional
 public class NotificationServiceImpl extends AbstractService<String, Notification> implements NotificationService {
+    @Value("${huidu.notification.system-notifier}")
+    private String systemNotifierId;
+
     @Resource
     private NotificationMapper notificationMapper;
+
+
+    @Override
+    public void notify(Notification notification) {
+        // 以系统通知的方式通知用户
+        notification.setSenderId(this.systemNotifierId);
+        notification.setCreateTime(new Date());
+        notification.setUpdateTime(notification.getCreateTime());
+        save(notification);
+    }
 
     @Override
     public PageSlice<NotificationVO> findAllIntegrally(Filter filter, Sorter sorter, Page page) {

@@ -29,30 +29,32 @@
         </association>
     </resultMap>
     <sql id="select_statement">
-        SELECT c.id                 content_id,
-               c.type               content_type,
-               c.comments           content_comments,
-               c.rate               content_rate,
-               c.likes              content_likes,
-               c.reposts            content_reposts,
-               c.create_time        content_create_time,
-               c.update_time        content_update_time,
-               ca.target_content_id content_article_target_content_id,
-               ca.title             content_article_title,
-               ca.words             content_article_words,
-               ca.content_type      content_article_content_type,
-               ca.content_source    content_article_content_source,
-               ca.status            content_article_status,
-               ca.`reads`           content_article_reads,
-               u.id                 user_id,
-               u.username           user_username,
-               u.nickname           user_nickname,
-               u.avatar             user_avatar
+        SELECT c.id content_id,
+        c.type content_type,
+        c.comments content_comments,
+        c.rate content_rate,
+        c.likes content_likes,
+        c.reposts content_reposts,
+        c.create_time content_create_time,
+        c.update_time content_update_time,
+        ca.target_content_id content_article_target_content_id,
+        ca.title content_article_title,
+        ca.words content_article_words,
+        ca.content_type content_article_content_type,
+        ca.content_source content_article_content_source,
+        ca.status content_article_status,
+        ca.`reads` content_article_reads,
+        u.id user_id,
+        u.username user_username,
+        u.nickname user_nickname,
+        u.avatar user_avatar
         FROM content c
-                 LEFT JOIN content_article ca ON c.id = ca.content_id
-                 LEFT JOIN user u ON c.owner_id = u.id
+        LEFT JOIN content_article ca ON c.id = ca.content_id
+        LEFT JOIN user u ON c.owner_id = u.id
         WHERE c.deleted = 0
-          AND c.type = #{type}
+        <if test="type != null">
+            AND c.type = #{type}
+        </if>
     </sql>
     <select id="selectByIdIntegrally" resultMap="IntegratedResultMap">
         <include refid="select_statement"/>
@@ -74,6 +76,13 @@
                 AND (u.username LIKE CONCAT('%', #{filter.owner[0]}, '%') OR u.nickname LIKE
                 CONCAT('%',#{filter.owner[0]}, '%'))
             </if>
+            <if test="filter.type != null and filter.type.length gt 0">
+                AND c.type IN
+                <foreach item="item" index="index" collection="filter.type"
+                         open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
             <if test="filter.status != null and filter.status.length gt 0">
                 AND ca.status IN
                 <foreach item="item" index="index" collection="filter.status"
@@ -84,19 +93,29 @@
         </if>
         <if test="sorter != null">
             <if test="sorter.field == 'create_time'">
-                ORDER BY c.create_time <if test="sorter.order == 'descend'">DESC</if>
+                ORDER BY c.create_time
+                <if test="sorter.order == 'descend'">DESC</if>
             </if>
             <if test="sorter.field == 'hot_degree'">
-                ORDER BY (c.likes * 3 + c.reads + c.comments) * c.rate <if test="sorter.order == 'descend'">DESC</if>
+                ORDER BY (c.likes * 3 + c.reads + c.comments) * c.rate
+                <if test="sorter.order == 'descend'">DESC</if>
             </if>
         </if>
     </select>
+
     <select id="selectHotIntegrally" resultMap="IntegratedResultMap">
-        <include refid="select_statement" />
+        <include refid="select_statement"/>
+        <if test="filter != null">
+            <if test="filter.targetContentId != null and filter.targetContentId.length gt 0">
+                AND ca.target_content_id = #{filter.targetContentId[0]}
+            </if>
+        </if>
         ORDER BY (c.likes * 3 + c.comments + c.rate * 2) DESC
     </select>
+
     <select id="selectFocusArticleByTypeAndReferenceId" resultMap="IntegratedResultMap">
-        <include refid="select_statement" />
-        AND c.id IN (select cr.content_id from content_reference cr where type=#{type} and cr.ref_id = #{referenceId} group by cr.ref_id,cr.content_id order by count(id))
+        <include refid="select_statement"/>
+        AND c.id IN (SELECT cr.content_id FROM content_reference cr WHERE cr.type=#{referenceType} AND cr.ref_id = #{referenceId}
+        GROUP BY cr.ref_id,cr.content_id ORDER BY count(id) DESC)
     </select>
 </mapper>

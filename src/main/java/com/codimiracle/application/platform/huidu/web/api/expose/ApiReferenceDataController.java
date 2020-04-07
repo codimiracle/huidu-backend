@@ -5,6 +5,7 @@ import com.codimiracle.application.platform.huidu.contract.Page;
 import com.codimiracle.application.platform.huidu.contract.PageSlice;
 import com.codimiracle.application.platform.huidu.entity.po.ReferenceData;
 import com.codimiracle.application.platform.huidu.entity.po.User;
+import com.codimiracle.application.platform.huidu.helper.MultipartFileSender;
 import com.codimiracle.application.platform.huidu.service.ReferenceDataService;
 import com.codimiracle.application.platform.huidu.util.CodeUtil;
 import com.codimiracle.application.platform.huidu.util.RestfulUtil;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -98,12 +100,12 @@ public class ApiReferenceDataController {
         Files.copy(file, response.getOutputStream());
     }
 
-    private void referenceDataToResponse(ReferenceData referenceData, HttpServletResponse response) throws IOException {
+    private void referenceDataToResponse(ReferenceData referenceData, HttpServletRequest request, HttpServletResponse response) throws Exception {
         Path path = Paths.get(referenceData.getFilePath());
-        response.setContentType(referenceData.getType());
-        response.addHeader("Content-Disposition", "attachment; filename=" + referenceData.getFileName());
-        Files.copy(path, response.getOutputStream());
-        response.getOutputStream().flush();
+        MultipartFileSender.fromPath(path)
+                .with(request)
+                .with(response)
+                .serveResource();
     }
 
     private void avatarNotFound(HttpServletResponse response) throws IOException {
@@ -114,12 +116,12 @@ public class ApiReferenceDataController {
         fileToResponse("./assets/empty.png", response);
     }
 
-    private void downloadReferenceDataOrNotFound(HttpServletResponse response, String referenceId, Supplier<? extends Throwable> notFound) throws Throwable {
+    private void downloadReferenceDataOrNotFound(HttpServletRequest request, HttpServletResponse response, String referenceId, Supplier<? extends Throwable> notFound) throws Throwable {
         ReferenceData referenceData = referenceDataService.findById(referenceId);
         if (Objects.nonNull(referenceData) && Objects.equals(Objects.toString(referenceData.getStatus()), "1")) {
             Path file = Paths.get(referenceData.getFilePath());
             if (Files.exists(file)) {
-                referenceDataToResponse(referenceData, response);
+                referenceDataToResponse(referenceData, request, response);
                 return;
             }
         }
@@ -130,8 +132,8 @@ public class ApiReferenceDataController {
     }
 
     @GetMapping("/api/reference-data/source/{reference_id}")
-    public void downloadReferenceData(HttpServletResponse response, @PathVariable("reference_id") String referenceId) throws Throwable {
-        downloadReferenceDataOrNotFound(response, referenceId, () -> {
+    public void downloadReferenceData(HttpServletRequest request, HttpServletResponse response, @PathVariable("reference_id") String referenceId) throws Throwable {
+        downloadReferenceDataOrNotFound(request, response, referenceId, () -> {
             try {
                 response.sendError(404, "Resource not found.");
             } catch (IOException e) {
@@ -142,8 +144,8 @@ public class ApiReferenceDataController {
     }
 
     @GetMapping("/api/user/avatar/{reference_id}")
-    public void downloadAvatar(HttpServletResponse response, @PathVariable("reference_id") String referenceId) throws Throwable {
-        downloadReferenceDataOrNotFound(response, referenceId, () -> {
+    public void downloadAvatar(HttpServletRequest request, HttpServletResponse response, @PathVariable("reference_id") String referenceId) throws Throwable {
+        downloadReferenceDataOrNotFound(request, response, referenceId, () -> {
             try {
                 avatarNotFound(response);
             } catch (IOException e) {
@@ -154,8 +156,8 @@ public class ApiReferenceDataController {
     }
 
     @GetMapping("/api/books/cover/{reference_id}")
-    public void downloadBookCover(HttpServletResponse response, @PathVariable("reference_id") String referenceId) throws Throwable {
-        downloadReferenceDataOrNotFound(response, referenceId, () -> {
+    public void downloadBookCover(HttpServletRequest request, HttpServletResponse response, @PathVariable("reference_id") String referenceId) throws Throwable {
+        downloadReferenceDataOrNotFound(request, response, referenceId, () -> {
             try {
                 coverNotFound(response);
             } catch (IOException e) {

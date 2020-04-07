@@ -16,6 +16,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 import java.util.Objects;
 
 /**
@@ -32,7 +33,7 @@ public class ApiCreatorBookEpisodeController {
     private BookEpisodeController bookEpisodeController;
 
     @PostMapping
-    public ApiResponse create(@AuthenticationPrincipal User user, @PathVariable("book_id") String bookId, @RequestBody BookEpisodeDTO bookEpisodeDTO) {
+    public ApiResponse create(@AuthenticationPrincipal User user, @PathVariable("book_id") String bookId, @Valid @RequestBody BookEpisodeDTO bookEpisodeDTO) {
         return bookEpisodeController.create(user, bookId, bookEpisodeDTO);
     }
 
@@ -46,7 +47,7 @@ public class ApiCreatorBookEpisodeController {
     }
 
     @PutMapping("/{id}")
-    public ApiResponse update(@AuthenticationPrincipal User user, @PathVariable String id, @RequestBody BookEpisodeDTO bookEpisodeDTO) {
+    public ApiResponse update(@AuthenticationPrincipal User user, @PathVariable String id, @Valid @RequestBody BookEpisodeDTO bookEpisodeDTO) {
         BookEpisode originalEpisode = bookEpisodeService.findById(id);
         if (Objects.isNull(originalEpisode) || !Objects.equals(originalEpisode.getOwnerId(), user.getId())) {
             return RestfulUtil.fail("没有找到该章节！");

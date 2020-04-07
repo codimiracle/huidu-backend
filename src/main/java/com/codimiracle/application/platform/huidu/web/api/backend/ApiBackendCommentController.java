@@ -31,6 +31,7 @@ import com.codimiracle.application.platform.huidu.util.RestfulUtil;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -54,7 +55,7 @@ public class ApiBackendCommentController {
     }
 
     @PutMapping("/{id}")
-    public ApiResponse update(@PathVariable String id, @RequestBody CommentDTO commentDTO) {
+    public ApiResponse update(@PathVariable String id, @Valid @RequestBody CommentDTO commentDTO) {
         Comment comment = Comment.from(commentDTO);
         Objects.requireNonNull(comment);
         comment.setId(id);

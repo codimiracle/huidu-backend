@@ -13,7 +13,10 @@ import java.util.List;
  */
 public interface BookService extends Service<String, Book> {
 
+    BookVO findPublishByIdIntegrally(BookType type, String id);
+
     BookVO findByIdIntegrally(BookType type, String id);
+
     BookVO findByIdIntegrally(String id);
 
     PageSlice<BookVO> findAllIntegrally(BookType type, Filter filter, Sorter sorter, Page page);
@@ -23,6 +26,8 @@ public interface BookService extends Service<String, Book> {
     void deleteByIdsLogically(List<String> ids);
 
     PageSlice<BookVO> findByCategoryIdIntegrally(String categoryId, Filter filter, Sorter sorter, Page page);
+
+    PageSlice<BookVO> findByCollectionIdIntegrally(String categoryId, Filter filter, Sorter sorter, Page page);
 
     List<String> retrivePublishYearsByType(BookType bookType);
 
@@ -49,4 +54,6 @@ public interface BookService extends Service<String, Book> {
     Book findByCommodityId(String commodityId);
 
     PageSlice<BookVO> findAllUsingUserFigureByBookType(BookType type, String userId, Filter filter, Sorter sorter, Page page);
+
+    Float avgReviewStars(String bookId);
 }

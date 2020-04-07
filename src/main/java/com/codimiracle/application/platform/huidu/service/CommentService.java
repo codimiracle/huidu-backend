@@ -35,9 +35,11 @@ public interface CommentService extends Service<String, Comment> {
     CommentVO findByIdIntegrally(String id);
 
     PageSlice<CommentVO> findAllIntegrally(Filter filter, Sorter sorter, Page page);
-    PageSlice<CommentVO> findAllIntegrally(String likerId, Filter filter, Sorter sorter, Page page);
 
     void deleteByIdLogically(String id);
 
-    void deleteByIdsLogically(List<String> asList);
+    void deleteByIdsLogically(List<String> ids);
+
+    PageSlice<CommentVO> findHotIntegrally(Filter filter, Sorter sorter, Page page);
+
 }

@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import javax.annotation.Resource;
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.UnsupportedAudioFileException;
+import javax.validation.Valid;
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
@@ -36,7 +37,7 @@ public class BookAudioEpisodeController {
     @Resource
     private ReferenceDataService referenceDataService;
 
-    public ApiResponse create(@AuthenticationPrincipal User user, @PathVariable("book_id") String bookId, @RequestBody BookAudioEpisodeDTO bookAudioEpisodeDTO) {
+    public ApiResponse create(@AuthenticationPrincipal User user, @PathVariable("book_id") String bookId, @Valid @RequestBody BookAudioEpisodeDTO bookAudioEpisodeDTO) {
         BookAudioEpisode bookAudioEpisode = BookAudioEpisode.from(bookAudioEpisodeDTO);
         bookAudioEpisode.setOwnerId(user.getId());
         bookAudioEpisode.setBookId(bookId);
@@ -69,7 +70,7 @@ public class BookAudioEpisodeController {
         return RestfulUtil.success();
     }
 
-    public ApiResponse update(@PathVariable("id") String id, @RequestBody BookAudioEpisodeDTO bookAudioEpisodeDTO) {
+    public ApiResponse update(@PathVariable("id") String id, @Valid @RequestBody BookAudioEpisodeDTO bookAudioEpisodeDTO) {
         BookAudioEpisode bookAudioEpisode = BookAudioEpisode.from(bookAudioEpisodeDTO);
         bookAudioEpisode.setId(id);
         if (Objects.nonNull(bookAudioEpisode.getStreamUrl())) {

@@ -9,6 +9,7 @@ import com.codimiracle.application.platform.huidu.util.RestfulUtil;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 
 /**
  * @author Codimiracle
@@ -21,7 +22,7 @@ public class ApiOperationController {
     private OperationService operationService;
 
     @PostMapping
-    public ApiResponse create(@RequestBody Operation operation) {
+    public ApiResponse create(@Valid @RequestBody Operation operation) {
         operationService.save(operation);
         return RestfulUtil.success();
     }
@@ -33,7 +34,7 @@ public class ApiOperationController {
     }
 
     @PutMapping("/{id}")
-    public ApiResponse update(@RequestBody Operation operation) {
+    public ApiResponse update(@Valid @RequestBody Operation operation) {
         operationService.update(operation);
         return RestfulUtil.success();
     }

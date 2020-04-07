@@ -26,7 +26,7 @@ public interface UserMapper extends Mapper<User> {
 
     User selectById(String id);
 
-    boolean existsUsername(String username);
+    Boolean existsUsername(String username);
 
-    boolean existsNickname(String nickname);
+    Boolean existsNickname(String nickname);
 }

@@ -9,6 +9,7 @@ import com.codimiracle.application.platform.huidu.util.RestfulUtil;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 import java.util.Arrays;
 
 /**
@@ -22,7 +23,7 @@ public class ApiBookMetadataController {
     private BookMetadataService bookMetadataService;
 
     @PostMapping
-    public ApiResponse create(@RequestBody BookMetadataDTO bookMetadataDTO) {
+    public ApiResponse create(@Valid @RequestBody BookMetadataDTO bookMetadataDTO) {
         BookMetadata bookMetadata = BookMetadata.from(bookMetadataDTO);
         bookMetadataService.save(bookMetadata);
         return RestfulUtil.success();
@@ -41,7 +42,7 @@ public class ApiBookMetadataController {
     }
 
     @PutMapping
-    public ApiResponse update(@PathVariable String id, @RequestBody BookMetadataDTO bookMetadataDTO) {
+    public ApiResponse update(@PathVariable String id, @Valid @RequestBody BookMetadataDTO bookMetadataDTO) {
         BookMetadata bookMetadata = BookMetadata.from(bookMetadataDTO);
         bookMetadata.setId(id);
         bookMetadataService.update(bookMetadata);

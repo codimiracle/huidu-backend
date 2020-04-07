@@ -11,6 +11,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 import java.util.Map;
 import java.util.Objects;
 
@@ -25,7 +26,7 @@ public class ApiUserAddressController {
     private AddressService addressService;
 
     @PostMapping
-    public ApiResponse create(@AuthenticationPrincipal User user, @RequestBody AddressDTO addressDTO) {
+    public ApiResponse create(@AuthenticationPrincipal User user, @Valid @RequestBody AddressDTO addressDTO) {
         Address address = Address.from(addressDTO);
         address.setUserId(user.getId());
         addressService.save(address);
@@ -44,7 +45,7 @@ public class ApiUserAddressController {
     }
 
     @PutMapping("/{id}")
-    public ApiResponse update(@AuthenticationPrincipal User user, @PathVariable("id") String id, @RequestBody AddressDTO addressDTO) {
+    public ApiResponse update(@AuthenticationPrincipal User user, @PathVariable("id") String id, @Valid @RequestBody AddressDTO addressDTO) {
         Address original = addressService.findById(id);
         if (Objects.isNull(original) || !Objects.equals(original.getUserId(), user.getId())) {
             return RestfulUtil.fail("权限不足！");
@@ -62,7 +63,7 @@ public class ApiUserAddressController {
     }
 
     @PostMapping("/default")
-    public ApiResponse makeDefaultAddress(@AuthenticationPrincipal User user, @RequestBody Map<String, String> parameters) {
+    public ApiResponse makeDefaultAddress(@AuthenticationPrincipal User user, @Valid @RequestBody Map<String, String> parameters) {
         addressService.defaultAddress(user.getId(), parameters.get("addressId"));
         return RestfulUtil.success();
     }

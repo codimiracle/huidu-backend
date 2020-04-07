@@ -33,7 +33,7 @@
         SELECT t.id   tag_id,
                t.name tag_name
         FROM tag t
-        WHERE 1 = 1
+        WHERE t.deleted = 0
     </sql>
     <select id="selectByIdIntegrally" resultMap="IntegratedResultMap">
         <include refid="select_statement"/>

@@ -29,10 +29,10 @@ public class BookShelfCellServiceImpl extends AbstractService<String, BookShelfC
     @Resource
     private HistoryService historyService;
 
-    private void paddingAssociation(BookShelfCellVO bookShelfCellVO) {
+    private void mutate(BookShelfCellVO bookShelfCellVO) {
         bookShelfCellVO.setBook(bookService.findByIdIntegrally(null, bookShelfCellVO.getBookId()));
         String ownerId = bookShelfCellVO.getShelf().getOwnerId();
-        HistoryVO historyVO = historyService.findByUserIdAndBookIdIntegrallyOrFirstEpisode(ownerId, bookShelfCellVO.getBookId());
+        HistoryVO historyVO = historyService.findLastReadByUserIdAndBookIdIntegrallyOrFirstEpisode(ownerId, bookShelfCellVO.getBookId());
         bookShelfCellVO.setHistoryId(historyVO.getId());
         bookShelfCellVO.setHistory(historyVO);
     }
@@ -40,7 +40,7 @@ public class BookShelfCellServiceImpl extends AbstractService<String, BookShelfC
     @Override
     public PageSlice<BookShelfCellVO> findAllIntegrally(Filter filter, Sorter sorter, Page page) {
         PageSlice<BookShelfCellVO> slice = extractPageSlice(bookShelfCellMapper.findAllIntegrally(filter, sorter, page));
-        slice.getList().forEach(this::paddingAssociation);
+        slice.getList().forEach(this::mutate);
         return slice;
     }
 

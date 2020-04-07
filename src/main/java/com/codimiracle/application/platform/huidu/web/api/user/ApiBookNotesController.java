@@ -13,6 +13,7 @@ import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 import java.util.Date;
 import java.util.Objects;
 
@@ -28,7 +29,7 @@ public class ApiBookNotesController {
     private BookNotesService bookNotesService;
 
     @PostMapping
-    public ApiResponse create(@AuthenticationPrincipal User user, @RequestBody BookNotesDTO bookNotesDTO) {
+    public ApiResponse create(@AuthenticationPrincipal User user, @Valid @RequestBody BookNotesDTO bookNotesDTO) {
         if (bookNotesService.isDommarkExists(bookNotesDTO.getDommark())) {
             return RestfulUtil.fail("附近已有笔记标注，请删除后重试！");
         }
@@ -47,7 +48,7 @@ public class ApiBookNotesController {
     }
 
     @PutMapping("/{book_id}/notes/{id}")
-    public ApiResponse update(@PathVariable String id, @RequestBody BookNotesDTO bookNotesDTO) {
+    public ApiResponse update(@PathVariable String id, @Valid @RequestBody BookNotesDTO bookNotesDTO) {
         BookNotes bookNotes = BookNotes.from(bookNotesDTO);
         bookNotes.setUpdateTime(new Date());
         Assert.notNull(bookNotes, "数据转换后为空！");

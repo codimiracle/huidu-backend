@@ -9,6 +9,7 @@ import com.codimiracle.application.platform.huidu.util.RestfulUtil;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 
 /**
  * @author Codimiracle
@@ -21,7 +22,7 @@ public class ApiSubscribeController {
     private SubscribeService subscribeService;
 
     @PostMapping
-    public ApiResponse create(@RequestBody Subscribe subscribe) {
+    public ApiResponse create(@Valid @RequestBody Subscribe subscribe) {
         subscribeService.save(subscribe);
         return RestfulUtil.success();
     }
@@ -33,7 +34,7 @@ public class ApiSubscribeController {
     }
 
     @PutMapping("/{id}")
-    public ApiResponse update(@RequestBody Subscribe subscribe) {
+    public ApiResponse update(@Valid @RequestBody Subscribe subscribe) {
         subscribeService.update(subscribe);
         return RestfulUtil.success();
     }

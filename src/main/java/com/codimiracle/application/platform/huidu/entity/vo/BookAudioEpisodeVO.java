@@ -51,9 +51,9 @@ public class BookAudioEpisodeVO {
      */
     private String status;
 
-    private Integer bookId;
+    private String bookId;
 
-    private Integer commodityId;
+    private String commodityId;
 
     /**
      * 音频流url
@@ -63,12 +63,7 @@ public class BookAudioEpisodeVO {
     /**
      * 下一章节id
      */
-    private Integer nextEpisodeId;
-
-    /**
-     * 删除标识
-     */
-    private Boolean deleted;
+    private String next;
 
     /**
      * 创建时间
@@ -82,4 +77,5 @@ public class BookAudioEpisodeVO {
 
     private BookVO book;
     private BookEpisodeVO episode;
+    private CommodityVO commodity;
 }

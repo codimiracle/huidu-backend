@@ -19,6 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 import java.util.Objects;
 
 /**
@@ -41,7 +42,7 @@ public class ApiUserAccountController {
     private PasswordEncoder passwordEncoder;
 
     @PostMapping("/pay")
-    public ApiResponse pay(@AuthenticationPrincipal User user, @RequestBody PayingDTO payingDTO) {
+    public ApiResponse pay(@AuthenticationPrincipal User user, @Valid @RequestBody PayingDTO payingDTO) {
         Order order = orderService.findByOrderNumber(payingDTO.getOrderNumber());
         if (Objects.isNull(order) || !Objects.equals(order.getOwnerId(), user.getId())) {
             return RestfulUtil.fail("订单没有找到！");
@@ -57,7 +58,7 @@ public class ApiUserAccountController {
     }
 
     @PostMapping("/recharge")
-    public ApiResponse recharge(@AuthenticationPrincipal User user, @RequestBody RechargeDTO rechargeDTO) {
+    public ApiResponse recharge(@AuthenticationPrincipal User user, @Valid @RequestBody RechargeDTO rechargeDTO) {
         OrderringDTO orderringDTO = new OrderringDTO();
         orderringDTO.setType(OrderType.Recharge.getType());
         orderringDTO.setCharge(rechargeDTO.getCharge());

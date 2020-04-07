@@ -12,6 +12,8 @@ import java.util.List;
  */
 public interface NotificationService extends Service<String, Notification> {
 
+    void notify(Notification notification);
+
     PageSlice<NotificationVO> findAllIntegrally(Filter filter, Sorter sorter, Page page);
 
     void deleteByIdLogically(String id);

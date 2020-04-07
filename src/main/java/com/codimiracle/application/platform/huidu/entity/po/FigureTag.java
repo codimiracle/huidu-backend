@@ -3,6 +3,7 @@ package com.codimiracle.application.platform.huidu.entity.po;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 
 @Data
 @Table(name = "user_figure")
@@ -20,8 +21,8 @@ public class FigureTag {
     @Column(name = "deleted")
     private boolean deleted;
 
-    @Transient
-    private Integer score;
+    @Column(name = "score")
+    private BigDecimal score;
 
     @Transient
     private Tag tag;

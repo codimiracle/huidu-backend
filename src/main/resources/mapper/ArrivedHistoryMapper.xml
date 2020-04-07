@@ -20,12 +20,26 @@
         <association property="user"
                      resultMap="com.codimiracle.application.platform.huidu.mapper.UserMapper.ProtectedResultMap"/>
     </resultMap>
+    <sql id="select_statement">
+        SELECT ah.id arrived_history_id,
+        ah.days arrived_history_days,
+        ah.motto arrived_history_motto,
+        ah.sign_time arrived_history_today,
+        ah.sign_time arrived_history_sign_time,
+        ah.user_id,
+        u.avatar user_avatar,
+        u.username user_username,
+        u.nickname user_nickname
+        FROM arrived_history ah
+        LEFT JOIN user u ON ah.user_id = u.id
+        WHERE 1 = 1
+    </sql>
     <select id="selectLastArrivedHistory" resultMap="BaseResultMap">
         SELECT ah.id,
-               ah.days,
-               ah.motto,
-               ah.sign_time,
-               ah.user_id
+        ah.days,
+        ah.motto,
+        ah.sign_time,
+        ah.user_id
         FROM arrived_history ah
         WHERE ah.sign_time &lt; #{signingDate}
         AND ah.user_id = #{signerId}
@@ -33,26 +47,16 @@
         LIMIT 0,1
     </select>
     <select id="selectByThatDayIntegrally" resultMap="IntegratedResultMap">
-        SELECT ah.id        arrived_history_id,
-               ah.days      arrived_history_days,
-               ah.motto     arrived_history_motto,
-               ah.sign_time arrived_history_today,
-               ah.sign_time arrived_history_sign_time,
-               ah.user_id,
-               u.avatar     user_avatar,
-               u.username   user_username,
-               u.nickname   user_nickname
-        FROM arrived_history ah
-                 LEFT JOIN user u ON ah.user_id = u.id
-        WHERE DATE(ah.sign_time) = DATE(#{thatDay})
+        <include refid="select_statement"/>
+        AND DATE(ah.sign_time) = DATE(#{thatDay})
         AND ah.user_id = #{signerId}
     </select>
     <select id="selectByThatDay" resultMap="BaseResultMap">
         SELECT ah.id,
-               ah.days,
-               ah.motto,
-               ah.sign_time,
-               ah.user_id
+        ah.days,
+        ah.motto,
+        ah.sign_time,
+        ah.user_id
         FROM arrived_history ah
         WHERE DATE(ah.sign_time) = DATE(#{thatDay})
         AND ah.user_id = #{signerId}
@@ -61,5 +65,13 @@
         SELECT DATE(ah.sign_time) `key`, TRUE value
         FROM arrived_history ah
         WHERE ah.user_id = #{userId}
+    </select>
+    <select id="selectAllIntegrally" resultMap="IntegratedResultMap">
+        <include refid="select_statement"/>
+        <if test="filter != null">
+            <if test="filter.userId != null and filter.userId.length gt 0">
+                AND ah.user_id = #{filter.userId[0]}
+            </if>
+        </if>
     </select>
 </mapper>

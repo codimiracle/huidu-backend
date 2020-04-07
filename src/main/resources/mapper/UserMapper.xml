@@ -132,6 +132,7 @@
                u.role_id,
                ur.name,
                ur.authorities,
+               ui.user_id,
                ui.gender,
                ui.age,
                ui.slogan,

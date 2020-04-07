@@ -55,31 +55,52 @@ public class CommentServiceImpl extends AbstractUnsupportedOperationServiece<Str
     @Resource
     private ContentLikesService contentLikesService;
 
-    @Override
-    public void save(Comment entity) {
-        Content content = Comment.extractContent(entity);
-        Content originalContent = contentService.findById(entity.getTargetContentId());
-        if (entity.getStatus() == ContentStatus.Publish) {
-            contentService.commentsIncrement(entity.getTargetContentId());
-            //首次评论
-            if (originalContent.getComments() > 0) {
-                contentService.rateIncrementBy(entity.getTargetContentId(), entity.getRate());
-            } else {
-                contentService.rateIncrementBy(entity.getTargetContentId(), entity.getRate() * 2);
+    private void updateStatistics(Comment comment) {
+        Content targetContent = contentService.findById(comment.getTargetContentId());
+        if (comment.getStatus() == ContentStatus.Publish) {
+            contentService.commentsIncrement(comment.getTargetContentId());
+            // 仅对图书进行累积评分
+            if (targetContent.getType() == ContentType.Book) {
+                //首次评论
+                if (targetContent.getComments() == 0) {
+                    contentService.rateIncrementBy(comment.getTargetContentId(), comment.getRate());
+                } else {
+                    contentService.rateIncrementBy(comment.getTargetContentId(), comment.getRate() * 2);
+                }
             }
         }
+    }
+
+    private void saveContentPart(Comment comment) {
+        Content content = Comment.extractContent(comment);
         contentService.save(content);
-        BeanUtils.copyProperties(content, entity);
-        ContentArticle article = Comment.extractArticle(entity);
-        article.setContentId(content.getId());
+        // 把主键数据写入到 Comment 中
+        BeanUtils.copyProperties(content, comment);
+    }
+
+    private void saveArticlePart(Comment comment) {
+        ContentArticle article = Comment.extractArticle(comment);
+        article.setContentId(comment.getId());
         contentArticleService.save(article);
-        BeanUtils.copyProperties(article, entity);
-        Optional.ofNullable(entity.getMentions()).ifPresent((mentions) -> {
+        BeanUtils.copyProperties(article, comment);
+    }
+
+    private void saveMentionPart(Comment comment) {
+        Optional.ofNullable(comment.getMentions()).ifPresent((mentions) -> {
             mentions.forEach((m) -> {
-                m.setContentId(content.getId());
+                m.setContentId(comment.getId());
                 contentMentionService.save(m);
             });
         });
+    }
+
+
+    @Override
+    public void save(Comment entity) {
+        updateStatistics(entity);
+        saveContentPart(entity);
+        saveArticlePart(entity);
+        saveMentionPart(entity);
     }
 
     @Override
@@ -109,16 +130,11 @@ public class CommentServiceImpl extends AbstractUnsupportedOperationServiece<Str
         return null;
     }
 
-    private PageSlice<CommentVO> paddingAssociation(PageSlice<ArticleVO> slice, String likerId) {
+    private PageSlice<CommentVO> mutate(PageSlice<ArticleVO> slice) {
         List<CommentVO> list = slice.getList().stream().map((articleVO -> {
             CommentVO commentVO = new CommentVO();
             BeanUtils.copyProperties(articleVO, commentVO);
             commentVO.setMentions(contentMentionService.findByContentId(articleVO.getContentId()));
-            if (Objects.nonNull(likerId)) {
-                commentVO.setLiked(contentLikesService.isLiked(likerId, commentVO.getContentId()));
-            } else {
-                commentVO.setLiked(false);
-            }
             return commentVO;
         })).collect(Collectors.toList());
         PageSlice<CommentVO> commentPageSlice = new PageSlice<>();
@@ -132,13 +148,7 @@ public class CommentServiceImpl extends AbstractUnsupportedOperationServiece<Str
     @Override
     public PageSlice<CommentVO> findAllIntegrally(Filter filter, Sorter sorter, Page page) {
         PageSlice<ArticleVO> slice = contentArticleService.findAllIntegrally(ContentType.Comment, filter, sorter, page);
-        return paddingAssociation(slice, null);
-    }
-
-    @Override
-    public PageSlice<CommentVO> findAllIntegrally(String likerId, Filter filter, Sorter sorter, Page page) {
-        PageSlice<ArticleVO> slice = contentArticleService.findAllIntegrally(ContentType.Comment, filter, sorter, page);
-        return paddingAssociation(slice, likerId);
+        return mutate(slice);
     }
 
     @Override
@@ -149,5 +159,11 @@ public class CommentServiceImpl extends AbstractUnsupportedOperationServiece<Str
     @Override
     public void deleteByIdsLogically(List<String> ids) {
         contentService.deleteByIdsLogically(ids);
+    }
+
+    @Override
+    public PageSlice<CommentVO> findHotIntegrally(Filter filter, Sorter sorter, Page page) {
+        PageSlice<ArticleVO> slice = contentArticleService.findHotIntegrally(ContentType.Comment, filter, sorter, page);
+        return mutate(slice);
     }
 }

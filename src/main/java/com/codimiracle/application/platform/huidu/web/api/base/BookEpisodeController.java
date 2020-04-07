@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Objects;
@@ -27,7 +28,7 @@ public class BookEpisodeController {
     @Resource
     private BookEpisodeService bookEpisodeService;
 
-    public ApiResponse create(@AuthenticationPrincipal User user, @PathVariable("book_id") String bookId, @RequestBody BookEpisodeDTO bookEpisodeDTO) {
+    public ApiResponse create(@AuthenticationPrincipal User user, @PathVariable("book_id") String bookId, @Valid @RequestBody BookEpisodeDTO bookEpisodeDTO) {
         bookEpisodeDTO.setBookId(bookId);
         BookEpisode episode = BookEpisode.from(bookEpisodeDTO);
         episode.setCreateTime(new Date());
@@ -51,7 +52,7 @@ public class BookEpisodeController {
         return RestfulUtil.success();
     }
 
-    public ApiResponse update(@PathVariable String id, @RequestBody BookEpisodeDTO bookEpisodeDTO) {
+    public ApiResponse update(@PathVariable String id, @Valid @RequestBody BookEpisodeDTO bookEpisodeDTO) {
         BookEpisode episode = BookEpisode.from(bookEpisodeDTO);
         Objects.requireNonNull(episode, "没有需要更新的数据！");
         episode.setId(id);

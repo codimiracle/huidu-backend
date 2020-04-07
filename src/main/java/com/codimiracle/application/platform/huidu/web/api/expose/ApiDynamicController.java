@@ -24,6 +24,7 @@ package com.codimiracle.application.platform.huidu.web.api.expose;/*
 
 import com.codimiracle.application.platform.huidu.contract.*;
 import com.codimiracle.application.platform.huidu.entity.vo.ContentVO;
+import com.codimiracle.application.platform.huidu.enumeration.ContentStatus;
 import com.codimiracle.application.platform.huidu.enumeration.ContentType;
 import com.codimiracle.application.platform.huidu.service.ContentService;
 import com.codimiracle.application.platform.huidu.util.RestfulUtil;
@@ -43,7 +44,8 @@ public class ApiDynamicController {
     @GetMapping
     public ApiResponse collection(@RequestParam("filter") Filter filter, @RequestParam("sorter") Sorter sorter, @ModelAttribute Page page) {
         filter = Objects.isNull(filter) ? new Filter() : filter;
-        filter.put("type", new String[] {ContentType.Topic.getType(), ContentType.Review.getType()});
+        filter.put("status", new String[] {ContentStatus.Publish.toString()});
+        filter.put("type", new String[]{ContentType.Topic.getType(), ContentType.Review.getType()});
         sorter = Objects.isNull(sorter) ? new Sorter() : sorter;
         sorter.setField("createTime");
         sorter.setOrder("descend");

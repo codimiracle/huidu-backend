@@ -4,19 +4,18 @@ import com.codimiracle.application.platform.huidu.contract.*;
 import com.codimiracle.application.platform.huidu.entity.po.Book;
 import com.codimiracle.application.platform.huidu.entity.po.BookTags;
 import com.codimiracle.application.platform.huidu.entity.po.Content;
+import com.codimiracle.application.platform.huidu.entity.po.Tag;
 import com.codimiracle.application.platform.huidu.entity.vo.BookVO;
 import com.codimiracle.application.platform.huidu.enumeration.BookStatus;
 import com.codimiracle.application.platform.huidu.enumeration.BookType;
 import com.codimiracle.application.platform.huidu.mapper.BookMapper;
 import com.codimiracle.application.platform.huidu.service.*;
+import com.codimiracle.application.platform.huidu.util.TagUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -88,8 +87,20 @@ public class BookServiceImpl extends AbstractService<String, Book> implements Bo
     }
 
     private void persistentTags(Book model) {
-        model.getTags().stream().filter((t) -> Objects.isNull(t.getId())).forEach(tagService::save);
-        List<BookTags> bookTagsList = model.getTags().stream().map((t) -> BookTags.valueOf(model, t)).collect(Collectors.toList());
+        List<BookTags> allBookTags = bookTagsService.findByBookId(model.getId());
+        List<Tag> newTags = model.getTags().stream().filter((t) -> Objects.isNull(t.getId())).collect(Collectors.toList());
+        newTags.forEach(tagService::save);
+        Map<String, Tag> tagsMap = model.getTags().stream().collect(Collectors.toMap(Tag::getId, (tag) -> tag));
+        allBookTags.forEach((bookTags -> {
+            if (tagsMap.containsKey(bookTags.getTagId())) {
+                bookTags.setDeleted(false);
+            } else {
+                bookTags.setDeleted(true);
+            }
+            tagsMap.remove(bookTags.getTagId());
+        }));
+        allBookTags.forEach(bookTagsService::update);
+        List<BookTags> bookTagsList = tagsMap.values().stream().map((t) -> BookTags.valueOf(model, t)).collect(Collectors.toList());
         bookTagsList.forEach(bookTagsService::save);
     }
 
@@ -103,6 +114,15 @@ public class BookServiceImpl extends AbstractService<String, Book> implements Bo
             }
             bookVO.setTags(bookTagsService.findByBookIdItegrally(bookVO.getId()));
         }
+    }
+
+    @Override
+    public BookVO findPublishByIdIntegrally(BookType type, String id) {
+        BookVO bookVO = findByIdIntegrally(type, id);
+        if (Objects.equals(bookVO.getStatus(), BookStatus.Serializing.getStatus())|| Objects.equals(bookVO.getStatus(), BookStatus.Ended.getStatus()) || Objects.equals(bookVO.getStatus(), BookStatus.Paused.getStatus())) {
+            return bookVO;
+        }
+        return null;
     }
 
     @Override
@@ -138,6 +158,11 @@ public class BookServiceImpl extends AbstractService<String, Book> implements Bo
     @Override
     public PageSlice<BookVO> findByCategoryIdIntegrally(String categoryId, Filter filter, Sorter sorter, Page page) {
         return extractPageSlice(bookMapper.selectByCategoryIdIntegrally(categoryId, filter, sorter, page));
+    }
+
+    @Override
+    public PageSlice<BookVO> findByCollectionIdIntegrally(String categoryId, Filter filter, Sorter sorter, Page page) {
+        return extractPageSlice(bookMapper.selectByCollectionIdIntegrally(categoryId, filter, sorter, page));
     }
 
     @Override
@@ -224,6 +249,11 @@ public class BookServiceImpl extends AbstractService<String, Book> implements Bo
     public PageSlice<BookVO> findAllUsingUserFigureByBookType(BookType type, String userId, Filter filter, Sorter sorter, Page page) {
         filter = ensurePublish(filter);
         return extractPageSlice(bookMapper.selectAllUsingUserFigureByBookType(type, userId, filter, sorter, page));
+    }
+
+    @Override
+    public Float avgReviewStars(String bookId) {
+        return bookMapper.avgReviewRate(bookId);
     }
 
 }

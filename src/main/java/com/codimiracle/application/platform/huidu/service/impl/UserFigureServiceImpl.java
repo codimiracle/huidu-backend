@@ -8,8 +8,10 @@ import com.codimiracle.application.platform.huidu.entity.vo.UserProtectedVO;
 import com.codimiracle.application.platform.huidu.mapper.UserFigureMapper;
 import com.codimiracle.application.platform.huidu.service.TagService;
 import com.codimiracle.application.platform.huidu.service.UserFigureService;
+import org.apache.ibatis.exceptions.TooManyResultsException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tk.mybatis.mapper.entity.Condition;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -17,7 +19,7 @@ import java.util.Objects;
 
 
 /**
- * Created by Codimiracle on 2020/03/17.
+ * @author Codimiracle
  */
 @Service
 @Transactional
@@ -81,5 +83,22 @@ public class UserFigureServiceImpl extends AbstractService<String, FigureTag> im
     @Override
     public List<CategoryVO> findSametasteCategoryByAvgIntegrally() {
         return userFigureMapper.selectSametasteCategoryByAvgIntegrally();
+    }
+
+    public void incrementScoreBy(String figureTagId, float weight) {
+        userFigureMapper.incrementScoreBy(figureTagId, weight);
+    }
+    @Override
+    public FigureTag findByUserIdAndTagId(String userId, String tagId) {
+        Condition condition = Conditioner.conditionOf(FigureTag.class);
+        condition.createCriteria().andEqualTo("userId", userId).andEqualTo("tagId", tagId);
+        List<FigureTag> figureTags = userFigureMapper.selectByCondition(condition);
+        if (figureTags.size() == 1) {
+            return figureTags.get(0);
+        } else if (figureTags.size() == 0) {
+            return null;
+        } else {
+            throw new TooManyResultsException();
+        }
     }
 }

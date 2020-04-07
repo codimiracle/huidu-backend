@@ -3,6 +3,7 @@ package com.codimiracle.application.platform.huidu.entity.po;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Data
 @Table(name = "content_examination")
@@ -24,4 +25,7 @@ public class ContentExamination {
 
     @Column(name = "user_id")
     private String userId;
+
+    @Column(name = "examine_time")
+    private Date examineTime;
 }

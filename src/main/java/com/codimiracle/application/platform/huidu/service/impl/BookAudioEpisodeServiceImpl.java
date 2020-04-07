@@ -8,6 +8,8 @@ import com.codimiracle.application.platform.huidu.enumeration.BookAudioEpisodeSt
 import com.codimiracle.application.platform.huidu.mapper.BookAudioEpisodeMapper;
 import com.codimiracle.application.platform.huidu.service.BookAudioEpisodeService;
 import com.codimiracle.application.platform.huidu.service.BookEpisodeService;
+import com.codimiracle.application.platform.huidu.service.BookService;
+import com.codimiracle.application.platform.huidu.service.CommodityService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,24 +28,32 @@ public class BookAudioEpisodeServiceImpl extends AbstractService<String, BookAud
     private BookAudioEpisodeMapper bookAudioEpisodeMapper;
     @Resource
     private BookEpisodeService bookEpisodeService;
+    @Resource
+    private BookService bookService;
+    @Resource
+    private CommodityService commodityService;
 
-    private void paddingAssociation(BookAudioEpisodeVO bookAudioEpisodeVO) {
+    private BookAudioEpisodeVO mutate(BookAudioEpisodeVO bookAudioEpisodeVO) {
         if (Objects.nonNull(bookAudioEpisodeVO)) {
+            bookAudioEpisodeVO.setBook(bookService.findByIdIntegrally(bookAudioEpisodeVO.getBookId()));
+            bookAudioEpisodeVO.setCommodity(commodityService.findByIdIntegrally(bookAudioEpisodeVO.getCommodityId()));
             bookAudioEpisodeVO.setEpisode(bookEpisodeService.findByIdIntegrally(bookAudioEpisodeVO.getEpisodeId()));
+            bookAudioEpisodeVO.setNext(bookAudioEpisodeMapper.selectAudioEpisodeIdByMediaNumber(bookAudioEpisodeVO.getBookId(), bookAudioEpisodeVO.getMediaNumber() + 1));
         }
+        return bookAudioEpisodeVO;
     }
 
     @Override
     public PageSlice<BookAudioEpisodeVO> findAllIntegrally(String bookId, Filter filter, Sorter sorter, Page page) {
         PageSlice<BookAudioEpisodeVO> bookAudioEpisodeVOPageSlice = extractPageSlice(bookAudioEpisodeMapper.selectAllIntegrally(bookId, filter, sorter, page));
-        bookAudioEpisodeVOPageSlice.getList().forEach((this::paddingAssociation));
+        bookAudioEpisodeVOPageSlice.getList().forEach((this::mutate));
         return bookAudioEpisodeVOPageSlice;
     }
 
     @Override
     public BookAudioEpisodeVO findByIdIntegrally(String id) {
         BookAudioEpisodeVO bookAudioEpisodeVO = bookAudioEpisodeMapper.selectByIdIntegrally(id);
-        paddingAssociation(bookAudioEpisodeVO);
+        mutate(bookAudioEpisodeVO);
         return bookAudioEpisodeVO;
     }
 
@@ -60,7 +70,7 @@ public class BookAudioEpisodeServiceImpl extends AbstractService<String, BookAud
     @Override
     public BookAudioEpisodeVO findByMediaNumberIntegrally(String bookId, Integer mediaNumber) {
         BookAudioEpisodeVO bookAudioEpisodeVO = bookAudioEpisodeMapper.selectByMediaNumberIntegrally(bookId, mediaNumber);
-        paddingAssociation(bookAudioEpisodeVO);
+        mutate(bookAudioEpisodeVO);
         return bookAudioEpisodeVO;
     }
 

@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 /**
  * @author Codimiracle
  */
@@ -24,7 +26,7 @@ public class ApiBackendElectronicBookController {
     private BookController bookController;
 
     @PostMapping
-    public ApiResponse create(@AuthenticationPrincipal User user, @RequestBody ElectronicBookDTO electronicBookDTO) {
+    public ApiResponse create(@AuthenticationPrincipal User user, @Valid @RequestBody ElectronicBookDTO electronicBookDTO) {
         return bookController.create(user, electronicBookDTO.toBookDTO());
     }
 
@@ -40,7 +42,7 @@ public class ApiBackendElectronicBookController {
     }
 
     @PutMapping("/{id}")
-    public ApiResponse update(@PathVariable String id, @RequestBody ElectronicBookDTO electronicBookDTO) {
+    public ApiResponse update(@PathVariable String id, @Valid @RequestBody ElectronicBookDTO electronicBookDTO) {
         return bookController.update(id, electronicBookDTO.toBookDTO());
     }
 

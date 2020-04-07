@@ -26,4 +26,5 @@ import lombok.Data;
 
 @Data
 public class ReviewDTO extends TopicDTO {
+    private Float rate;
 }

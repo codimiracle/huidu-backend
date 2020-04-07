@@ -1,5 +1,6 @@
 package com.codimiracle.application.platform.huidu.entity.po;
 
+import com.codimiracle.application.platform.huidu.enumeration.NotificationType;
 import lombok.Data;
 
 import javax.persistence.Column;
@@ -32,7 +33,7 @@ public class Notification {
     /**
      * 通知类型（subscribe: 订阅通知, message: 消息）
      */
-    private String type;
+    private NotificationType type;
 
     /**
      * 通知内容

@@ -14,11 +14,9 @@ import java.util.List;
 public interface ContentArticleMapper extends Mapper<ContentArticle> {
     ArticleVO selectByIdIntegrally(@Param("type") ContentType type, @Param("id") String id);
 
-    List<ArticleVO> selectAllIntegrally();
-
     List<ArticleVO> selectAllIntegrally(@Param("type") ContentType type, @Param("filter") Filter filter, @Param("sorter") Sorter sorter, @Param("page") Page page);
 
-    List<ArticleVO> selectHotIntegrally(ContentType type, Filter filter, Sorter sorter, Page page);
+    List<ArticleVO> selectHotIntegrally(@Param("type") ContentType type, @Param("filter") Filter filter, @Param("sorter") Sorter sorter, @Param("page") Page page);
 
-    List<ArticleVO> selectFocusArticleByTypeAndReferenceId(String type, String referenceId, Filter filter, Sorter sorter, Page page);
+    List<ArticleVO> selectFocusArticleByTypeAndReferenceId(@Param("type") ContentType type, @Param("referenceType") String referenceType, @Param("referenceId") String referenceId, @Param("filter") Filter filter, @Param("sorter") Sorter sorter, @Param("page") Page page);
 }

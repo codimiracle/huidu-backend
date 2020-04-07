@@ -36,4 +36,6 @@ public class ArticleVO extends ContentVO {
     private String status;
     private List<ReferenceVO> references;
     private Integer reads;
+    private boolean liked;
+    private ExaminationVO examination;
 }

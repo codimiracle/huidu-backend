@@ -21,6 +21,7 @@ public interface BookMapper extends Mapper<Book> {
     void deleteByIdsLogically(List<String> ids);
 
     List<BookVO> selectByCategoryIdIntegrally(@Param("categoryId") String categoryId, @Param("filter") Filter filter, @Param("sorter") Sorter sorter, @Param("page") Page page);
+    List<BookVO> selectByCollectionIdIntegrally(@Param("categoryId") String categoryId, @Param("filter") Filter filter, @Param("sorter") Sorter sorter, @Param("page") Page page);
 
     List<String> selectPublishYearsByType(@Param("type") BookType bookType);
 
@@ -43,4 +44,7 @@ public interface BookMapper extends Mapper<Book> {
     List<BookVO> selectAllUsingUserFigureByBookType(@Param("type") BookType type, @Param("userId") String userId, @Param("filter") Filter filter, @Param("sorter") Sorter sorter, @Param("page") Page page);
 
     List<BookVO> selectAllUsingUserFigureByHistoryToday(@Param("userId") String userId, @Param("filter") Filter filter, @Param("sorter") Sorter sorter, @Param("page") Page page);
+
+    Float avgReviewRate(String bookId);
+
 }

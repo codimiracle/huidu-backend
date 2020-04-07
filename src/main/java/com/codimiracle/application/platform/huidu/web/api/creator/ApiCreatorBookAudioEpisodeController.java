@@ -16,6 +16,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 import java.util.Objects;
 
 /**
@@ -33,7 +34,7 @@ public class ApiCreatorBookAudioEpisodeController {
     private BookAudioEpisodeService bookAudioEpisodeService;
 
     @PostMapping
-    public ApiResponse create(@AuthenticationPrincipal User user, @PathVariable("book_id") String bookId, @RequestBody BookAudioEpisodeDTO bookAudioEpisodeDTO) {
+    public ApiResponse create(@AuthenticationPrincipal User user, @PathVariable("book_id") String bookId, @Valid @RequestBody BookAudioEpisodeDTO bookAudioEpisodeDTO) {
         return bookAudioEpisodeController.create(user, bookId, bookAudioEpisodeDTO);
     }
 
@@ -47,7 +48,7 @@ public class ApiCreatorBookAudioEpisodeController {
     }
 
     @PutMapping("/{id}")
-    public ApiResponse update(@AuthenticationPrincipal User user, @PathVariable("id") String id, @RequestBody BookAudioEpisodeDTO bookAudioEpisodeDTO) {
+    public ApiResponse update(@AuthenticationPrincipal User user, @PathVariable("id") String id, @Valid @RequestBody BookAudioEpisodeDTO bookAudioEpisodeDTO) {
         BookAudioEpisode originalEpisode = bookAudioEpisodeService.findById(id);
         if (Objects.isNull(originalEpisode) || !Objects.equals(originalEpisode.getOwnerId(), user.getId())) {
             return RestfulUtil.fail("权限不足!");

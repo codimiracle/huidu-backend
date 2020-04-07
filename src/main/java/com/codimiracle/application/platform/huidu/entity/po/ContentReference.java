@@ -33,6 +33,8 @@ public class ContentReference {
     @Column(name = "content_id")
     private String contentId;
 
+    private boolean deleted;
+
     public static ContentReference from(ContentReferenceDTO contentReferenceDTO) {
         if (Objects.isNull(contentReferenceDTO)) {
             return null;

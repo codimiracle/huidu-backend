@@ -85,7 +85,8 @@
                u.nickname    user_nickname,
                u.avatar      user_avatar
         FROM content c
-                 LEFT JOIN user u ON c.owner_id = u.id
+                LEFT JOIN user u ON c.owner_id = u.id
+                LEFT JOIN content_article ca ON c.id = ca.content_id
         WHERE c.deleted = 0
     </sql>
     <select id="findByIdIntegrally" resultMap="IntegratedResultMap">
@@ -95,12 +96,22 @@
     <select id="selectAllIntegrally" resultMap="IntegratedResultMap">
         <include refid="select_statement"/>
         <if test="filter != null">
+            <if test="filter.title != null and filter.title.length gt 0">
+                AND ca.title LIKE #{filter.title[0]}
+            </if>
             <if test="filter.ownerId != null and filter.ownerId.length gt 0">
                 AND c.owner_id = #{filter.ownerId[0]}
             </if>
             <if test="filter.type != null and filter.type.length gt 0">
                 AND c.type IN
                 <foreach collection="filter.type" separator="," open="(" close=")" item="item">#{item}</foreach>
+            </if>
+            <if test="filter.status != null and filter.status.length gt 0">
+                AND ca.status IN
+                <foreach item="item" index="index" collection="filter.status"
+                         open="(" separator="," close=")">
+                    #{item}
+                </foreach>
             </if>
         </if>
         <if test="sorter != null">

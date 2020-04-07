@@ -57,4 +57,17 @@ public enum BookType {
     public String toString() {
         return this.type;
     }
+
+    public String getName() {
+        switch (this.type) {
+            case "electronic-book":
+                return "电子书";
+            case "audio-book":
+                return "有声书";
+            case "paper-book":
+                return "纸质书";
+            default:
+                return "图书";
+        }
+    }
 }

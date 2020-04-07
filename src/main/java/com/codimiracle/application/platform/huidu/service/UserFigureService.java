@@ -28,4 +28,7 @@ public interface UserFigureService extends Service<String, FigureTag> {
 
     List<CategoryVO> findSametasteCategoryByAvgIntegrally();
 
+    FigureTag findByUserIdAndTagId(String userId, String tagId);
+
+    void incrementScoreBy(String id, float weight);
 }

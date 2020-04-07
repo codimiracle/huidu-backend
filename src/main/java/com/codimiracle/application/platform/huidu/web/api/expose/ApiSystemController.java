@@ -24,15 +24,18 @@ package com.codimiracle.application.platform.huidu.web.api.expose;/*
 
 import com.codimiracle.application.platform.huidu.contract.ApiResponse;
 import com.codimiracle.application.platform.huidu.contract.Page;
+import com.codimiracle.application.platform.huidu.entity.dto.SiginUpDTO;
 import com.codimiracle.application.platform.huidu.entity.dto.SignInDTO;
 import com.codimiracle.application.platform.huidu.entity.embedded.HotCommunity;
 import com.codimiracle.application.platform.huidu.entity.embedded.PersonalRecommendation;
 import com.codimiracle.application.platform.huidu.entity.po.User;
+import com.codimiracle.application.platform.huidu.entity.po.UserRole;
 import com.codimiracle.application.platform.huidu.entity.po.UserToken;
 import com.codimiracle.application.platform.huidu.entity.vo.CategoryVO;
 import com.codimiracle.application.platform.huidu.entity.vo.RealtimeVO;
 import com.codimiracle.application.platform.huidu.entity.vo.UserTokenVO;
 import com.codimiracle.application.platform.huidu.enumeration.ActivityStatus;
+import com.codimiracle.application.platform.huidu.helper.NotificationTemplate;
 import com.codimiracle.application.platform.huidu.service.*;
 import com.codimiracle.application.platform.huidu.util.RestfulUtil;
 import com.codimiracle.application.platform.huidu.util.StringifizationUtil;
@@ -43,6 +46,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -63,6 +67,9 @@ public class ApiSystemController {
 
     @Resource
     private UserService userService;
+
+    @Resource
+    private UserRoleService userRoleService;
 
     @Resource
     private UserTokenService userTokenService;
@@ -88,6 +95,12 @@ public class ApiSystemController {
     @Resource
     private ContentReferenceService contentReferenceService;
 
+    @Resource
+    private NotificationService notificationService;
+
+    @Resource
+    private NotificationTemplate notificationTemplate;
+
     @GetMapping("/version")
     public ApiResponse version() {
         if (Files.exists(Paths.get("./version"))) {
@@ -102,13 +115,37 @@ public class ApiSystemController {
     }
 
     @PostMapping("/sign-in")
-    public ApiResponse signIn(@RequestBody SignInDTO signInDTO) {
+    public ApiResponse signIn(@Valid @RequestBody SignInDTO signInDTO) {
         User user = userService.loadUserByUsername(signInDTO.getUsername());
         if (passwordEncoder.matches(signInDTO.getPassword(), user.getPassword())) {
             UserTokenVO userTokenVO = userTokenService.authenticate(user, signInDTO.isRememberMe());
             return RestfulUtil.success(userTokenVO);
         }
-        return RestfulUtil.fail("登录失败，密码错误或用户名不存在！");
+        return RestfulUtil.fail("密码错误或用户名不存在！");
+    }
+
+    @PostMapping("/sign-up")
+    public ApiResponse signUp(@Valid @RequestBody SiginUpDTO siginUpDTO) {
+        User user = User.from(siginUpDTO.getUserdata());
+        Objects.requireNonNull(user);
+        user.setEnabled(true);
+        user.setPassword(siginUpDTO.getPassword());
+        String roleName = null;
+        if (Objects.equals(siginUpDTO.getAccountType(), "user")) {
+            roleName = "用户";
+        } else if (Objects.equals(siginUpDTO.getAccountType(), "author")) {
+            roleName = "作者";
+        } else {
+            return RestfulUtil.fail("无法识别相应的权限设定！");
+        }
+        UserRole role = userRoleService.findByRoleName(roleName);
+        if (Objects.isNull(role)) {
+            return RestfulUtil.fail("抱歉系统无法完成权限设定！");
+        }
+        user.setRoleId(role.getId());
+        userService.save(user);
+        notificationService.notify(notificationTemplate.generateNormal(user.getId(), "欢迎注册荟读账号"));
+        return RestfulUtil.success();
     }
 
     @GetMapping("/sign-out")
@@ -129,7 +166,7 @@ public class ApiSystemController {
         if (userService.existsUsername(username)) {
             return RestfulUtil.success();
         } else {
-            return RestfulUtil.fail("用户名不存在!");
+            return RestfulUtil.response(404, "用户名不存在!");
         }
     }
 
@@ -141,7 +178,7 @@ public class ApiSystemController {
         if (userService.existsNickname(nickname)) {
             return RestfulUtil.success();
         } else {
-            return RestfulUtil.fail("用户名不存在!");
+            return RestfulUtil.response(404, "用户名不存在!");
         }
     }
 
@@ -161,18 +198,20 @@ public class ApiSystemController {
         hotCommunity.setFocus(contentReferenceService.findCommunityFocusIntegrally(null, null, new Page()).getList());
         PersonalRecommendation personalRecommendation = new PersonalRecommendation();
         realtimeVO.setRecommendations(personalRecommendation);
+        List<CategoryVO> similarCategories;
+        List<CategoryVO> sametasteCategories;
         if (Objects.isNull(user)) {
-            List<CategoryVO> similarCategories = userFigureService.findSimilarCategoryByAvgIntegrally();
-            List<CategoryVO> sametasteCategory = userFigureService.findSametasteCategoryByAvgIntegrally();
-            personalRecommendation.setGuessing(similarCategories.get(0));
-            personalRecommendation.setSametaste(sametasteCategory.get(0));
+            similarCategories = userFigureService.findSimilarCategoryByAvgIntegrally();
+            sametasteCategories = userFigureService.findSametasteCategoryByAvgIntegrally();
         } else {
-            List<CategoryVO> similarCategories = userFigureService.findSimilarCategoryByUserIdIntegrally(user.getId());
-            List<CategoryVO> sametasteCategory = userFigureService.findSametasteCategoryByUserIdIntegrally(user.getId());
-            if (similarCategories.size() > 0 && sametasteCategory.size() > 0) {
-                personalRecommendation.setGuessing(similarCategories.get(0));
-                personalRecommendation.setSametaste(sametasteCategory.get(0));
-            }
+            similarCategories = userFigureService.findSimilarCategoryByUserIdIntegrally(user.getId());
+            sametasteCategories = userFigureService.findSametasteCategoryByUserIdIntegrally(user.getId());
+        }
+        if (similarCategories.size() > 0) {
+            personalRecommendation.setGuessing(similarCategories.get(0));
+        }
+        if (sametasteCategories.size() > 0) {
+            personalRecommendation.setSametaste(sametasteCategories.get(0));
         }
         return RestfulUtil.success(realtimeVO);
     }

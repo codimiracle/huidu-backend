@@ -10,6 +10,7 @@ import com.codimiracle.application.platform.huidu.util.RestfulUtil;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 import java.util.Date;
 
 /**
@@ -23,7 +24,7 @@ public class ApiBackendActivityController {
     private ActivityService activityService;
 
     @PostMapping
-    public ApiResponse create(@RequestBody ActivityDTO activityDTO) {
+    public ApiResponse create(@Valid @RequestBody ActivityDTO activityDTO) {
         Activity activity = Activity.from(activityDTO);
         activity.setCreateTime(new Date());
         activity.setUpdateTime(activity.getCreateTime());
@@ -38,7 +39,7 @@ public class ApiBackendActivityController {
     }
 
     @PutMapping("/{id}")
-    public ApiResponse update(@PathVariable String id, @RequestBody ActivityDTO activityDTO) {
+    public ApiResponse update(@PathVariable String id, @Valid @RequestBody ActivityDTO activityDTO) {
         Activity activity = Activity.from(activityDTO);
         activity.setId(id);
         activity.setCreateTime(new Date());

@@ -50,7 +50,8 @@ import java.util.stream.Collectors;
         PassingPointStatus.class,
         CategoryType.class,
         BookAudioEpisodeStatus.class,
-        SubscribeType.class
+        SubscribeType.class,
+        NotificationType.class
 })
 public class EnumTypeHandler<E extends Enum<E>> extends BaseTypeHandler<E> {
 

@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 /**
  * @author Codimiracle
  */
@@ -24,7 +26,7 @@ public class ApiBackendAudioBookController {
     private BookController bookController;
 
     @PostMapping
-    public ApiResponse create(@AuthenticationPrincipal User user, @RequestBody AudioBookDTO audioBookDTO) {
+    public ApiResponse create(@AuthenticationPrincipal User user, @Valid @RequestBody AudioBookDTO audioBookDTO) {
         return bookController.create(user, audioBookDTO.toBookDTO());
     }
 
@@ -40,7 +42,7 @@ public class ApiBackendAudioBookController {
     }
 
     @PutMapping("/{id}")
-    public ApiResponse update(@PathVariable String id, @RequestBody AudioBookDTO audioBookDTO) {
+    public ApiResponse update(@PathVariable String id, @Valid @RequestBody AudioBookDTO audioBookDTO) {
         return bookController.update(id, audioBookDTO.toBookDTO());
     }
 

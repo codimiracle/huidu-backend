@@ -23,6 +23,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
@@ -43,7 +44,9 @@ public class OrderController {
     private LogisticsInformationService logisticsInformationService;
 
     @PostMapping("/orderring")
-    public synchronized ApiResponse orderring(@AuthenticationPrincipal User user, @RequestBody OrderringDTO orderringDTO) {
+    public synchronized ApiResponse orderring(@AuthenticationPrincipal User user,
+                                              @Valid @RequestBody OrderringDTO orderringDTO) {
+        // 转换传入的多个购买项信息
         Order order = Order.form(orderringDTO);
         order.setOwnerId(user.getId());
         order.setStatus(OrderStatus.AwaitingPayment);
@@ -60,7 +63,7 @@ public class OrderController {
     }
 
     @PostMapping("/{order_number}/logistics-information")
-    public ApiResponse updateLogisticsInformation(@PathVariable("order_number") String orderNumber, @RequestBody LogisticsInformationDTO logisticsInformationDTO) {
+    public ApiResponse updateLogisticsInformation(@PathVariable("order_number") String orderNumber, @Valid @RequestBody LogisticsInformationDTO logisticsInformationDTO) {
         Order order = orderService.findById(orderNumber);
         LogisticsInformation logisticsInformation = LogisticsInformation.from(logisticsInformationDTO);
         logisticsInformation.setId(order.getLogisticsInformationId());

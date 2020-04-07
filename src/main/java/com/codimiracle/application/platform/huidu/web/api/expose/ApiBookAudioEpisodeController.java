@@ -26,26 +26,11 @@ public class ApiBookAudioEpisodeController {
     @Resource
     private HistoryService historyService;
 
-    @GetMapping("/last-read")
-    public ApiResponse entity(@AuthenticationPrincipal User user, @PathVariable("book_id") String bookId) {
-        HistoryVO historyVO;
-        if (Objects.nonNull(user)) {
-            historyVO = historyService.findByUserIdAndBookIdIntegrally(user.getId(), bookId);
-            if (Objects.nonNull(historyVO)) {
-                return RestfulUtil.entity(historyVO);
-            }
-        }
-
+    @GetMapping("/first-episode")
+    public ApiResponse firstEpisode(@AuthenticationPrincipal User user, @PathVariable("book_id") String bookId) {
         //返回第一章
         BookAudioEpisodeVO bookAudioEpisodeVO = bookAudioEpisodeService.findByMediaNumberIntegrally(bookId, 1);
-        if (Objects.isNull(bookAudioEpisodeVO)) {
-            //无数据
-            return RestfulUtil.entity(null);
-        }
-        historyVO = new HistoryVO();
-        historyVO.setReadTime(null);
-        historyVO.setAudioEpisode(bookAudioEpisodeVO);
-        return RestfulUtil.entity(historyVO);
+        return RestfulUtil.entity(bookAudioEpisodeVO);
     }
 
     @GetMapping("/{id}")

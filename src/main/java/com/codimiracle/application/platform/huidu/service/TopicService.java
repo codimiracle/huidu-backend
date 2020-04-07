@@ -30,18 +30,13 @@ import com.codimiracle.application.platform.huidu.entity.vt.Topic;
 import java.util.List;
 
 public interface TopicService extends Service<String, Topic> {
-    void update(Topic topic, List<ContentReference> oldRefers);
     int deleteByIdLogically(String id);
 
     TopicVO findByIdIntegrally(String id);
 
-    List<TopicVO> findAllIntegrally();
-
     PageSlice<TopicVO> findAllIntegrally(Filter filter, Sorter sorter, Page page);
 
     PageSlice<TopicVO> findHotIntegrally(Filter filter, Sorter sorter, Page page);
-
-    PageSlice<TopicVO> findTopIntegrally(Filter filter, Sorter sorter, Page page);
 
     PageSlice<TopicVO> findFocusTopicByReferenceIdIntegrally(String bookId, Filter filter, Sorter sorter, Page page);
 }

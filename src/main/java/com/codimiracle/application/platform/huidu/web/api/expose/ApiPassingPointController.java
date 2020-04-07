@@ -9,6 +9,7 @@ import com.codimiracle.application.platform.huidu.util.RestfulUtil;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 
 /**
  * @author Codimiracle
@@ -21,7 +22,7 @@ public class ApiPassingPointController {
     private PassingPointService passingPointService;
 
     @PostMapping
-    public ApiResponse create(@RequestBody PassingPoint passingPoint) {
+    public ApiResponse create(@Valid @RequestBody PassingPoint passingPoint) {
         passingPointService.save(passingPoint);
         return RestfulUtil.success();
     }
@@ -33,7 +34,7 @@ public class ApiPassingPointController {
     }
 
     @PutMapping("/{id}")
-    public ApiResponse update(@RequestBody PassingPoint passingPoint) {
+    public ApiResponse update(@Valid @RequestBody PassingPoint passingPoint) {
         passingPointService.update(passingPoint);
         return RestfulUtil.success();
     }

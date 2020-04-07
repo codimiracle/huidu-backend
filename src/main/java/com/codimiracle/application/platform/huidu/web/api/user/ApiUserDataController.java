@@ -35,8 +35,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 
-@CrossOrigin(allowCredentials = "")
+@CrossOrigin
 @RestController
 @RequestMapping("/api/user")
 public class ApiUserDataController {
@@ -51,7 +52,7 @@ public class ApiUserDataController {
     }
 
     @PostMapping("/change-password")
-    public ApiResponse changePassword(@AuthenticationPrincipal User user, @RequestBody ChangePasswordDTO changePasswordDTO) {
+    public ApiResponse changePassword(@AuthenticationPrincipal User user, @Valid @RequestBody ChangePasswordDTO changePasswordDTO) {
         if (passwordEncoder.matches(changePasswordDTO.getOldPassword(), user.getPassword())) {
             User updatingUser = new User();
             updatingUser.setId(user.getId());
@@ -63,10 +64,13 @@ public class ApiUserDataController {
     }
 
     @PutMapping("/profile")
-    public ApiResponse updateProfile(@AuthenticationPrincipal User user, @RequestBody ProfileDTO profileDTO) {
+    public ApiResponse updateProfile(@AuthenticationPrincipal User user, @Valid @RequestBody ProfileDTO profileDTO) {
         UserDTO userDTO = new UserDTO();
         BeanUtils.copyProperties(profileDTO, userDTO);
         User updatingData = User.from(userDTO);
+        updatingData.setEnabled(user.isEnabled());
+        updatingData.setAccountLocked(user.isAccountLocked());
+        updatingData.setDeleted(user.isDeleted());
         updatingData.setId(user.getId());
         userService.update(updatingData);
         return RestfulUtil.success();

@@ -35,6 +35,7 @@ public class BookEpisodeVO {
      */
     private String title;
 
+    private String commodityId;
     /**
      * 对应购买项
      */
@@ -56,10 +57,16 @@ public class BookEpisodeVO {
      */
     private String status;
 
+    private String bookId;
     /**
      * 图书信息
      */
     private BookVO book;
+
+    /**
+     * 下一章章节 id
+     */
+    private String next;
 
     private Date createTime;
     private Date updateTime;

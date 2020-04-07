@@ -6,6 +6,8 @@ import com.codimiracle.application.platform.huidu.entity.po.ContentLikes;
 import com.codimiracle.application.platform.huidu.mapper.ContentLikesMapper;
 import com.codimiracle.application.platform.huidu.service.ContentLikesService;
 import com.codimiracle.application.platform.huidu.service.ContentService;
+import com.google.common.collect.Interner;
+import com.google.common.collect.Interners;
 import org.apache.ibatis.exceptions.TooManyResultsException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +24,7 @@ public class ContentLikesServiceImpl extends AbstractService<String, ContentLike
     private ContentLikesMapper contentLikesMapper;
     @Resource
     private ContentService contentService;
+    private Interner<String> likeLock = Interners.newWeakInterner();
 
     public ContentLikes findByUserIdAndContentId(String userId, String contentId) throws TooManyResultsException {
         Condition condition = Conditioner.conditionOf(ContentLikes.class);
@@ -56,25 +59,31 @@ public class ContentLikesServiceImpl extends AbstractService<String, ContentLike
 
     @Override
     public void like(String likerId, String contentId) {
-        ContentLikes contentLikes = findByUserIdAndContentId(likerId, contentId);
-        if (Objects.isNull(contentLikes)) {
-            contentLikes = new ContentLikes();
-            contentLikes.setContentId(contentId);
-            contentLikes.setLiked(true);
-            contentLikes.setUserId(likerId);
-            save(contentLikes);
-        } else if (!contentLikes.isLiked()){
-            contentLikes.setLiked(true);
-            update(contentLikes);
+        String lock = likeLock.intern(String.format("user-%s-like-act-%s", likerId, contentId));
+        synchronized (lock) {
+            ContentLikes contentLikes = findByUserIdAndContentId(likerId, contentId);
+            if (Objects.isNull(contentLikes)) {
+                contentLikes = new ContentLikes();
+                contentLikes.setContentId(contentId);
+                contentLikes.setLiked(true);
+                contentLikes.setUserId(likerId);
+                save(contentLikes);
+            } else if (!contentLikes.isLiked()) {
+                contentLikes.setLiked(true);
+                update(contentLikes);
+            }
         }
     }
 
     @Override
     public void unlike(String unlikerId, String contentId) {
-        ContentLikes contentLikes = findByUserIdAndContentId(unlikerId, contentId);
-        if (Objects.nonNull(contentLikes) && contentLikes.isLiked()) {
-            contentLikes.setLiked(false);
-            update(contentLikes);
+        String lock = likeLock.intern(String.format("user-%s-like-act-%s", unlikerId, contentId));
+        synchronized (lock) {
+            ContentLikes contentLikes = findByUserIdAndContentId(unlikerId, contentId);
+            if (Objects.nonNull(contentLikes) && contentLikes.isLiked()) {
+                contentLikes.setLiked(false);
+                update(contentLikes);
+            }
         }
     }
 

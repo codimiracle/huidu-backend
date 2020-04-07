@@ -38,6 +38,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 import java.util.Objects;
 
 @CrossOrigin
@@ -50,17 +51,17 @@ public class ApiUserOrderController {
     private OrderService orderService;
 
     @PostMapping("/shipment")
-    public ApiResponse shipmentPrediction(@RequestBody ShipmentPredictionDTO shipmentPredictionDTO) {
+    public ApiResponse shipmentPrediction(@Valid @RequestBody ShipmentPredictionDTO shipmentPredictionDTO) {
         return orderController.shipmentPrediction(shipmentPredictionDTO);
     }
 
     @PostMapping("/orderring")
-    public ApiResponse orderring(@AuthenticationPrincipal User user, @RequestBody OrderringDTO orderringDTO) {
+    public ApiResponse orderring(@AuthenticationPrincipal User user, @Valid @RequestBody OrderringDTO orderringDTO) {
         return orderController.orderring(user, orderringDTO);
     }
 
     @PostMapping("/{order_number}/evaluate")
-    public ApiResponse evaluate(@AuthenticationPrincipal User user, @PathVariable("order_number") String orderNumber, @RequestBody CommentDTO commentDTO) {
+    public ApiResponse evaluate(@AuthenticationPrincipal User user, @PathVariable("order_number") String orderNumber, @Valid @RequestBody CommentDTO commentDTO) {
         return orderController.evaluate(user, orderNumber, commentDTO);
     }
 

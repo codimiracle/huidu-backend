@@ -3,6 +3,7 @@ package com.codimiracle.application.platform.huidu.entity.po;
 import com.codimiracle.application.platform.huidu.entity.dto.BookDTO;
 import com.codimiracle.application.platform.huidu.enumeration.BookStatus;
 import com.codimiracle.application.platform.huidu.enumeration.BookType;
+import com.codimiracle.application.platform.huidu.util.TagUtil;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
 
@@ -110,9 +111,6 @@ public class Book {
         //新建类别
         if (Objects.isNull(bookDTO.getCategoryId())) {
             book.setCategory(Category.from(bookDTO.getCategory()));
-        }
-        if (Objects.nonNull(bookDTO.getTags())) {
-            book.setTags(Arrays.asList(bookDTO.getTags()).stream().map(Tag::new).collect(Collectors.toList()));
         }
         book.setMetadata(BookMetadata.from(bookDTO.getMetadata()));
         book.setCommodity(Commodity.from(bookDTO.getCommodity()));

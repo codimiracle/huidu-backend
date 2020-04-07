@@ -13,9 +13,9 @@ import java.util.Date;
 import java.util.List;
 
 public interface HistoryMapper extends Mapper<History> {
-    HistoryVO selectByUserIdAndBookIdIntegrally(@Param("userId") String userId, @Param("bookId") String bookId);
+    HistoryVO selectLastReadByUserIdAndBookIdIntegrally(@Param("userId") String userId, @Param("bookId") String bookId);
 
-    History selectByUserIdAndBookId(@Param("userId") String userId, @Param("bookId") String bookId);
+    History selectLastReadByUserIdAndBookId(@Param("userId") String userId, @Param("bookId") String bookId);
 
     HistoryVO selectByIdIntegrally(@Param("historyId") String historyId);
 
@@ -24,4 +24,9 @@ public interface HistoryMapper extends Mapper<History> {
     void deleteByIdLogically(String id);
 
     List<HistoryVO> selectAllIntegrally(@RequestParam("filter") Filter filter, @RequestParam("sorter") Sorter sorter, @RequestParam("page") Page page);
+
+    List<History> selectByUserIdAndBookIdIntegrally(@Param("userId") String userId, @Param("bookId") String bookId);
+
+    HistoryVO selectLastReadByUserIdAndBookIdAndEpisodeIdIntegrally(@Param("userId") String userId, @Param("bookId") String bookId, @Param("episodeId") String episodeId);
+    HistoryVO selectLastReadByUserIdAndBookIdAndAudioEpisodeIdIntegrally(@Param("userId") String userId, @Param("bookId") String bookId, @Param("audioEpisodeId") String audioEpisodeId);
 }

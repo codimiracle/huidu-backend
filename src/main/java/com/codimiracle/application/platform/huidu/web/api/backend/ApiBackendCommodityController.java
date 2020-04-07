@@ -9,6 +9,7 @@ import com.codimiracle.application.platform.huidu.util.RestfulUtil;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -23,7 +24,7 @@ public class ApiBackendCommodityController {
     private CommodityService commodityService;
 
     @PostMapping
-    public ApiResponse create(@RequestBody CommodityDTO commodityDTO) {
+    public ApiResponse create(@Valid @RequestBody CommodityDTO commodityDTO) {
         Commodity commodity = Commodity.from(commodityDTO);
         commodityService.save(commodity);
         return RestfulUtil.entity(commodityService.findByIdIntegrally(commodity.getId()));
@@ -42,7 +43,7 @@ public class ApiBackendCommodityController {
     }
 
     @PutMapping("/{id}")
-    public ApiResponse update(@PathVariable String id, @RequestBody CommodityDTO commodityDTO) {
+    public ApiResponse update(@PathVariable String id, @Valid @RequestBody CommodityDTO commodityDTO) {
         Commodity commodity = Commodity.from(commodityDTO);
         Objects.requireNonNull(commodity);
         commodity.setId(id);

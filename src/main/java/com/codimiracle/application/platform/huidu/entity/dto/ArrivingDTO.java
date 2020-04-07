@@ -29,4 +29,5 @@ import java.util.Date;
 @Data
 public class ArrivingDTO {
     private Date date;
+    private String motto;
 }

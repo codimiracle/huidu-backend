@@ -32,13 +32,9 @@ import java.util.List;
 public interface ReviewService extends Service<String, Review> {
     ReviewVO findByIdIntegrally(String id);
 
-    void update(Review updatingReview, List<ContentReference> needToDelete);
-
     int deleteByIdLogically(String id);
 
     PageSlice<ReviewVO> findHotIntegrally(Filter filter, Sorter sorter, Page page);
-
-    List<ReviewVO> findAllIntegrally();
 
     PageSlice<ReviewVO> findAllIntegrally(Filter filter, Sorter sorter, Page page);
 

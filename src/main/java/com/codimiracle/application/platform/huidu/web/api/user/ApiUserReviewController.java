@@ -27,19 +27,26 @@ import com.codimiracle.application.platform.huidu.contract.Filter;
 import com.codimiracle.application.platform.huidu.contract.Page;
 import com.codimiracle.application.platform.huidu.contract.Sorter;
 import com.codimiracle.application.platform.huidu.entity.dto.ReviewDTO;
-import com.codimiracle.application.platform.huidu.entity.po.ContentReference;
+import com.codimiracle.application.platform.huidu.entity.po.Book;
+import com.codimiracle.application.platform.huidu.entity.po.History;
 import com.codimiracle.application.platform.huidu.entity.po.User;
+import com.codimiracle.application.platform.huidu.entity.vo.BookAudioEpisodeVO;
+import com.codimiracle.application.platform.huidu.entity.vo.BookEpisodeVO;
+import com.codimiracle.application.platform.huidu.entity.vo.ReviewVO;
 import com.codimiracle.application.platform.huidu.entity.vt.Review;
+import com.codimiracle.application.platform.huidu.enumeration.BookStatus;
+import com.codimiracle.application.platform.huidu.enumeration.BookType;
 import com.codimiracle.application.platform.huidu.enumeration.ContentStatus;
-import com.codimiracle.application.platform.huidu.service.ReviewService;
+import com.codimiracle.application.platform.huidu.service.*;
 import com.codimiracle.application.platform.huidu.util.RestfulUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.util.*;
-import java.util.stream.Collectors;
+import javax.validation.Valid;
+import java.util.Date;
+import java.util.Objects;
 
 @CrossOrigin
 @RestController
@@ -50,45 +57,77 @@ public class ApiUserReviewController {
     @Resource
     private ReviewService reviewService;
 
+    @Resource
+    private BookService bookService;
+
+    @Resource
+    private BookAudioEpisodeService bookAudioEpisodeService;
+    @Resource
+    private BookEpisodeService bookEpisodeService;
+
+    @Resource
+    private HistoryService historyService;
+
+    private boolean checkBookIsRead(String userId, String bookId) {
+        Book book = bookService.findById(bookId);
+        if (book.getStatus() != BookStatus.Paused || book.getStatus() != BookStatus.Ended) {
+            return false;
+        }
+        if (book.getType() == BookType.ElectronicBook) {
+            BookEpisodeVO lastEpisode = bookEpisodeService.findLastPublishedEpisodeByBookId(bookId);
+            History history = historyService.findByUserIdAndBookIdAndEpisodeId(userId, bookId, lastEpisode.getId());
+            int progress = Math.round(history.getProgress() * 100);
+            return Objects.equals(history.getEpisodeId(), lastEpisode.getId()) && progress == 100;
+        } else if (book.getType() == BookType.AudioBook) {
+            BookAudioEpisodeVO lastEpisode = bookAudioEpisodeService.findLastPublishedEpisodeByBookId(bookId);
+            History history = historyService.findByUserIdAndBookIdAndAudioEpisodeId(userId, bookId, lastEpisode.getId());
+            int progress = Math.round(history.getProgress() * 100);
+            return Objects.equals(history.getAudioEpisodeId(), lastEpisode.getId()) && progress == 100;
+        } else {
+            return false;
+        }
+    }
+
     @PostMapping
-    public ApiResponse create(@AuthenticationPrincipal User user, @RequestBody ReviewDTO reviewDTO) {
+    public ApiResponse create(@AuthenticationPrincipal User user, @Valid @RequestBody ReviewDTO reviewDTO) {
         Review review = Review.from(reviewDTO);
         review.setOwnerId(user.getId());
         review.setCreateTime(new Date());
         review.setUpdateTime(review.getCreateTime());
-        review.setStatus(ContentStatus.Examining);
+        if (review.getReferenceList().size() != 1) {
+            return RestfulUtil.fail("该点评引用不合法！");
+        }
+        if (!checkBookIsRead(user.getId(), reviewDTO.getReferences()[0])) {
+            return RestfulUtil.fail("没有达到点评条件！");
+        }
+        review.setStatus(ContentStatus.Draft);
         reviewService.save(review);
         return RestfulUtil.entity(reviewService.findByIdIntegrally(review.getId()));
     }
 
     @PutMapping("/{id}")
-    public ApiResponse update(@AuthenticationPrincipal User user, @PathVariable String id, @RequestBody ReviewDTO reviewDTO) {
+    public ApiResponse update(@AuthenticationPrincipal User user, @PathVariable String id, @Valid @RequestBody ReviewDTO reviewDTO) {
         Review review = reviewService.findById(id);
         if (Objects.isNull(review) || !Objects.equals(review.getOwnerId(), user.getId())) {
-            return RestfulUtil.fail("权限不足！");
+            return RestfulUtil.fail("权限不足");
         }
         Review updatingReview = Review.from(reviewDTO);
-        //不允许内容类型发生变更
-        updatingReview.setType(null);
-        updatingReview.setId(id);
         Objects.requireNonNull(updatingReview);
-        List<ContentReference> oldReferences = review.getReferenceList();
-        List<ContentReference> newReferences = updatingReview.getReferenceList();
-        List<ContentReference> needToDelete = new ArrayList<>();
-        //映射已有对象
-        Map<String, ContentReference> validatedMap = newReferences.stream().collect(Collectors.toMap(ContentReference::getRefId, (e) -> e));
-        for (ContentReference reference : oldReferences) {
-            if (validatedMap.containsKey(reference.getRefId())) {
-                //不做任何操作
-                validatedMap.remove(reference.getRefId());
-            } else {
-                //放入待删除列表
-                needToDelete.add(reference);
-            }
-        }
-        updatingReview.setReferenceList(new ArrayList<>(validatedMap.values()));
-        reviewService.update(updatingReview, needToDelete);
+        updatingReview.setId(id);
+        updatingReview.setContentId(id);
+        updatingReview.setType(null);
+        updatingReview.setUpdateTime(new Date());
+        reviewService.update(updatingReview);
         return RestfulUtil.entity(reviewService.findByIdIntegrally(id));
+    }
+
+    @GetMapping("/{id}")
+    public ApiResponse entity(@AuthenticationPrincipal User user, @PathVariable("id") String id) {
+        ReviewVO reviewVO = reviewService.findByIdIntegrally(id);
+        if (Objects.isNull(reviewVO) || Objects.equals(reviewVO.getOwner().getId(), user.getId())) {
+            return RestfulUtil.fail("找不到对应的话题！");
+        }
+        return RestfulUtil.entity(reviewVO);
     }
 
     @DeleteMapping("/{id}")

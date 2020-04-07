@@ -12,6 +12,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -24,7 +25,7 @@ public class ApiUserCartController {
     private UserCartService userCartService;
 
     @PostMapping("/join")
-    public ApiResponse join(@AuthenticationPrincipal User user, @RequestBody CartItemDTO cartItemDTO) {
+    public ApiResponse join(@AuthenticationPrincipal User user, @Valid @RequestBody CartItemDTO cartItemDTO) {
         CartItem cartItem = CartItem.from(cartItemDTO);
         cartItem.setUserId(user.getId());
         cartItem.setJoinTime(new Date());
@@ -45,7 +46,7 @@ public class ApiUserCartController {
     }
 
     @PutMapping("/{id}")
-    public ApiResponse update(@AuthenticationPrincipal User user, @PathVariable String id, @RequestBody CartItemDTO cartItemDTO) {
+    public ApiResponse update(@AuthenticationPrincipal User user, @PathVariable String id, @Valid @RequestBody CartItemDTO cartItemDTO) {
         CartItem updatingCartItem = CartItem.from(cartItemDTO);
         updatingCartItem.setId(id);
         userCartService.update(updatingCartItem);

@@ -1,5 +1,6 @@
 package com.codimiracle.application.platform.huidu.entity.po;
 
+import com.codimiracle.application.platform.huidu.enumeration.SubscribeType;
 import lombok.Data;
 
 import javax.persistence.Column;
@@ -20,7 +21,7 @@ public class Subscribe {
     /**
      * 订阅类型（put-on-sales：图书上架通知，content-comment：内容评论通知，）
      */
-    private String type;
+    private SubscribeType type;
 
     @Column(name = "book_id")
     private String bookId;
@@ -33,6 +34,8 @@ public class Subscribe {
 
     @Column(name = "subscriber_id")
     private String subscriberId;
+
+    private Boolean deleted;
 
     @Column(name = "create_time")
     private Date createTime;

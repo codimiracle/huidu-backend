@@ -3,7 +3,6 @@ package com.codimiracle.application.platform.huidu.web.api.expose;
 import com.codimiracle.application.platform.huidu.contract.*;
 import com.codimiracle.application.platform.huidu.entity.po.User;
 import com.codimiracle.application.platform.huidu.entity.vo.BookEpisodeVO;
-import com.codimiracle.application.platform.huidu.entity.vo.HistoryVO;
 import com.codimiracle.application.platform.huidu.service.BookEpisodeService;
 import com.codimiracle.application.platform.huidu.service.HistoryService;
 import com.codimiracle.application.platform.huidu.util.RestfulUtil;
@@ -32,14 +31,10 @@ public class ApiBookEpisodeController {
         return RestfulUtil.entity(bookEpisodeVO);
     }
 
-    @GetMapping("/last-read")
-    public ApiResponse entity(@AuthenticationPrincipal User user, @PathVariable("book_id") String bookId) {
-        //尚未登录
-        HistoryVO historyVO = null;
-        if (Objects.nonNull(user)) {
-            historyVO = historyService.findByUserIdAndBookIdIntegrallyOrFirstEpisode(user.getId(), bookId);
-        }
-        return RestfulUtil.entity(historyVO);
+    @GetMapping("/first-episode")
+    public ApiResponse firstEpisode(@AuthenticationPrincipal User user, @PathVariable("book_id") String bookId) {
+        BookEpisodeVO episodeVO = bookEpisodeService.findByEpisodeNumberIntegrally(bookId, 1);
+        return RestfulUtil.entity(episodeVO);
     }
 
     @GetMapping("/last-update-episode")

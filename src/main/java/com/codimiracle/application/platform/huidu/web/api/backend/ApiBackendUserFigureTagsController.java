@@ -12,6 +12,8 @@ import com.codimiracle.application.platform.huidu.util.TagUtil;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -28,14 +30,14 @@ public class ApiBackendUserFigureTagsController {
     private TagService tagService;
 
     @PostMapping
-    public ApiResponse append(@PathVariable("user_id") String userId, @RequestBody FigureTagsDTO figureTagsDTO) {
+    public ApiResponse append(@PathVariable("user_id") String userId, @Valid @RequestBody FigureTagsDTO figureTagsDTO) {
         List<Tag> tagsList = TagUtil.mutateToPersistent(tagService, Arrays.asList(figureTagsDTO.getTags()));
         List<FigureTag> figureTagList = tagsList.stream().map((tag) -> {
             FigureTag figureTag = new FigureTag();
             figureTag.setUserId(userId);
             figureTag.setTagId(tag.getId());
             figureTag.setTag(tag);
-            figureTag.setScore(0);
+            figureTag.setScore(BigDecimal.ZERO);
             return figureTag;
         }).collect(Collectors.toList());
         userFigureService.save(figureTagList);

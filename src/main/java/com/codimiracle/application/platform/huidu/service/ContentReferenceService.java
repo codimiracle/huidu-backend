@@ -4,6 +4,7 @@ import com.codimiracle.application.platform.huidu.contract.*;
 import com.codimiracle.application.platform.huidu.entity.embedded.CommunityFocus;
 import com.codimiracle.application.platform.huidu.entity.po.ContentReference;
 import com.codimiracle.application.platform.huidu.entity.vo.ReferenceVO;
+import com.codimiracle.application.platform.huidu.enumeration.ContentType;
 
 import java.util.List;
 
@@ -22,4 +23,6 @@ public interface ContentReferenceService extends Service<String, ContentReferenc
     List<ReferenceVO> findByContentIdIntegrally(String contentId);
 
     PageSlice<CommunityFocus> findCommunityFocusIntegrally(Filter filter, Sorter sorter, Page page);
+
+    ContentReference findByRefIdAndType(String contentId, String refId, ContentType type);
 }

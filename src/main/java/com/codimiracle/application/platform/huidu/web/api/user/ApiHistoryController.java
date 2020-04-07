@@ -11,6 +11,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 import java.util.Date;
 
 /**
@@ -24,7 +25,7 @@ public class ApiHistoryController {
     private HistoryService historyService;
 
     @PostMapping
-    public ApiResponse reading(@AuthenticationPrincipal User user, @RequestBody ReadingHistoryDTO readingHistoryDTO) {
+    public ApiResponse reading(@AuthenticationPrincipal User user, @Valid @RequestBody ReadingHistoryDTO readingHistoryDTO) {
         History history = History.from(readingHistoryDTO);
         history.setUserId(user.getId());
         history.setReadTime(new Date());

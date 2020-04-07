@@ -19,10 +19,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import javax.annotation.Resource;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * @author Codimiracle
@@ -54,10 +51,19 @@ public class BookController {
         book.setContent(content);
         Category category = book.getCategory();
         if (Objects.nonNull(category)) {
-            category.setTags(TagUtil.mutateToPersistent(tagService, Arrays.asList(bookDTO.getCategory().getTags())));
+            if (Objects.isNull(bookDTO.getCategory().getTags())) {
+                category.setTags(Collections.emptyList());
+            } else {
+                category.setTags(TagUtil.mutateToPersistent(tagService, Arrays.asList(bookDTO.getCategory().getTags())));
+            }
         }
-        if (Objects.nonNull(book.getTags())) {
-            book.setTags(TagUtil.mutateToPersistent(tagService, Arrays.asList(bookDTO.getTags())));
+        if (Objects.nonNull(bookDTO.getTags())) {
+            List<String> tagNames = new ArrayList<>(bookDTO.getTags().length + 1);
+            if (Arrays.stream(bookDTO.getTags()).noneMatch((tagName) -> Objects.equals(book.getType().getName(), tagName))) {
+                tagNames.add(book.getType().getName());
+            }
+            tagNames.addAll(Arrays.asList(bookDTO.getTags()));
+            book.setTags(TagUtil.mutateToPersistent(tagService, tagNames));
         }
         bookService.save(book);
         return RestfulUtil.entity(bookService.findByIdIntegrally(book.getType(), book.getId()));
@@ -82,8 +88,13 @@ public class BookController {
         if (Objects.nonNull(book.getCommodity())) {
             book.getCommodity().setId(book.getCommodityId());
         }
-        if (Objects.nonNull(book.getTags())) {
-            book.setTags(TagUtil.mutateToPersistent(tagService, Arrays.asList(bookDTO.getTags())));
+        if (Objects.nonNull(bookDTO.getTags())) {
+            List<String> tagNames = new ArrayList<>(bookDTO.getTags().length + 1);
+            if (Arrays.stream(bookDTO.getTags()).noneMatch((tagName) -> Objects.equals(book.getType().getName(), tagName))) {
+                tagNames.add(book.getType().getName());
+            }
+            tagNames.addAll(Arrays.asList(bookDTO.getTags()));
+            book.setTags(TagUtil.mutateToPersistent(tagService, tagNames));
         }
         book.setId(id);
         bookService.update(book);
@@ -109,7 +120,7 @@ public class BookController {
         PageSlice<BookVO> slice = bookService.findAllIntegrally(type, filter, sorter, page);
         return RestfulUtil.list(slice);
     }
-    
+
     public ApiResponse publishCollection(BookType type, Filter filter, Sorter sorter, Page page) {
         filter = Objects.nonNull(filter) ? filter : new Filter();
         filter.put("status", new String[]{BookStatus.Serializing.toString(), BookStatus.Paused.toString(), BookStatus.Ended.toString()});
@@ -142,5 +153,9 @@ public class BookController {
 
     public ApiResponse hotCollection(BookType type, Filter filter, Sorter sorter, Page page) {
         return RestfulUtil.list(bookService.findAllHotIntegrally(type, filter, sorter, page));
+    }
+
+    public ApiResponse reviewStars(String bookId) {
+        return RestfulUtil.success(bookService.avgReviewStars(bookId));
     }
 }

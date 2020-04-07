@@ -30,4 +30,6 @@ public interface BookEpisodeMapper extends Mapper<BookEpisode> {
     List<Catalogs> selectCatalogsByBookId(@Param("bookId") String bookId, @Param("status") ContentStatus status);
 
     BookEpisodeVO selectLastPublishedEpisodeByBookId(String bookId);
+
+    String selectEpisodeIdByEpisodeNumber(@Param("bookId") String bookId, @Param("episodeNumber") int episodeNumber);
 }

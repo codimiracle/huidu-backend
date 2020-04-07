@@ -9,6 +9,7 @@ import com.codimiracle.application.platform.huidu.util.RestfulUtil;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -23,7 +24,7 @@ public class ApiUserController {
     private UserService userService;
 
     @PostMapping
-    public ApiResponse create(@RequestBody UserDTO userDTO) {
+    public ApiResponse create(@Valid @RequestBody UserDTO userDTO) {
         User user = User.from(userDTO);
         userService.save(user);
         return RestfulUtil.success();
@@ -42,7 +43,7 @@ public class ApiUserController {
     }
 
     @PutMapping("/{id}")
-    public ApiResponse update(@PathVariable String id, @RequestBody UserDTO userDTO) {
+    public ApiResponse update(@PathVariable String id, @Valid @RequestBody UserDTO userDTO) {
         User user = User.from(userDTO);
         Objects.requireNonNull(user);
         user.setId(id);

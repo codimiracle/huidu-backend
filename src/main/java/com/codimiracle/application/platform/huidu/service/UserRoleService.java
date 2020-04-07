@@ -19,4 +19,6 @@ public interface UserRoleService extends Service<String, UserRole> {
     UserRoleVO findByIdIntegrally(String id);
 
     PageSlice<UserRoleVO> findAllIntegrally(Filter filter, Sorter sorter, Page page);
+
+    UserRole findByRoleName(String name);
 }

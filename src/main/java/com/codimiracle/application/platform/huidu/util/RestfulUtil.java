@@ -28,4 +28,8 @@ public class RestfulUtil {
     public static <T> ApiResponse list(PageSlice<T> slice) {
         return new ApiResponse<>(200, "success", slice);
     }
+
+    public static ApiResponse response(int code, String message) {
+        return new ApiResponse<>(code, message, null);
+    }
 }

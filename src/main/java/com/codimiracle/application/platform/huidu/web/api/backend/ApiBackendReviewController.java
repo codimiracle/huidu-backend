@@ -26,21 +26,13 @@ import com.codimiracle.application.platform.huidu.contract.ApiResponse;
 import com.codimiracle.application.platform.huidu.contract.Filter;
 import com.codimiracle.application.platform.huidu.contract.Page;
 import com.codimiracle.application.platform.huidu.contract.Sorter;
-import com.codimiracle.application.platform.huidu.entity.dto.ReviewDTO;
-import com.codimiracle.application.platform.huidu.entity.po.ContentReference;
 import com.codimiracle.application.platform.huidu.entity.vo.ReviewVO;
-import com.codimiracle.application.platform.huidu.entity.vt.Review;
 import com.codimiracle.application.platform.huidu.service.ReviewService;
 import com.codimiracle.application.platform.huidu.util.RestfulUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 @CrossOrigin
 @RestController
@@ -55,31 +47,6 @@ public class ApiBackendReviewController {
     public ApiResponse entity(@PathVariable String id) {
         ReviewVO review = reviewService.findByIdIntegrally(id);
         return RestfulUtil.entity(review);
-    }
-
-    @PutMapping("/{id}")
-    public ApiResponse update(@PathVariable String id, @RequestBody ReviewDTO reviewDTO) {
-        Review review = reviewService.findById(id);
-        Review updatingReview = Review.from(reviewDTO);
-        updatingReview.setId(id);
-        Objects.requireNonNull(updatingReview);
-        List<ContentReference> oldReferences = review.getReferenceList();
-        List<ContentReference> newReferences = updatingReview.getReferenceList();
-        List<ContentReference> needToDelete = new ArrayList<>();
-        //映射已有对象
-        Map<String, ContentReference> validatedMap = newReferences.stream().collect(Collectors.toMap(ContentReference::getRefId, (e) -> e));
-        for (ContentReference reference : oldReferences) {
-            if (validatedMap.containsKey(reference.getRefId())) {
-                //不做任何操作
-                validatedMap.remove(reference.getRefId());
-            } else {
-                //放入待删除列表
-                needToDelete.add(reference);
-            }
-        }
-        updatingReview.setReferenceList(new ArrayList<>(validatedMap.values()));
-        reviewService.update(updatingReview, needToDelete);
-        return RestfulUtil.entity(reviewService.findByIdIntegrally(id));
     }
 
     @DeleteMapping("/{id}")

@@ -34,13 +34,14 @@ import com.codimiracle.application.platform.huidu.service.ContentArticleService;
 import com.codimiracle.application.platform.huidu.service.ContentReferenceService;
 import com.codimiracle.application.platform.huidu.service.ContentService;
 import com.codimiracle.application.platform.huidu.service.TopicService;
+import com.codimiracle.application.platform.huidu.util.ReferenceUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -54,26 +55,63 @@ public class TopicServiceImpl extends AbstractUnsupportedOperationServiece<Strin
     @Resource
     ContentReferenceService contentReferenceService;
 
-    @Override
-    public void save(Topic entity) {
+    private void saveContentPart(Topic topic) {
         Content content = new Content();
-        BeanUtils.copyProperties(entity, content);
+        BeanUtils.copyProperties(topic, content);
         contentService.save(content);
-        BeanUtils.copyProperties(content, entity);
+        BeanUtils.copyProperties(content, topic);
+    }
+
+    private void saveArticlePart(Topic topic) {
         ContentArticle article = new ContentArticle();
-        BeanUtils.copyProperties(entity, article);
-        article.setContentId(content.getId());
+        BeanUtils.copyProperties(topic, article);
+        article.setContentId(topic.getId());
         contentArticleService.save(article);
-        BeanUtils.copyProperties(article, entity);
-        entity.getReferenceList().forEach((r) -> {
-            r.setContentId(content.getId());
+        BeanUtils.copyProperties(article, topic);
+    }
+
+    private void saveReference(Topic topic) {
+        topic.getReferenceList().forEach((r) -> {
+            r.setContentId(topic.getId());
             contentReferenceService.save(r);
         });
     }
 
     @Override
+    public void save(Topic entity) {
+        saveContentPart(entity);
+        saveArticlePart(entity);
+        saveReference(entity);
+    }
+
+    @Override
     public void save(List<Topic> entities) {
         entities.forEach(this::save);
+    }
+
+    private void updateReferences(Topic topic) {
+        // 找出已有引用
+        List<ContentReference> allContentReference = contentReferenceService.findByContentId(topic.getId());
+        ReferenceUtil.mutateToPersistent(contentReferenceService, topic.getId(), topic.getReferenceList());
+        // 新引用
+        List<ContentReference> newContentReference = topic.getReferenceList().stream().filter(contentReference -> Objects.isNull(contentReference.getId())).collect(Collectors.toList());
+        //重用旧引用
+        Map<String, ContentReference> reusingContentReferenceMap = topic.getReferenceList().stream().collect(Collectors.toMap(contentReference -> String.format("%s-%s", contentReference.getType(), contentReference.getRefId()), c -> c));
+        allContentReference.forEach(r -> {
+            String key = String.format("%s-%s", r.getType(), r.getRefId());
+            if (!reusingContentReferenceMap.containsKey(key)) {
+                r.setDeleted(true);
+            } else {
+                r.setDeleted(false);
+            }
+        });
+        //保存新引用
+        newContentReference.forEach((r) -> {
+            r.setContentId(topic.getId());
+            contentReferenceService.save(r);
+        });
+        //更新旧引用
+        allContentReference.forEach(contentReferenceService::update);
     }
 
     @Override
@@ -84,10 +122,7 @@ public class TopicServiceImpl extends AbstractUnsupportedOperationServiece<Strin
         ContentArticle article = new ContentArticle();
         BeanUtils.copyProperties(entity, article);
         contentArticleService.update(article);
-        entity.getReferenceList().forEach((r) -> {
-            r.setContentId(content.getId());
-            contentReferenceService.save(r);
-        });
+        updateReferences(entity);
     }
 
     @Override
@@ -100,12 +135,6 @@ public class TopicServiceImpl extends AbstractUnsupportedOperationServiece<Strin
         BeanUtils.copyProperties(article, topic);
         topic.setReferenceList(references);
         return topic;
-    }
-
-    @Override
-    public void update(Topic topic, List<ContentReference> oldRefers) {
-        oldRefers.stream().map(ContentReference::getId).reduce((a, b) -> a + ',' + b).ifPresent(contentReferenceService::deleteByIds);
-        update(topic);
     }
 
     @Override
@@ -139,19 +168,6 @@ public class TopicServiceImpl extends AbstractUnsupportedOperationServiece<Strin
     }
 
     @Override
-    public List<TopicVO> findAllIntegrally() {
-        List<TopicVO> topicVOList = new ArrayList<>();
-        List<ArticleVO> articleVOList = contentArticleService.findAllIntegrally();
-        for (ArticleVO articleVO : articleVOList) {
-            TopicVO topicVO = new TopicVO();
-            BeanUtils.copyProperties(articleVO, topicVO);
-            topicVO.setReferences(contentReferenceService.findByContentIdIntegrally(topicVO.getContentId()));
-            topicVOList.add(topicVO);
-        }
-        return topicVOList;
-    }
-
-    @Override
     public PageSlice<TopicVO> findAllIntegrally(Filter filter, Sorter sorter, Page page) {
         PageSlice<ArticleVO> slice = contentArticleService.findAllIntegrally(ContentType.Topic, filter, sorter, page);
         return mutate(slice);
@@ -163,13 +179,8 @@ public class TopicServiceImpl extends AbstractUnsupportedOperationServiece<Strin
     }
 
     @Override
-    public PageSlice<TopicVO> findTopIntegrally(Filter filter, Sorter sorter, Page page) {
-        return findHotIntegrally(filter, sorter, page);
-    }
-
-    @Override
     public PageSlice<TopicVO> findFocusTopicByReferenceIdIntegrally(String bookId, Filter filter, Sorter sorter, Page page) {
-        PageSlice<ArticleVO> slice = contentArticleService.findFocusArticleByTypeAndReferenceId("book", bookId, filter, sorter, page);
+        PageSlice<ArticleVO> slice = contentArticleService.findFocusArticleByTypeAndReferenceId(ContentType.Topic, "book", bookId, filter, sorter, page);
         return mutate(slice);
     }
 }

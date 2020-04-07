@@ -32,6 +32,6 @@
         WHERE cr.content_id = #{contentId}
     </select>
     <select id="selectCommunityFocus" resultMap="focusResultMap">
-        SELECT cr.ref_id book_id FROM content_reference cr WHERE type='book' GROUP BY cr.type = 'book', cr.ref_id ORDER BY count(id) DESC
+        SELECT cr.ref_id book_id FROM content_reference cr LEFT JOIN book b ON b.id = cr.ref_id WHERE cr.type='book' AND cr.deleted = 0 AND b.deleted = 0 GROUP BY cr.type = 'book', cr.ref_id ORDER BY count(cr.id) DESC
     </select>
 </mapper>

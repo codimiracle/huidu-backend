@@ -20,6 +20,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 import java.util.Date;
 import java.util.Objects;
 
@@ -40,7 +41,7 @@ public class ApiCreatorElectronicBookController {
     private BookController bookController;
 
     @PostMapping
-    public ApiResponse create(@AuthenticationPrincipal User user, @RequestBody ElectronicBookDTO electronicBookDTO) {
+    public ApiResponse create(@AuthenticationPrincipal User user, @Valid @RequestBody ElectronicBookDTO electronicBookDTO) {
         electronicBookDTO.getMetadata().setAuthor(user.getNickname());
         //设定初始状态
         electronicBookDTO.setStatus(BookStatus.Examining.getStatus());
@@ -70,7 +71,7 @@ public class ApiCreatorElectronicBookController {
     }
 
     @PutMapping("/{id}")
-    public ApiResponse update(@AuthenticationPrincipal User user, @PathVariable("id") String id, @RequestBody ElectronicBookDTO electronicBookDTO) {
+    public ApiResponse update(@AuthenticationPrincipal User user, @PathVariable("id") String id, @Valid @RequestBody ElectronicBookDTO electronicBookDTO) {
         Book book = bookService.findById(id);
         Content content = contentService.findById(book.getContentId());
         if (Objects.equals(user.getId(), content.getOwnerId())) {

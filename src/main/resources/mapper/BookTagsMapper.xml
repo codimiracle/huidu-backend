@@ -21,6 +21,6 @@
                t.name tag_name
         FROM book_tags bt
                  LEFT JOIN tag t ON bt.tag_id = t.id
-        WHERE bt.book_id = #{id}
+        WHERE bt.deleted = 0 AND bt.book_id = #{id}
     </select>
 </mapper>

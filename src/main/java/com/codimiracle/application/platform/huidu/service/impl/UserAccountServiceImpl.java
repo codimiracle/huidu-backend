@@ -109,7 +109,10 @@ public class UserAccountServiceImpl extends AbstractService<String, UserAccount>
         List<UserAccount> userAccountList = userAccountMapper.selectByUserId(userId);
         UserAccountVO userAccountVO = new UserAccountVO();
         userAccountVO.setUserId(userId);
-        userAccountVO.setBalance(userAccountList.stream().map(UserAccount::getBalance).reduce(Money::total).orElse(HuiduMoneyUtil.huicoinMoney(BigDecimal.ZERO)));
+        userAccountVO.setBalance(userAccountList.stream()
+                .map(UserAccount::getBalance)
+                .reduce(Money::total).orElse(HuiduMoneyUtil.huicoinMoney(BigDecimal.ZERO))
+        );
         return userAccountVO;
     }
 

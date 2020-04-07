@@ -28,23 +28,22 @@ import com.codimiracle.application.platform.huidu.service.TagService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class TagUtil {
-    public static <T, U> List<T> merge(List<T> tList, List<U> uList, Function<T, U> mapper, Function<U, T> uToT) {
-        Map<U, T> map = tList.stream().collect(Collectors.toMap(mapper, (t) -> t));
-        uList.stream().map(uToT).forEach((t) -> {
-            if (!map.containsKey(mapper.apply(t))) {
-                map.put(mapper.apply(t), t);
-            }
-        });
-        return new ArrayList<>(map.values());
-    }
-
     public static List<Tag> mutateToPersistent(TagService service, List<String> queryTagNames) {
         List<Tag> tagList = service.findByTagNames(queryTagNames);
-        tagList = TagUtil.merge(tagList, queryTagNames, Tag::getName, Tag::new);
+        tagList = OneToManyUtil.merge(tagList, queryTagNames, Tag::getName, Tag::new);
         return tagList;
+    }
+
+    public static List<Tag> filterNewTags(List<Tag> tags) {
+        return tags.stream().filter((tag -> Objects.isNull(tag.getId()))).collect(Collectors.toList());
+    }
+
+    public static List<Tag> filterExistsTags(List<Tag> tags) {
+        return tags.stream().filter(tag -> Objects.nonNull(tag.getId())).collect(Collectors.toList());
     }
 }

@@ -12,6 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -29,14 +30,14 @@ public class ApiBackendUserController {
     private PasswordEncoder passwordEncoder;
 
     @PostMapping
-    public ApiResponse create(@RequestBody UserDTO userDTO) {
+    public ApiResponse create(@Valid @RequestBody UserDTO userDTO) {
         User user = User.from(userDTO);
         userService.save(user);
         return RestfulUtil.entity(userService.findByIdIntegrally(user.getId()));
     }
 
     @PostMapping("/{id}/reset-password")
-    public ApiResponse resetPassword(@PathVariable String userId, @RequestBody UserResetPasswordDTO userResetPasswordDTO) {
+    public ApiResponse resetPassword(@PathVariable String userId, @Valid @RequestBody UserResetPasswordDTO userResetPasswordDTO) {
         User updatedUser = new User();
         updatedUser.setId(userId);
         updatedUser.setId(userId);
@@ -57,7 +58,7 @@ public class ApiBackendUserController {
     }
 
     @PutMapping("/{id}")
-    public ApiResponse update(@PathVariable String id, @RequestBody UserDTO userDTO) {
+    public ApiResponse update(@PathVariable String id, @Valid @RequestBody UserDTO userDTO) {
         User user = User.from(userDTO);
         Objects.requireNonNull(user);
         user.setId(id);
@@ -72,7 +73,7 @@ public class ApiBackendUserController {
     }
 
     @PutMapping("{id}/reset-password")
-    public ApiResponse resetPassword(@PathVariable String id, @RequestBody UserDTO userDTO) {
+    public ApiResponse resetPassword(@PathVariable String id, @Valid @RequestBody UserDTO userDTO) {
         User user = new User();
         user.setId(id);
         user.setPassword(userDTO.getPassword());

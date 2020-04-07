@@ -25,6 +25,8 @@
         <result column="book_episode_words" jdbcType="INTEGER" property="words"/>
         <result column="book_episode_status" jdbcType="VARCHAR" property="status"/>
         <result column="book_episode_episode_number" jdbcType="INTEGER" property="episodeNumber"/>
+        <result column="book_id" jdbcType="INTEGER" property="bookId"/>
+        <result column="commodity_id" jdbcType="INTEGER" property="commodityId" />
         <result column="book_episode_create_time" jdbcType="TIMESTAMP" property="createTime"/>
         <result column="book_episode_update_time" jdbcType="TIMESTAMP" property="updateTime"/>
         <association property="owner"
@@ -69,52 +71,14 @@
                be.status            book_episode_status,
                be.create_time       book_episode_create_time,
                be.update_time       book_episode_update_time,
+               be.book_id           book_id,
+               be.commodity_id      commodity_id,
                u.id                 user_id,
                u.username           user_username,
                u.nickname           user_nickname,
-               u.avatar             user_avatar,
-               b.id                 book_id,
-               b.title              book_title,
-               b.description        book_description,
-               b.cover              book_cover,
-               b.teller             book_teller,
-               b.category_id        book_category_id,
-               b.publish_year       book_publish_year,
-               b.type               book_type,
-               b.episodes           book_episodes,
-               b.status             book_status,
-               b.money              book_money,
-               bm.id                book_metadata_id,
-               bm.name              book_metadata_name,
-               bm.cover             book_metadata_cover,
-               bm.description       book_metadata_description,
-               bm.words             book_metadata_words,
-               bm.author            book_metadata_author,
-               c.id                 book_episode_commodity_id,
-               c.name               book_episode_commodity_name,
-               c.type               book_episode_commodity_type,
-               c.picture            book_episode_commodity_picture,
-               c.introduction       book_episode_commodity_introduction,
-               c.rate               book_episode_commodity_rate,
-               c.weight             book_episode_commodity_weight,
-               c.stock              book_episode_commodity_stock,
-               c.available_stock    book_episode_commodity_available_stock,
-               c.sales              book_episode_commodity_sales,
-               c.shipment           book_episode_commodity_shipment,
-               c.extra              book_episode_commodity_extra,
-               c.prices             book_episode_commodity_prices,
-               c.status             book_episode_commodity_status,
-               cc.id                category_id,
-               cc.name              category_name,
-               cc.description       category_description,
-               cc.extra_url         category_extra_url,
-               cc.extra_aside_title category_extra_aside_title
+               u.avatar             user_avatar
         FROM book_episode be
                  LEFT JOIN user u ON be.owner_id = u.id
-                 LEFT JOIN book b ON be.book_id = b.id
-                 LEFT JOIN book_metadata bm ON b.metadata_id = bm.id
-                 LEFT JOIN category cc ON b.category_id = cc.id
-                 LEFT JOIN commodity c ON be.commodity_id = c.id
         WHERE be.deleted = 0
     </sql>
     <sql id="select_statement_publish">
@@ -187,5 +151,8 @@
         AND be.book_id = #{bookId}
         ORDER BY be.update_time DESC
         LIMIT 0,1
+    </select>
+    <select id="selectEpisodeIdByEpisodeNumber" resultType="java.lang.String">
+        SELECT be.id FROM book_episode be WHERE be.deleted = 0 AND be.book_id = #{bookId} AND be.episode_number = #{episodeNumber}
     </select>
 </mapper>

@@ -51,13 +51,17 @@ public class HuiduTokenAuthenticationFilter extends AbstractAuthenticationProces
         Optional<String> authentication = Optional.ofNullable(request.getHeader(HttpHeaders.AUTHORIZATION));
         if (authentication.isPresent()) {
             String token = StringUtils.removeStart(authentication.get(), "Bearer").trim();
-            Authentication authenticationToken = new UsernamePasswordAuthenticationToken("token-authentication", token);
+            Authentication authenticationToken = new UsernamePasswordAuthenticationToken(
+                    "token-authentication", token);
             return this.getAuthenticationManager().authenticate(authenticationToken);
         }
         if (SecurityContextHolder.getContext().getAuthentication() != null) {
             return SecurityContextHolder.getContext().getAuthentication();
         }
-        AnonymousAuthenticationToken anonymousAuthenticationToken = new AnonymousAuthenticationToken("token-authentication", "anonymousUser", AuthorityUtils.createAuthorityList("ROLE_ANONYMOUS"));
+        // 不带 Token 作为匿名用户
+        AnonymousAuthenticationToken anonymousAuthenticationToken = new AnonymousAuthenticationToken(
+                "token-authentication", "anonymousUser",
+                AuthorityUtils.createAuthorityList("ROLE_ANONYMOUS"));
         anonymousAuthenticationToken.setDetails(authenticationDetailsSource.buildDetails(request));
         return anonymousAuthenticationToken;
     }

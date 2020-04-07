@@ -9,6 +9,7 @@ import com.codimiracle.application.platform.huidu.util.RestfulUtil;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -23,7 +24,7 @@ public class ApiBackendUserRoleController {
     private UserRoleService userRoleService;
 
     @PostMapping
-    public ApiResponse create(@RequestBody UserRoleDTO userRoleDTO) {
+    public ApiResponse create(@Valid @RequestBody UserRoleDTO userRoleDTO) {
         UserRole userRole = UserRole.from(userRoleDTO);
         userRoleService.save(userRole);
         return RestfulUtil.entity(userRole);
@@ -43,7 +44,7 @@ public class ApiBackendUserRoleController {
 
 
     @PutMapping("/{id}")
-    public ApiResponse update(@PathVariable String id, @RequestBody UserRoleDTO userRoleDTO) {
+    public ApiResponse update(@PathVariable String id, @Valid @RequestBody UserRoleDTO userRoleDTO) {
         UserRole userRole = UserRole.from(userRoleDTO);
         Objects.requireNonNull(userRole);
         userRole.setId(id);

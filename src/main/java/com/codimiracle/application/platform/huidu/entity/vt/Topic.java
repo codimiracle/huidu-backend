@@ -145,7 +145,11 @@ public class Topic {
         topic.setType(ContentType.Topic);
         topic.setTitle(topicDTO.getTitle());
         topic.setContentSource(topicDTO.getContent().getSource());
-        topic.setStatus(ContentStatus.valueOfCode(topicDTO.getStatus()));
+        if (Objects.nonNull(topicDTO.getStatus())) {
+            topic.setStatus(ContentStatus.valueOfCode(topicDTO.getStatus()));
+        } else {
+            topic.setStatus(ContentStatus.Draft);
+        }
         topic.setContentType(topicDTO.getContent().getType());
         topic.setWords(topicDTO.getWords());
         topic.setReferenceList(Arrays.stream(topicDTO.getReferences()).map(bookId -> {
