@@ -5,6 +5,7 @@ import com.codimiracle.application.platform.huidu.contract.Filter;
 import com.codimiracle.application.platform.huidu.contract.Page;
 import com.codimiracle.application.platform.huidu.contract.Sorter;
 import com.codimiracle.application.platform.huidu.entity.dto.AudioBookDTO;
+import com.codimiracle.application.platform.huidu.entity.dto.BulkDeletionDTO;
 import com.codimiracle.application.platform.huidu.entity.po.Book;
 import com.codimiracle.application.platform.huidu.entity.po.Content;
 import com.codimiracle.application.platform.huidu.entity.po.User;
@@ -58,8 +59,8 @@ public class ApiCreatorAudioBookController {
         }
     }
 
-    public ApiResponse delete(String[] ids) {
-        bookController.delete(ids);
+    public ApiResponse deleteBulk(@Valid @RequestBody BulkDeletionDTO bulkDeletionDTO) {
+        bookController.deleteBulk(bulkDeletionDTO);
         return RestfulUtil.success();
     }
 
