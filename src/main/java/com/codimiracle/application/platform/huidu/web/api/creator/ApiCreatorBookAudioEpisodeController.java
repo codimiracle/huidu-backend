@@ -65,6 +65,11 @@ public class ApiCreatorBookAudioEpisodeController {
         return bookAudioEpisodeController.entity(id);
     }
 
+    @GetMapping("/last-episode-number")
+    public ApiResponse lastEpisodeNumber(@PathVariable("book_id") String bookId) {
+        return bookAudioEpisodeController.lastEpisodeNumber(bookId);
+    }
+
     @GetMapping("/last-updated-episode")
     public ApiResponse lastUpdateEpisode(@PathVariable("book_id") String bookId) {
         BookAudioEpisodeVO lastUpdatedEpisode = bookAudioEpisodeService.findLastUpdateEpisodeByBookIdIntegrally(bookId);
