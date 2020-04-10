@@ -1,8 +1,11 @@
 package com.codimiracle.application.platform.huidu.service.impl;
 
 import com.codimiracle.application.platform.huidu.contract.AbstractService;
+import com.codimiracle.application.platform.huidu.contract.Page;
+import com.codimiracle.application.platform.huidu.contract.PageSlice;
 import com.codimiracle.application.platform.huidu.entity.po.User;
 import com.codimiracle.application.platform.huidu.entity.po.UserToken;
+import com.codimiracle.application.platform.huidu.entity.vo.UserProtectedVO;
 import com.codimiracle.application.platform.huidu.entity.vo.UserTokenVO;
 import com.codimiracle.application.platform.huidu.mapper.UserTokenMapper;
 import com.codimiracle.application.platform.huidu.service.UserService;
@@ -65,5 +68,10 @@ public class UserTokenServiceImpl extends AbstractService<String, UserToken> imp
     @Override
     public UserToken findByUserId(String userId) {
         return findBy("userId", userId);
+    }
+
+    @Override
+    public PageSlice<UserProtectedVO> findOnlineUserProtectively(Page page) {
+        return extractPageSlice(userTokenMapper.selectOnlineUserProtectively(page));
     }
 }

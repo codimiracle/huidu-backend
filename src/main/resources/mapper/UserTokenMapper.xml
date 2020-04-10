@@ -20,10 +20,19 @@
     </resultMap>
     <select id="selectByIdIntegrally" resultMap="IntegratedResultMap">
         SELECT ut.id,
-               ut.user_id,
-               ut.expire_time,
-               ut.token
+        ut.user_id,
+        ut.expire_time,
+        ut.token
         FROM user_token ut
         WHERE id = #{id}
+    </select>
+    <select id="selectOnlineUserProtectively"
+            resultMap="com.codimiracle.application.platform.huidu.mapper.UserMapper.ProtectedResultMap">
+        SELECT
+        u.avatar user_avatar,
+        u.nickname user_nickname,
+        u.username user_username,
+        u.id user_id
+        FROM user_token ut LEFT JOIN user u ON ut.user_id = u.id WHERE ut.expire_time > NOW()
     </select>
 </mapper>
