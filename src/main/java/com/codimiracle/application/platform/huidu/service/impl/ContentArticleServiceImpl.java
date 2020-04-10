@@ -71,6 +71,22 @@ public class ContentArticleServiceImpl extends AbstractService<String, ContentAr
         return inflateContentExamination(inflateLikedState(contentArticleMapper.selectByIdIntegrally(type, id)));
     }
 
+    public ArticleVO findByIdIntegrally(String id) {
+        return findByIdIntegrally(null, id);
+    }
+
+    private ArticleVO inflateTargetContent(ArticleVO articleVO) {
+        if (Objects.nonNull(articleVO)) {
+            articleVO.setTargetContent(findByIdIntegrally(articleVO.getTargetContentId()));
+        }
+        return articleVO;
+    }
+
+    private PageSlice<ArticleVO> inflateTargetContent(PageSlice<ArticleVO> slice) {
+        slice.getList().forEach(this::inflateTargetContent);
+        return slice;
+    }
+
     private ArticleVO inflateContentExamination(ArticleVO articleVO) {
         if (Objects.isNull(articleVO)) {
             return null;
@@ -122,4 +138,8 @@ public class ContentArticleServiceImpl extends AbstractService<String, ContentAr
         return inflateLikedState(extractPageSlice(contentArticleMapper.selectFocusArticleByTypeAndReferenceId(type, referenceType, bookId, filter, sorter, page)));
     }
 
+    @Override
+    public PageSlice<ArticleVO> findAllIntegrallyWithTargetContent(ContentType type, Filter filter, Sorter sorter, Page page) {
+        return inflateTargetContent(inflateLikedState(extractPageSlice(contentArticleMapper.selectAllIntegrally(type, filter, sorter, page))));
+    }
 }

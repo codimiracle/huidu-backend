@@ -24,4 +24,6 @@ public interface ContentArticleService extends Service<String, ContentArticle> {
     PageSlice<ArticleVO> findHotIntegrally(ContentType type, Filter filter, Sorter sorter, Page page);
 
     PageSlice<ArticleVO> findFocusArticleByTypeAndReferenceId(ContentType type, String referenceType, String bookId, Filter filter, Sorter sorter, Page page);
+
+    PageSlice<ArticleVO> findAllIntegrallyWithTargetContent(ContentType type, Filter filter, Sorter sorter, Page page);
 }

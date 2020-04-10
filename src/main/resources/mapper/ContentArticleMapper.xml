@@ -110,7 +110,7 @@
                 AND ca.target_content_id = #{filter.targetContentId[0]}
             </if>
         </if>
-        ORDER BY (c.likes * 3 + c.comments + c.rate * 2) DESC
+        ORDER BY (c.likes * 3 + c.comments + ca.reads * 2) DESC
     </select>
 
     <select id="selectFocusArticleByTypeAndReferenceId" resultMap="IntegratedResultMap">
