@@ -1,12 +1,15 @@
 package com.codimiracle.application.platform.huidu.service.impl;
 
 import com.codimiracle.application.platform.huidu.contract.*;
+import com.codimiracle.application.platform.huidu.entity.po.Book;
 import com.codimiracle.application.platform.huidu.entity.po.History;
 import com.codimiracle.application.platform.huidu.entity.vo.BookAudioEpisodeVO;
 import com.codimiracle.application.platform.huidu.entity.vo.BookEpisodeVO;
 import com.codimiracle.application.platform.huidu.entity.vo.BookVO;
 import com.codimiracle.application.platform.huidu.entity.vo.HistoryVO;
+import com.codimiracle.application.platform.huidu.enumeration.BookAudioEpisodeStatus;
 import com.codimiracle.application.platform.huidu.enumeration.BookType;
+import com.codimiracle.application.platform.huidu.enumeration.ContentStatus;
 import com.codimiracle.application.platform.huidu.mapper.HistoryMapper;
 import com.codimiracle.application.platform.huidu.service.*;
 import com.google.common.collect.Interner;
@@ -20,6 +23,7 @@ import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 
 /**
@@ -39,6 +43,8 @@ public class HistoryServiceImpl extends AbstractService<String, History> impleme
     private BookEpisodeService bookEpisodeService;
     @Resource
     private BookAudioEpisodeService bookAudioEpisodeService;
+    @Resource
+    private BuryingPointService buryingPointService;
 
     private HistoryVO mutate(HistoryVO historyVO) {
         if (Objects.nonNull(historyVO)) {
@@ -76,8 +82,14 @@ public class HistoryServiceImpl extends AbstractService<String, History> impleme
         //返回第一章
         if (Objects.equals(bookVO.getType(), BookType.ElectronicBook.getType())) {
             bookEpisodeVO = bookEpisodeService.findByEpisodeNumberIntegrally(bookId, 1);
+            if (Objects.nonNull(bookEpisodeVO) && !Objects.equals(bookEpisodeVO.getStatus(), ContentStatus.Publish.toString())) {
+                bookEpisodeVO = null;
+            }
         } else {
             bookAudioEpisodeVO = bookAudioEpisodeService.findByMediaNumberIntegrally(bookId, 1);
+            if (Objects.nonNull(bookAudioEpisodeVO) && !Objects.equals(bookAudioEpisodeVO.getStatus(), BookAudioEpisodeStatus.Publish.toString())) {
+                bookAudioEpisodeVO = null;
+            }
         }
         historyVO.setReadTime(null);
         historyVO.setEpisode(bookEpisodeVO);
@@ -185,6 +197,8 @@ public class HistoryServiceImpl extends AbstractService<String, History> impleme
                 history.setEpisodeId(episodeId);
                 history.setProgress(progress);
                 history.setReadTime(new Date());
+                buryingPointService.forReading(userId, bookId);
+                bookService.readsIncrement(bookId);
                 save(history);
             }
         }
@@ -208,6 +222,8 @@ public class HistoryServiceImpl extends AbstractService<String, History> impleme
                 history.setAudioEpisodeId(audioEpisdoeId);
                 history.setProgress(progress);
                 history.setReadTime(new Date());
+                buryingPointService.forReading(userId, bookId);
+                bookService.playsIncrement(bookId);
                 save(history);
             }
         }
@@ -252,5 +268,21 @@ public class HistoryServiceImpl extends AbstractService<String, History> impleme
 
     private HistoryVO findLastReadByUserIdAndBookIdAndAudioEpisodeIdIntegrally(String userId, String bookId, String audioEpisodeId) {
         return mutate(historyMapper.selectLastReadByUserIdAndBookIdAndAudioEpisodeIdIntegrally(userId, bookId, audioEpisodeId));
+    }
+
+    @Override
+    public Float findReadingProgressByUserIdAndBookId(String userId, String bookId) {
+        Book book = bookService.findById(bookId);
+        float total;
+        if (Objects.equals(book.getType(), BookType.ElectronicBook)) {
+            total = Optional.ofNullable(bookEpisodeService.findLastEpisodeNumberByBookId(bookId)).orElse(0) * 100.0f;
+        } else {
+            total = Optional.ofNullable(bookAudioEpisodeService.findLastMediaNumberByBookId(bookId)).orElse(0) * 100.0f;
+        }
+        if (total > 0) {
+            Float readProgress = historyMapper.sumProgressByUserIdAndBookId(userId, bookId);
+            return Math.round(Optional.ofNullable(readProgress).orElse(0.0f) / total * 10000) / 100.0f;
+        }
+        return 0.0f;
     }
 }

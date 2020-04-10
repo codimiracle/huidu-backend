@@ -28,5 +28,8 @@ public interface HistoryMapper extends Mapper<History> {
     List<History> selectByUserIdAndBookIdIntegrally(@Param("userId") String userId, @Param("bookId") String bookId);
 
     HistoryVO selectLastReadByUserIdAndBookIdAndEpisodeIdIntegrally(@Param("userId") String userId, @Param("bookId") String bookId, @Param("episodeId") String episodeId);
+
     HistoryVO selectLastReadByUserIdAndBookIdAndAudioEpisodeIdIntegrally(@Param("userId") String userId, @Param("bookId") String bookId, @Param("audioEpisodeId") String audioEpisodeId);
+
+    Float sumProgressByUserIdAndBookId(String userId, String bookId);
 }

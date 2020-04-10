@@ -90,9 +90,12 @@
         AND h.episode_id = #{episodeId}
     </select>
     <select id="selectLastReadByUserIdAndBookIdAndAudioEpisodeIdIntegrally" resultMap="IntegratedResultMap">
-        <include refid="select_statement" />
+        <include refid="select_statement"/>
         AND h.user_id = #{userId}
         AND h.book_id = #{bookId}
         AND h.audio_episode_id = #{audioEpisodeId}
+    </select>
+    <select id="sumProgressByUserIdAndBookId" resultType="java.lang.Float">
+        SELECT sum(h.progress) FROM history h WHERE h.user_id = #{userId} AND h.book_id = #{bookId}
     </select>
 </mapper>

@@ -37,6 +37,7 @@ public interface HistoryService extends Service<String, History> {
     History findByUserIdAndBookIdAndAudioEpisodeId(String userId, String bookId, String audioEpisodeId);
 
     void accessEpisode(String userId, String bookId, String episdoeId, Float progress);
+
     void accessAudioEpisode(String userId, String bookId, String audioEpisdoeId, Float progress);
 
     HistoryVO findLastReadByUserIdAndBookIdAndEpisodeIdIntegrally(String userId, String bookId, String episodeId);
@@ -44,4 +45,6 @@ public interface HistoryService extends Service<String, History> {
     HistoryVO findByUserIdAndBookIdAndEpisodeIdOrNewIntegrally(String id, String bookId, String episodeId);
 
     HistoryVO findByUserIdAndBookIdAndAudioEpisodeIdOrNewIntegrally(String id, String bookId, String episodeId);
+
+    Float findReadingProgressByUserIdAndBookId(String ownerId, String bookId);
 }
