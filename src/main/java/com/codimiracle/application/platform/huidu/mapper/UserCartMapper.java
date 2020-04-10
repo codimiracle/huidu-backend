@@ -23,4 +23,5 @@ public interface UserCartMapper extends Mapper<CartItem> {
 
     void deleteByIdsLogically(@Param("ids") List<String> ids);
 
+    Boolean existsByUserIdAndCommodityId(String userId, String commodityId);
 }

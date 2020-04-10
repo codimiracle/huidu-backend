@@ -23,4 +23,6 @@ public interface UserCartService extends Service<String, CartItem> {
     void settleByIdLogically(String cartItemId);
 
     void deleteByIdsLogically(List<String> ids);
+
+    boolean isJoined(String userId, String bookId);
 }

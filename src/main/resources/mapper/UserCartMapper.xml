@@ -73,4 +73,7 @@
         AND uc.id IN
         <foreach collection="ids" open="(" close=")" separator="," item="item">#{item}</foreach>
     </select>
+    <select id="existsByUserIdAndCommodityId" resultType="java.lang.Boolean">
+        SELECT 1 FROM user_cart uc WHERE uc.deleted = 0 AND uc.commodity_id = #{commodityId} AND uc.user_id = #{userId}
+    </select>
 </mapper>
