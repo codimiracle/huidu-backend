@@ -25,6 +25,7 @@ package com.codimiracle.application.platform.huidu.entity.vo;/*
 import lombok.Data;
 
 import java.util.Date;
+import java.util.Objects;
 
 @Data
 public class UserTokenVO {
@@ -37,4 +38,8 @@ public class UserTokenVO {
     private String token;
 
     private UserVO user;
+
+    public boolean isValid() {
+        return expireTime.getTime() > System.currentTimeMillis() && Objects.nonNull(user) && !user.isAccountLocked() && user.isEnabled();
+    }
 }
