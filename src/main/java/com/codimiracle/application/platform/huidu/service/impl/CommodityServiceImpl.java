@@ -41,4 +41,8 @@ public class CommodityServiceImpl extends AbstractService<String, Commodity> imp
         commodityMapper.deleteByIdsLogically(ids);
     }
 
+    @Override
+    public void incrementSalesById(String commodityId, Integer quantity) {
+        commodityMapper.incrementSalesById(commodityId, quantity);
+    }
 }

@@ -18,4 +18,6 @@ public interface CommodityMapper extends Mapper<Commodity> {
     void deleteByIdLogically(String id);
 
     void deleteByIdsLogically(List<String> ids);
+
+    void incrementSalesById(@Param("commodityId") String commodityId, @Param("quantity") Integer quantity);
 }

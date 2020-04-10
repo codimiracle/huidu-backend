@@ -93,7 +93,9 @@ public class Commodity {
         BeanUtils.copyProperties(commodityDTO, commodity);
         commodity.setShipment(Money.of(CurrencyUnit.of("CNY"), commodityDTO.getShipment()));
         commodity.setPrices(Money.of(CurrencyUnit.of("CNY"), commodityDTO.getPrices()));
+        commodity.setType(CommodityType.valueOfCode(commodityDTO.getType()));
         commodity.setStatus(CommodityStatus.valueOfCode(commodityDTO.getStatus()));
+        commodity.setExtra(commodityDTO.getSpecification());
         return commodity;
     }
 }

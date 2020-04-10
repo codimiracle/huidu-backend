@@ -19,4 +19,6 @@ public interface CommodityService extends Service<String, Commodity> {
     void deleteByIdLogically(String id);
 
     void deleteByIdsLogically(List<String> ids);
+
+    void incrementSalesById(String commodityId, Integer quantity);
 }

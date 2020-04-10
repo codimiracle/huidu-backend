@@ -67,7 +67,7 @@ public class CommodityDTO {
     /**
      * 额外数据
      */
-    private String extra;
+    private String specification;
 
     private BigDecimal prices;
 

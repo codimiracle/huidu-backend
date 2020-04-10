@@ -48,15 +48,20 @@
         WHERE commodity.id IN
         <foreach collection="list" item="item" open="(" close=")" separator=",">#{item}</foreach>
     </update>
+
+    <update id="incrementSalesById">
+        UPDATE commodity c SET c.sales = c.sales + #{quantity} WHERE c.id = #{commodityId}
+    </update>
+
     <sql id="select_statement">
-        SELECT c.id              commodity_id,
-               c.name            commodity_name,
-               c.type            commodity_type,
-               c.picture         commodity_picture,
-               c.introduction    commodity_introduction,
-               c.rate            commodity_rate,
-               c.weight          commodity_weight,
-               c.stock           commodity_stock,
+        SELECT c.id commodity_id,
+        c.name commodity_name,
+        c.type commodity_type,
+        c.picture commodity_picture,
+        c.introduction commodity_introduction,
+        c.rate commodity_rate,
+        c.weight commodity_weight,
+        c.stock commodity_stock,
                c.available_stock commodity_available_stock,
                c.sales           commodity_sales,
                c.shipment        commodity_shipment,

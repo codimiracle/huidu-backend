@@ -24,7 +24,10 @@ package com.codimiracle.application.platform.huidu.entity.vo;/*
 
 import com.fasterxml.jackson.annotation.JsonRawValue;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 import org.joda.money.Money;
+
+import java.util.Objects;
 
 @Data
 public class CommodityVO<T> {
@@ -43,4 +46,8 @@ public class CommodityVO<T> {
     private T extra;
     private Money prices;
     private String status;
+
+    public T getExtra() {
+        return Objects.nonNull(extra) && !StringUtils.isEmpty(extra.toString()) ? this.extra : null;
+    }
 }
