@@ -71,6 +71,7 @@ public class OrderController {
             logisticsInformationService.save(logisticsInformation);
             Order updatedOrder = new Order();
             updatedOrder.setStatus(OrderStatus.AwaitingDelivery);
+            updatedOrder.setDeliverTime(new Date());
             updatedOrder.setOrderNumber(orderNumber);
             updatedOrder.setLogisticsInformationId(logisticsInformation.getId());
             orderService.update(updatedOrder);
@@ -111,8 +112,8 @@ public class OrderController {
         return RestfulUtil.success();
     }
 
-    public ApiResponse switchToEvaluate(User user, String orderNumber, String status) {
-        orderService.changeStatus(user.getId(), orderNumber, OrderStatus.valueOfCode(status), OrderStatus.AwaitingEvaluation);
+    public ApiResponse switchToEvaluate(User user, String orderNumber) {
+        orderService.changeStatus(user.getId(), orderNumber, OrderStatus.AwaitingDelivery, OrderStatus.AwaitingEvaluation);
         return RestfulUtil.success();
     }
 }
