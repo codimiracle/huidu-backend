@@ -21,4 +21,6 @@ public interface TagService extends Service<String, Tag> {
     void deleteByIdLogically(String id);
 
     void deleteByIdsLogically(List<String> ids);
+
+    Tag findByTagName(String name);
 }

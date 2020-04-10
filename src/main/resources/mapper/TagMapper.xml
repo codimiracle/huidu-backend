@@ -7,6 +7,7 @@
         -->
         <id column="id" jdbcType="INTEGER" property="id"/>
         <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="deleted" jdbcType="BIT" property="deleted"/>
     </resultMap>
     <resultMap id="IntegratedResultMap" type="com.codimiracle.application.platform.huidu.entity.vo.TagVO">
         <id column="tag_id" jdbcType="INTEGER" property="id"/>
@@ -49,7 +50,8 @@
             AND t.name LIKE concat('%',#{filter.name[0]}, '%')
         </if>
         <if test="filter != null and filter.categoryName != null">
-            AND t.category_id IN (SELECT c.id FROM category c WHERE c.name LIKE concat('%',#{filter.categoryName[0]},
+            AND t.id IN (SELECT ct.tag_id FROM category_tags ct LEFT JOIN category c ON ct.category_id = c.id WHERE
+            c.name LIKE concat('%',#{filter.categoryName[0]},
             '%'))
         </if>
     </select>

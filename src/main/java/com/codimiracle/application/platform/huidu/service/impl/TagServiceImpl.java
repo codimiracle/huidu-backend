@@ -60,4 +60,9 @@ public class TagServiceImpl extends AbstractService<String, Tag> implements TagS
     public void deleteByIdsLogically(List<String> ids) {
         tagMapper.deleteByIdsLogically(ids);
     }
+
+    @Override
+    public Tag findByTagName(String name) {
+        return findBy("name", name);
+    }
 }
