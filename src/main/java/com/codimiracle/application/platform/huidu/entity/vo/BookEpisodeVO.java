@@ -36,12 +36,16 @@ public class BookEpisodeVO {
     private String title;
 
     private String commodityId;
+
+    private String contentId;
     /**
      * 对应购买项
      */
     private CommodityVO commodity;
 
     private Integer episodeNumber;
+
+    private ExaminationVO examination;
 
     private UserProtectedVO owner;
 

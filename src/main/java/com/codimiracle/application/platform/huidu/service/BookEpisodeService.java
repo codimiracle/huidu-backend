@@ -28,9 +28,15 @@ public interface BookEpisodeService extends Service<String, BookEpisode> {
 
     Integer findLastEpisodeNumberByBookId(String id);
 
+    Integer findLastPublishedEpisodeNumberByBookId(String bookId);
+
     BookEpisodeVO findByEpisodeNumberIntegrally(String bookId, Integer episodeNumber);
 
     List<Catalogs> findCatalogsByBookIdAndStatus(String id, ContentStatus status);
 
     BookEpisodeVO findLastPublishedEpisodeByBookId(String bookId);
+
+    void passExamination(String id, String reason, String userId);
+
+    void rejectExamination(String id, String reason, String userId);
 }

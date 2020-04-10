@@ -8,6 +8,7 @@
         <id column="id" jdbcType="INTEGER" property="id"/>
         <result column="title" jdbcType="VARCHAR" property="title"/>
         <result column="commodity_id" jdbcType="INTEGER" property="commodityId"/>
+        <result column="content_id" jdbcType="INTEGER" property="contentId"/>
         <result column="owner_id" jdbcType="INTEGER" property="ownerId"/>
         <result column="episode_number" jdbcType="INTEGER" property="episodeNumber"/>
         <result column="content_type" jdbcType="VARCHAR" property="contentType"/>
@@ -27,6 +28,7 @@
         <result column="book_episode_episode_number" jdbcType="INTEGER" property="episodeNumber"/>
         <result column="book_id" jdbcType="INTEGER" property="bookId"/>
         <result column="commodity_id" jdbcType="INTEGER" property="commodityId" />
+        <result column="content_id" jdbcType="INTEGER" property="contentId"/>
         <result column="book_episode_create_time" jdbcType="TIMESTAMP" property="createTime"/>
         <result column="book_episode_update_time" jdbcType="TIMESTAMP" property="updateTime"/>
         <association property="owner"
@@ -62,23 +64,23 @@
         <result column="catalogs_episode_id" jdbcType="INTEGER" property="episodeId"/>
     </resultMap>
     <sql id="select_statement">
-        SELECT be.id                book_episode_id,
-               be.title             book_episode_title,
-               be.episode_number    book_episode_episode_number,
-               be.content_type      book_episode_content_type,
-               be.content_source    book_episode_content_source,
-               be.words             book_episode_words,
-               be.status            book_episode_status,
-               be.create_time       book_episode_create_time,
-               be.update_time       book_episode_update_time,
-               be.book_id           book_id,
-               be.commodity_id      commodity_id,
-               u.id                 user_id,
-               u.username           user_username,
-               u.nickname           user_nickname,
-               u.avatar             user_avatar
+        SELECT be.id book_episode_id,
+        be.title book_episode_title,
+        be.episode_number book_episode_episode_number,
+        be.content_type book_episode_content_type,
+        be.content_source book_episode_content_source,
+        be.words book_episode_words,
+        be.status book_episode_status,
+        be.create_time book_episode_create_time,
+        be.update_time book_episode_update_time,
+        be.book_id book_id,
+        be.content_id content_id,
+        u.id user_id,
+        u.username user_username,
+        u.nickname user_nickname,
+        u.avatar user_avatar
         FROM book_episode be
-                 LEFT JOIN user u ON be.owner_id = u.id
+        LEFT JOIN user u ON be.owner_id = u.id
         WHERE be.deleted = 0
     </sql>
     <sql id="select_statement_publish">
@@ -122,7 +124,7 @@
         ORDER By be.update_time DESC
         LIMIT 0,1
     </select>
-    <select id="selectLastEpisodeIntegrally" resultMap="IntegratedResultMap">
+    <select id="selectLastEpisodeByBookIdIntegrally" resultMap="IntegratedResultMap">
         <include refid="select_statement"/>
         AND be.book_id = #{bookId}
         ORDER BY be.episode_number DESC

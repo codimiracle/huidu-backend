@@ -30,6 +30,9 @@ public class BookEpisode {
     @Column(name = "owner_id")
     private String ownerId;
 
+    @Column(name = "content_id")
+    private String contentId;
+
     @Column(name = "episode_number")
     private Integer episodeNumber;
 

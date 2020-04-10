@@ -23,7 +23,7 @@ public interface BookEpisodeMapper extends Mapper<BookEpisode> {
 
     BookEpisodeVO selectLastUpdateEpisodeIntegrally(String bookId);
 
-    BookEpisodeVO selectLastEpisodeIntegrally(String bookId);
+    BookEpisodeVO selectLastEpisodeByBookIdIntegrally(String bookId);
 
     BookEpisodeVO selectByEpisodeNumberIntegrally(String bookId, Integer episodeNumber);
 

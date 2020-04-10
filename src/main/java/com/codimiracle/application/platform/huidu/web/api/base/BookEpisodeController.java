@@ -53,15 +53,16 @@ public class BookEpisodeController {
     }
 
     public ApiResponse update(@PathVariable String id, @Valid @RequestBody BookEpisodeDTO bookEpisodeDTO) {
-        BookEpisode episode = BookEpisode.from(bookEpisodeDTO);
-        Objects.requireNonNull(episode, "没有需要更新的数据！");
-        episode.setId(id);
-        episode.setUpdateTime(new Date());
-        BookEpisodeVO existsBookEpisode = bookEpisodeService.findByEpisodeNumberIntegrally(episode.getBookId(), episode.getEpisodeNumber());
+        BookEpisode bookEpisode = bookEpisodeService.findById(id);
+        BookEpisode updatingEpisode = BookEpisode.from(bookEpisodeDTO);
+        Objects.requireNonNull(updatingEpisode, "没有需要更新的数据！");
+        updatingEpisode.setId(id);
+        updatingEpisode.setUpdateTime(new Date());
+        BookEpisodeVO existsBookEpisode = bookEpisodeService.findByEpisodeNumberIntegrally(bookEpisode.getBookId(), updatingEpisode.getEpisodeNumber());
         if (Objects.nonNull(existsBookEpisode) && !Objects.equals(existsBookEpisode.getId(), id)) {
             return RestfulUtil.fail("章节号对应的章节已经存在！");
         }
-        bookEpisodeService.update(episode);
+        bookEpisodeService.update(updatingEpisode);
         return RestfulUtil.entity(bookEpisodeService.findByIdIntegrally(id));
     }
 
