@@ -70,7 +70,7 @@
         WHERE 1 = 1
     </sql>
     <update id="changeStatus">
-        UPDATE `order` o SET o.status = #{to} WHERE o.order_number = #{o.orderNumber} AND o.status = #{from}
+        UPDATE `order` o SET o.status = #{to} WHERE o.order_number = #{orderNumber} AND o.status = #{from}
     </update>
     <select id="selectByOrderNumberIntegrally" resultMap="IntegratedResultMap">
         <include refid="select_statement"/>

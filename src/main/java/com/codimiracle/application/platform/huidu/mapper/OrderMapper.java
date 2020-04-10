@@ -16,5 +16,5 @@ public interface OrderMapper extends Mapper<Order> {
 
     List<OrderVO> selectAllIntegrally(@Param("filter") Filter filter, @Param("sorter") Sorter sorter, @Param("page") Page page);
 
-    void changeStatus(String orderNumber, OrderStatus from, OrderStatus to);
+    void changeStatus(@Param("orderNumber") String orderNumber, @Param("from") OrderStatus from, @Param("to") OrderStatus to);
 }

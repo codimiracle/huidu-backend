@@ -31,7 +31,7 @@ public enum OrderStatus {
      */
     AwaitingPayment("awaiting-payment"),
     /**
-     * 订单发货
+     * 待发货
      */
     AwaitingShipment("awaiting-shipment"),
     /**

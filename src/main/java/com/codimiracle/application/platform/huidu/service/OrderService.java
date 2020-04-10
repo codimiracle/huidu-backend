@@ -30,7 +30,5 @@ public interface OrderService extends Service<String, Order> {
 
     void cancel(String userId, String orderNumber, OrderStatus from);
 
-    void complete(String userId, String orderNumber, OrderStatus valueOfCode);
-
     void evaluate(String userId, String orderNumber, Comment comment);
 }

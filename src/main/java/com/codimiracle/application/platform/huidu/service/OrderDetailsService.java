@@ -13,4 +13,7 @@ import java.util.List;
 public interface OrderDetailsService extends Service<String, OrderDetails> {
 
     List<OrderDetailsVO> findByOrderNumberIntegrally(String orderNumber);
+
+    List<OrderDetails> findByOrderNumber(String orderNumber);
+
 }
