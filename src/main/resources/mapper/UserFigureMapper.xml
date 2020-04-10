@@ -33,6 +33,10 @@
     <update id="incrementScoreBy">
         UPDATE user_figure uf SET uf.score = uf.score + #{weight} WHERE uf.id = #{figureTagId}
     </update>
+    <update id="deleteByIdsLogically">
+        UPDATE user_figure uf SET uf.deleted = 1 WHERE uf.id IN
+        <foreach collection="ids" item="item" open="(" close=")" separator=",">#{item}</foreach>
+    </update>
     <select id="selectAllTagIntegrally" resultMap="IntegratedResultMap">
         <include refid="select_statement"/>
         <if test="filter != null">
@@ -57,15 +61,23 @@
         WHERE u.id IN (<include refid="similar_user_id"/>)
     </select>
     <sql id="similar_user_id">
-        SELECT ufs.user_id FROM user_figure ufs WHERE ufs.user_id != #{userId} AND ufs.tag_id IN (
-        SELECT tag_id FROM user_figure uf WHERE uf.user_id = #{userId} ORDER BY uf.score DESC)
+        SELECT DISTINCT ufs.user_id FROM user_figure ufm LEFT JOIN user_figure ufs ON ufm.tag_id = ufs.tag_id WHERE
+        ufm.deleted = 0 AND ufs.deleted = 0 AND ufm.user_id = #{userId} AND ufs.user_id != #{userId} AND ufs.score >=
+        ufm.score
+    </sql>
+    <sql id="maybelike_category_id_for_user">
+        SELECT ct.category_id FROM category_tags ct LEFT JOIN user_figure ufm ON ct.tag_id = ufm.tag_id WHERE ct.deleted
+        = 0 AND ufm.deleted = 0 AND ufm.user_id = #{userId} GROUP BY ct.category_id ORDER BY avg(ufm.score) DESC
+    </sql>
+    <sql id="maybelike_category_id_for_anonymous">
+        SELECT ct.category_id FROM category_tags ct LEFT JOIN user_figure ufm ON ct.tag_id = ufm.tag_id WHERE ct.deleted
+        = 0 AND ufm.deleted = 0 GROUP BY ct.category_id ORDER BY avg(ufm.score) DESC
     </sql>
     <select id="selectSimilarCategoryByUserIdIntegrally"
             resultMap="com.codimiracle.application.platform.huidu.mapper.CategoryMapper.IntegratedResultMap">
         <include
                 refid="com.codimiracle.application.platform.huidu.mapper.CategoryMapper.select_statement_without_type"/>
-        AND c.id IN (SELECT category_id FROM user_figure uf LEFT JOIN category_tags ct ON ct.tag_id = uf.tag_id WHERE
-        uf.user_id = #{userId} GROUP BY ct.category_id ORDER BY SUM(uf.score) DESC)
+        AND c.id IN (<include refid="maybelike_category_id_for_user"/>)
     </select>
     <select id="selectSametastCategoryByUserIdIntegrally"
             resultMap="com.codimiracle.application.platform.huidu.mapper.CategoryMapper.IntegratedResultMap">
@@ -78,14 +90,12 @@
             resultMap="com.codimiracle.application.platform.huidu.mapper.CategoryMapper.IntegratedResultMap">
         <include
                 refid="com.codimiracle.application.platform.huidu.mapper.CategoryMapper.select_statement_without_type"/>
-        AND c.id IN (SELECT category_id FROM user_figure uf LEFT JOIN category_tags ct ON ct.tag_id = uf.tag_id GROUP BY
-        ct.category_id ORDER BY SUM(uf.score) DESC)
+        AND c.id IN (<include refid="maybelike_category_id_for_anonymous"/>)
     </select>
     <select id="selectSametasteCategoryByAvgIntegrally"
             resultMap="com.codimiracle.application.platform.huidu.mapper.CategoryMapper.IntegratedResultMap">
         <include
                 refid="com.codimiracle.application.platform.huidu.mapper.CategoryMapper.select_statement_without_type"/>
-        AND c.id IN (SELECT category_id FROM user_figure uf LEFT JOIN category_tags ct ON ct.tag_id = uf.tag_id GROUP BY
-        ct.category_id ORDER BY SUM(uf.score) DESC)
+        AND c.id IN (<include refid="maybelike_category_id_for_anonymous"/>)
     </select>
 </mapper>

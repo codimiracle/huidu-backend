@@ -31,4 +31,6 @@ public interface UserFigureService extends Service<String, FigureTag> {
     FigureTag findByUserIdAndTagId(String userId, String tagId);
 
     void incrementScoreBy(String id, float weight);
+
+    void deleteByIdsLogically(List<String> ids);
 }

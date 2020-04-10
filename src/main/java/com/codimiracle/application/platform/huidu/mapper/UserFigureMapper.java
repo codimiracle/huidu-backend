@@ -28,4 +28,6 @@ public interface UserFigureMapper extends Mapper<FigureTag> {
     List<CategoryVO> selectSametasteCategoryByAvgIntegrally();
 
     void incrementScoreBy(String figureTagId, float weight);
+
+    void deleteByIdsLogically(List<String> ids);
 }

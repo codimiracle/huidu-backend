@@ -101,4 +101,9 @@ public class UserFigureServiceImpl extends AbstractService<String, FigureTag> im
             throw new TooManyResultsException();
         }
     }
+
+    @Override
+    public void deleteByIdsLogically(List<String> ids) {
+        userFigureMapper.deleteByIdsLogically(ids);
+    }
 }
