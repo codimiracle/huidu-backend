@@ -98,7 +98,8 @@
         count(bn.id) collection_note_count,
         bn.book_id collection_book_id
         FROM book_notes bn
-        LEFT JOIN book b ON bn.book_id = b.id WHERE bn.deleted = 0
+        LEFT JOIN book b ON bn.book_id = b.id
+        WHERE bn.deleted = 0
     </sql>
 
     <select id="selectAllIntegrally" resultMap="IntegratedResultMap">
@@ -142,5 +143,6 @@
                 AND bn.user_id = #{filter.userId[0]}
             </if>
         </if>
+        GROUP BY bn.user_id, bn.book_id
     </select>
 </mapper>

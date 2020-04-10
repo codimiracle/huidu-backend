@@ -34,14 +34,20 @@ import java.util.Optional;
 @Setter
 public class Sorter {
     /**
-     *
+     * Entity field name
      */
-    String field;
+    private String field;
+
+    /**
+     * for compatibility
+     */
+    private String columnKey;
+
     /**
      * descend or ascend
      */
     @Getter
-    String order;
+    private String order;
 
     /**
      * 转换为下划线风格字段

@@ -5,10 +5,7 @@ import com.codimiracle.application.platform.huidu.entity.po.Content;
 import com.codimiracle.application.platform.huidu.entity.vo.ContentVO;
 import com.codimiracle.application.platform.huidu.enumeration.ContentType;
 import com.codimiracle.application.platform.huidu.mapper.ContentMapper;
-import com.codimiracle.application.platform.huidu.service.BookService;
-import com.codimiracle.application.platform.huidu.service.ContentService;
-import com.codimiracle.application.platform.huidu.service.ReviewService;
-import com.codimiracle.application.platform.huidu.service.TopicService;
+import com.codimiracle.application.platform.huidu.service.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,7 +31,16 @@ public class ContentServiceImpl extends AbstractService<String, Content> impleme
     private ReviewService reviewService;
 
     @Resource
+    private BookEpisodeService bookEpisodeService;
+
+    @Resource
+    private BookAudioEpisodeService bookAudioEpisodeService;
+
+    @Resource
     private BookService bookService;
+
+    @Resource
+    private ContentArticleService contentArticleService;
 
     @Override
     public int deleteByIdLogically(String id) {
@@ -92,10 +98,70 @@ public class ContentServiceImpl extends AbstractService<String, Content> impleme
                 return reviewService.findByIdIntegrally(contentVO.getContentId());
             }
             if (Objects.equals(ContentType.Book.toString(), contentVO.getType())) {
-                return  bookService.findByContentIdIntegrally(contentVO.getContentId());
+                return bookService.findByContentIdIntegrally(contentVO.getContentId());
             }
             return contentVO;
         }).collect(Collectors.toList()));
         return slice;
+    }
+
+    @Override
+    public void rejectById(String id, String reason, String userId) {
+        Content content = findById(id);
+        switch (content.getType()) {
+            case Book:
+                bookService.rejectExamination(id, reason, userId);
+                break;
+            case Episode:
+                bookEpisodeService.rejectExamination(id, reason, userId);
+                break;
+            case AudioEpisode:
+                bookAudioEpisodeService.rejectExamination(id, reason, userId);
+                break;
+            case Topic:
+            case Review:
+            case Comment:
+                contentArticleService.rejectExamination(id, reason, userId);
+                break;
+            default:
+                throw new ServiceException("无法审查内容，请确认内容状态正确！");
+        }
+    }
+
+    @Override
+    public void rejectByIds(List<String> ids, String reason, String userId) {
+        ids.forEach((id) -> {
+            rejectById(id, reason, userId);
+        });
+    }
+
+    @Override
+    public void acceptById(String id, String reason, String userId) {
+        Content content = findById(id);
+        switch (content.getType()) {
+            case Book:
+                bookService.passExamination(id, reason, userId);
+                break;
+            case Episode:
+                bookEpisodeService.passExamination(id, reason, userId);
+                break;
+            case AudioEpisode:
+                bookAudioEpisodeService.passExamination(id, reason, userId);
+                break;
+            case Topic:
+            case Review:
+            case Comment:
+                contentArticleService.passExamination(id, reason, userId);
+                break;
+            default:
+                throw new ServiceException("无法审查内容，请确认内容是否存在！");
+        }
+    }
+
+    @Override
+    public void acceptByIds(List<String> ids, String reason, String userId) {
+        ids.forEach((id) -> {
+            acceptById(id, reason, userId);
+        });
     }
 }

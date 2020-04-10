@@ -183,4 +183,9 @@ public class TopicServiceImpl extends AbstractUnsupportedOperationServiece<Strin
         PageSlice<ArticleVO> slice = contentArticleService.findFocusArticleByTypeAndReferenceId(ContentType.Topic, "book", bookId, filter, sorter, page);
         return mutate(slice);
     }
+
+    @Override
+    public void deleteByIdsLogically(List<String> ids) {
+        contentService.deleteByIdsLogically(ids);
+    }
 }

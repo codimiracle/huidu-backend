@@ -13,6 +13,10 @@ import java.util.List;
  */
 public interface BookService extends Service<String, Book> {
 
+    void passExamination(String id, String reason, String userId);
+
+    void rejectExamination(String id, String reason, String userId);
+
     BookVO findPublishByIdIntegrally(BookType type, String id);
 
     BookVO findByIdIntegrally(BookType type, String id);

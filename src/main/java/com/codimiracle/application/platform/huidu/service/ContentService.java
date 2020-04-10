@@ -27,7 +27,16 @@ public interface ContentService extends Service<String, Content> {
     void commentsDecrement(String contentId);
 
     void rateIncrementBy(String contentId, Float rate);
+
     void rateDecrementBy(String contentId, Float rate);
 
     PageSlice<ContentVO> findAllIntegrally(Filter filter, Sorter sorter, Page page);
+
+    void rejectById(String id, String reason, String userId);
+
+    void rejectByIds(List<String> ids, String reason, String userId);
+
+    void acceptById(String id, String reason, String userId);
+
+    void acceptByIds(List<String> ids, String reason, String userId);
 }

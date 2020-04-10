@@ -4,9 +4,11 @@ import com.codimiracle.application.platform.huidu.contract.ApiResponse;
 import com.codimiracle.application.platform.huidu.contract.Filter;
 import com.codimiracle.application.platform.huidu.contract.Page;
 import com.codimiracle.application.platform.huidu.contract.Sorter;
+import com.codimiracle.application.platform.huidu.entity.po.User;
 import com.codimiracle.application.platform.huidu.enumeration.BookType;
 import com.codimiracle.application.platform.huidu.web.api.base.BookController;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -20,8 +22,8 @@ public class ApiPaperBookController {
     private BookController bookController;
 
     @GetMapping("/{id}")
-    public ApiResponse entity(@PathVariable String id) {
-        return bookController.entity(BookType.PaperBook, id);
+    public ApiResponse entity(@AuthenticationPrincipal User user, @PathVariable String id, @RequestParam(value = "details", required = false) boolean details) {
+        return bookController.entity(user, BookType.PaperBook, id, details);
     }
 
 
@@ -37,6 +39,6 @@ public class ApiPaperBookController {
 
     @GetMapping
     public ApiResponse collection(@RequestParam("filter") Filter filter, @RequestParam("sorter") Sorter sorter, @ModelAttribute Page page) {
-        return bookController.publishCollection(BookType.PaperBook, filter, sorter, page);
+        return bookController.collection(BookType.PaperBook, filter, sorter, page);
     }
 }

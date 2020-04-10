@@ -23,7 +23,6 @@ package com.codimiracle.application.platform.huidu.service;/*
  */
 
 import com.codimiracle.application.platform.huidu.contract.*;
-import com.codimiracle.application.platform.huidu.entity.po.ContentReference;
 import com.codimiracle.application.platform.huidu.entity.vo.TopicVO;
 import com.codimiracle.application.platform.huidu.entity.vt.Topic;
 
@@ -39,4 +38,6 @@ public interface TopicService extends Service<String, Topic> {
     PageSlice<TopicVO> findHotIntegrally(Filter filter, Sorter sorter, Page page);
 
     PageSlice<TopicVO> findFocusTopicByReferenceIdIntegrally(String bookId, Filter filter, Sorter sorter, Page page);
+
+    void deleteByIdsLogically(List<String> ids);
 }

@@ -22,6 +22,9 @@ package com.codimiracle.application.platform.huidu.entity.dto;/*
  * SOFTWARE.
  */
 
+import lombok.Data;
+
+@Data
 public class UserResetPasswordDTO {
     private String password;
 }

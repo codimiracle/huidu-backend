@@ -25,6 +25,7 @@ package com.codimiracle.application.platform.huidu.entity.vo;/*
 import lombok.Data;
 
 import java.util.List;
+import java.util.Optional;
 
 @Data
 public class BookVO extends ContentVO {
@@ -47,6 +48,12 @@ public class BookVO extends ContentVO {
     private List<TagVO> tags;
     private Integer plays;
     private Integer reads;
+    private ExaminationVO examination;
+    private Float reviewRate;
     private boolean joinedCart;
     private boolean joinedShelf;
+
+    public float getAvgRate() {
+        return Optional.ofNullable(reviewRate).orElse(0.0f) + Optional.ofNullable(getRate()).orElse(0.0f) / 2;
+    }
 }

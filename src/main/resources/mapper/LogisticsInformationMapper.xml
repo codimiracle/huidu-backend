@@ -12,6 +12,7 @@
     <resultMap id="IntegratedResultMap"
                type="com.codimiracle.application.platform.huidu.entity.vo.LogisticsInformationVO">
         <id column="logistics_information_id" jdbcType="INTEGER" property="id"/>
+        <result column="logistics_information_user_id" jdbcType="INTEGER" property="userId"/>
         <result column="logistics_information_express_number" jdbcType="VARCHAR" property="expressNumber"/>
         <result column="logistics_information_express_company" jdbcType="VARCHAR" property="expressCompany"/>
         <collection property="passingPoints"

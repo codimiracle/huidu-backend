@@ -30,6 +30,7 @@ import java.util.List;
 @Data
 public class ArticleVO extends ContentVO {
     private String targetContentId;
+    private ArticleVO targetContent;
     private String title;
     private Integer words;
     private ContentSource content;

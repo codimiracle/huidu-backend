@@ -71,8 +71,8 @@ public class ApiUserOrderController {
     }
 
     @PostMapping("/{order_number}/receive")
-    public ApiResponse switchToEvaluate(@AuthenticationPrincipal User user, @PathVariable("order_number") String orderNumber, @RequestParam("status") String status) {
-        return orderController.switchToEvaluate(user, orderNumber, status);
+    public ApiResponse switchToEvaluate(@AuthenticationPrincipal User user, @PathVariable("order_number") String orderNumber) {
+        return orderController.switchToEvaluate(user, orderNumber);
     }
 
     @GetMapping("/{order_number}")

@@ -67,6 +67,12 @@
                 AND c.name LIKE concat('%',#{filter.name[0]}, '%')
             </if>
         </if>
+        <if test="sorter != null">
+            <if test="sorter.field != null and sorter.field = 'id'">
+                ORDER BY c.id
+                <if test="sorter.order != null and sorter.field">DESC</if>
+            </if>
+        </if>
     </select>
     <select id="selectRelativeCategoriesByBookType" resultMap="IntegratedResultMap">
         <include refid="select_statement_without_type"/>

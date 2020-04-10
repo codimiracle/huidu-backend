@@ -3,6 +3,7 @@ package com.codimiracle.application.platform.huidu.web.api.expose;
 import com.codimiracle.application.platform.huidu.contract.*;
 import com.codimiracle.application.platform.huidu.entity.po.User;
 import com.codimiracle.application.platform.huidu.entity.vo.BookEpisodeVO;
+import com.codimiracle.application.platform.huidu.enumeration.ContentStatus;
 import com.codimiracle.application.platform.huidu.service.BookEpisodeService;
 import com.codimiracle.application.platform.huidu.service.HistoryService;
 import com.codimiracle.application.platform.huidu.util.RestfulUtil;
@@ -34,6 +35,9 @@ public class ApiBookEpisodeController {
     @GetMapping("/first-episode")
     public ApiResponse firstEpisode(@AuthenticationPrincipal User user, @PathVariable("book_id") String bookId) {
         BookEpisodeVO episodeVO = bookEpisodeService.findByEpisodeNumberIntegrally(bookId, 1);
+        if (!Objects.equals(episodeVO.getStatus(), ContentStatus.Publish.toString())) {
+            return RestfulUtil.entity(null);
+        }
         return RestfulUtil.entity(episodeVO);
     }
 
@@ -63,6 +67,8 @@ public class ApiBookEpisodeController {
 
     @GetMapping
     public ApiResponse collection(@PathVariable(value = "book_id") String bookId, @RequestParam("filter") Filter filter, @RequestParam("sorter") Sorter sorter, @ModelAttribute Page page) {
+        filter = Objects.nonNull(filter) ? filter : new Filter();
+        filter.put("status", new String[]{ContentStatus.Publish.toString()});
         PageSlice<BookEpisodeVO> slice = bookEpisodeService.findAllIntegrally(bookId, filter, sorter, page);
         return RestfulUtil.list(slice);
     }

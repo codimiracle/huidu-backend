@@ -42,4 +42,5 @@ public interface CommentService extends Service<String, Comment> {
 
     PageSlice<CommentVO> findHotIntegrally(Filter filter, Sorter sorter, Page page);
 
+    PageSlice<CommentVO> findAllIntegrallyWithTargetContent(Filter filter, Sorter sorter, Page page);
 }

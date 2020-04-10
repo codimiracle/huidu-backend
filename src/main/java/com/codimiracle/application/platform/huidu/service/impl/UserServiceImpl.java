@@ -4,7 +4,6 @@ import com.codimiracle.application.platform.huidu.contract.*;
 import com.codimiracle.application.platform.huidu.entity.po.User;
 import com.codimiracle.application.platform.huidu.entity.po.UserAccount;
 import com.codimiracle.application.platform.huidu.entity.po.UserInfo;
-import com.codimiracle.application.platform.huidu.entity.po.UserRole;
 import com.codimiracle.application.platform.huidu.entity.vo.UserProtectedVO;
 import com.codimiracle.application.platform.huidu.entity.vo.UserVO;
 import com.codimiracle.application.platform.huidu.mapper.UserMapper;
@@ -63,9 +62,11 @@ public class UserServiceImpl extends AbstractService<String, User> implements Us
             model.setPassword(passwordEncoder.encode(model.getPassword()));
         }
         super.update(model);
-        UserInfo userInfo = model.getExtra();
-        userInfo.setUserId(model.getId());
-        userInfoService.update(userInfo);
+        if (Objects.nonNull(model.getExtra())) {
+            UserInfo userInfo = model.getExtra();
+            userInfo.setUserId(model.getId());
+            userInfoService.update(userInfo);
+        }
     }
 
     @Override

@@ -122,17 +122,15 @@
         UPDATE book b
         SET b.`reads` = b.`reads` + 1
         WHERE b.id = #{id}
-        AND b.type = 'electronic-book'
     </update>
     <update id="playsIncrement">
         UPDATE book b
         SET b.plays = b.plays + 1
         WHERE b.id = #{id}
-        AND b.type = 'audio-book'
     </update>
     <select id="avgReviewRate" resultType="java.lang.Float">
-        SELECT avg(rate) FROM
-
+        SELECT avg(rate) FROM content c LEFT JOIN content_reference cr ON c.id = cr.content_id WHERE c.type = 'review'
+        AND cr.type = 'book' AND cr.ref_id = #{bookId}
     </select>
     <select id="selectByIdIntegrally" resultMap="IntegratedResultMap">
         <include refid="select_statement"/>
@@ -241,7 +239,7 @@
 
     <select id="selectPublishYearsByType" resultType="java.lang.String">
         SELECT DISTINCT b.publish_year
-        FROM book b
+        FROM book b WHERE b.deleted = 0
     </select>
     <select id="selectByContentIdIntegrally" resultMap="IntegratedResultMap">
         <include refid="select_statement_without_type"/>

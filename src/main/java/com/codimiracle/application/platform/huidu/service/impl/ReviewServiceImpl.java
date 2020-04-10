@@ -189,4 +189,9 @@ public class ReviewServiceImpl extends AbstractUnsupportedOperationServiece<Stri
     public PageSlice<ReviewVO> findHotReviewIntegrally(Filter filter, Sorter sorter, Page page) {
         return mutate(contentArticleService.findHotIntegrally(ContentType.Review, filter, sorter, page));
     }
+
+    @Override
+    public void deleteByIdsLogically(List<String> ids) {
+        contentService.deleteByIdsLogically(ids);
+    }
 }

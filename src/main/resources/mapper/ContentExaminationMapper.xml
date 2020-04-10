@@ -18,6 +18,7 @@
         <result column="examination_from_status" jdbcType="VARCHAR" property="fromStatus"/>
         <result column="examination_to_status" jdbcType="VARCHAR" property="toStatus"/>
         <result column="examination_reason" jdbcType="VARCHAR" property="reason"/>
+        <result column="examination_examine_time" jdbcType="VARCHAR" property="examineTime"/>
         <association property="examiner"
                      resultMap="com.codimiracle.application.platform.huidu.mapper.UserMapper.ProtectedResultMap"/>
     </resultMap>

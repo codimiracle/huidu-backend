@@ -166,4 +166,9 @@ public class CommentServiceImpl extends AbstractUnsupportedOperationServiece<Str
         PageSlice<ArticleVO> slice = contentArticleService.findHotIntegrally(ContentType.Comment, filter, sorter, page);
         return mutate(slice);
     }
+
+    @Override
+    public PageSlice<CommentVO> findAllIntegrallyWithTargetContent(Filter filter, Sorter sorter, Page page) {
+        return mutate(contentArticleService.findAllIntegrallyWithTargetContent(ContentType.Comment, filter, sorter, page));
+    }
 }

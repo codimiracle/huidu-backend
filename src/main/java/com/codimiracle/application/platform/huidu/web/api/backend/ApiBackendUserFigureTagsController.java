@@ -1,6 +1,7 @@
 package com.codimiracle.application.platform.huidu.web.api.backend;
 
 import com.codimiracle.application.platform.huidu.contract.*;
+import com.codimiracle.application.platform.huidu.entity.dto.BulkDeletionDTO;
 import com.codimiracle.application.platform.huidu.entity.dto.FigureTagsDTO;
 import com.codimiracle.application.platform.huidu.entity.po.FigureTag;
 import com.codimiracle.application.platform.huidu.entity.po.Tag;
@@ -47,6 +48,12 @@ public class ApiBackendUserFigureTagsController {
     @DeleteMapping("/{id}")
     public ApiResponse delete(@PathVariable("id") String figureTagId) {
         userFigureService.deleteByIdIntegrally(figureTagId);
+        return RestfulUtil.success();
+    }
+
+    @DeleteMapping
+    public ApiResponse deleteBulk(@Valid @RequestBody BulkDeletionDTO bulkDeletionDTO) {
+        userFigureService.deleteByIdsLogically(Arrays.asList(bulkDeletionDTO.getIds()));
         return RestfulUtil.success();
     }
 

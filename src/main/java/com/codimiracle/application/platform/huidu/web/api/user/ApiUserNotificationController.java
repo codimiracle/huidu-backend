@@ -1,6 +1,7 @@
 package com.codimiracle.application.platform.huidu.web.api.user;
 
 import com.codimiracle.application.platform.huidu.contract.*;
+import com.codimiracle.application.platform.huidu.entity.dto.BulkOperationDTO;
 import com.codimiracle.application.platform.huidu.entity.po.Notification;
 import com.codimiracle.application.platform.huidu.entity.po.User;
 import com.codimiracle.application.platform.huidu.entity.vo.NotificationVO;
@@ -40,8 +41,8 @@ public class ApiUserNotificationController {
     }
 
     @PostMapping("/mark-as-read-bulk")
-    public ApiResponse markAsReadBulk(@AuthenticationPrincipal User user, @ModelAttribute String[] ids) {
-        notificationService.markAsReadBulk(user.getId(), Arrays.asList(ids));
+    public ApiResponse markAsReadBulk(@AuthenticationPrincipal User user, @RequestBody BulkOperationDTO bulkOperationDTO) {
+        notificationService.markAsReadBulk(user.getId(), Arrays.asList(bulkOperationDTO.getIds()));
         return RestfulUtil.success();
     }
 

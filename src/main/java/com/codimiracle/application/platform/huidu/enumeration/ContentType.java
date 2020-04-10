@@ -46,8 +46,16 @@ public enum ContentType {
     /**
      * 图书数据
      */
-    Book("book", 200)
-    ;
+    Book("book", 200),
+    /**
+     * 电子书章节
+     */
+    Episode("episode", 210),
+
+    /**
+     * 有声书章节
+     */
+    AudioEpisode("audio-episode", 211);
     private final String type;
     private final int code;
 

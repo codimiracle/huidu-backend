@@ -2,6 +2,7 @@ package com.codimiracle.application.platform.huidu.web.api.base;
 
 import com.codimiracle.application.platform.huidu.contract.*;
 import com.codimiracle.application.platform.huidu.entity.dto.BookDTO;
+import com.codimiracle.application.platform.huidu.entity.dto.BulkDeletionDTO;
 import com.codimiracle.application.platform.huidu.entity.po.Book;
 import com.codimiracle.application.platform.huidu.entity.po.Category;
 import com.codimiracle.application.platform.huidu.entity.po.Content;
@@ -35,6 +36,8 @@ public class BookController {
     @Resource
     private BookAudioEpisodeService bookAudioEpisodeService;
 
+    @Resource
+    private BuryingPointService buryingPointService;
     @Resource
     private ContentService contentService;
     @Resource
@@ -74,8 +77,8 @@ public class BookController {
         return RestfulUtil.success();
     }
 
-    public ApiResponse delete(String[] ids) {
-        bookService.deleteByIdsLogically(Arrays.asList(ids));
+    public ApiResponse deleteBulk(BulkDeletionDTO bulkDeletionDTO) {
+        bookService.deleteByIdsLogically(Arrays.asList(bulkDeletionDTO.getIds()));
         return RestfulUtil.success();
     }
 
@@ -99,6 +102,13 @@ public class BookController {
         book.setId(id);
         bookService.update(book);
         return RestfulUtil.entity(bookService.findByIdIntegrally(book.getType(), id));
+    }
+
+    public ApiResponse entity(User user, BookType type, String id, boolean details) {
+        if (Objects.nonNull(user) && details) {
+            buryingPointService.forBookDetails(user.getId(), id);
+        }
+        return entity(type, id);
     }
 
     public ApiResponse entity(BookType type, String id) {

@@ -4,15 +4,16 @@ import com.codimiracle.application.platform.huidu.contract.ApiResponse;
 import com.codimiracle.application.platform.huidu.contract.Filter;
 import com.codimiracle.application.platform.huidu.contract.Page;
 import com.codimiracle.application.platform.huidu.contract.Sorter;
+import com.codimiracle.application.platform.huidu.entity.po.User;
 import com.codimiracle.application.platform.huidu.enumeration.BookType;
 import com.codimiracle.application.platform.huidu.service.BookAudioEpisodeService;
 import com.codimiracle.application.platform.huidu.util.RestfulUtil;
 import com.codimiracle.application.platform.huidu.web.api.base.BookController;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.util.Objects;
 
 /**
  * @author Codimiracle
@@ -28,11 +29,8 @@ public class ApiAudioBookController {
     private BookAudioEpisodeService bookAudioEpisodeService;
 
     @GetMapping("/{id}")
-    public ApiResponse entity(@PathVariable String id, @RequestParam(value = "player", required = false) String player) {
-        if (Objects.nonNull(player)) {
-            bookController.playsIncrement(id);
-        }
-        return bookController.entity(BookType.AudioBook, id);
+    public ApiResponse entity(@AuthenticationPrincipal User user, @PathVariable String id, @RequestParam(value = "details", required = false) boolean details) {
+        return bookController.entity(user, BookType.AudioBook, id, details);
     }
 
     @GetMapping("/{id}/last-updated-episode")

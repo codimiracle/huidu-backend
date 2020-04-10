@@ -93,7 +93,10 @@ public class ApiRecommendationController {
     public ApiResponse recommendsForDiscover(@AuthenticationPrincipal User user) {
         DiscoverVO discoverVO = new DiscoverVO();
         Page firstPage = new Page();
-        discoverVO.setCategories(categoryService.findAllIntegrally(CategoryType.Collection, null, null, firstPage).getList());
+        Sorter newCollection = new Sorter();
+        newCollection.setField("id");
+        newCollection.setOrder("descend");
+        discoverVO.setCategories(categoryService.findAllIntegrally(CategoryType.Collection, null, newCollection, firstPage).getList());
         discoverVO.setHotBooks(bookService.findAllHotIntegrally(null, null, null, firstPage).getList());
         discoverVO.setMaybeLikes(bookService.findAllUsingUserFigureByAvgIntegrally(null, null, firstPage).getList());
         Filter thisYears = new Filter();

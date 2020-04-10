@@ -1,16 +1,13 @@
 package com.codimiracle.application.platform.huidu.service.impl;
 
 import com.codimiracle.application.platform.huidu.contract.*;
-import com.codimiracle.application.platform.huidu.entity.po.Book;
-import com.codimiracle.application.platform.huidu.entity.po.BookTags;
-import com.codimiracle.application.platform.huidu.entity.po.Content;
-import com.codimiracle.application.platform.huidu.entity.po.Tag;
+import com.codimiracle.application.platform.huidu.entity.po.*;
 import com.codimiracle.application.platform.huidu.entity.vo.BookVO;
 import com.codimiracle.application.platform.huidu.enumeration.BookStatus;
 import com.codimiracle.application.platform.huidu.enumeration.BookType;
 import com.codimiracle.application.platform.huidu.mapper.BookMapper;
 import com.codimiracle.application.platform.huidu.service.*;
-import com.codimiracle.application.platform.huidu.util.TagUtil;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,6 +36,12 @@ public class BookServiceImpl extends AbstractService<String, Book> implements Bo
     private BookTagsService bookTagsService;
     @Resource
     private TagService tagService;
+    @Resource
+    private UserCartService userCartService;
+    @Resource
+    private ContentExaminationService contentExaminationService;
+    @Resource
+    private BookShelfService bookShelfService;
 
     @Override
     public void save(Book model) {
@@ -61,6 +64,35 @@ public class BookServiceImpl extends AbstractService<String, Book> implements Bo
         if (Objects.nonNull(model.getTags())) {
             persistentTags(model);
         }
+    }
+
+    private void examinate(String id, String reason, String userId, BookStatus status) {
+        Book book = findByContentId(id);
+        if (!Objects.equals(book.getStatus(), BookStatus.Examining)) {
+            throw new ServiceException("无法审查该内容！");
+        }
+        ContentExamination examination = new ContentExamination();
+        examination.setFromStatus(book.getStatus().toString());
+        examination.setToStatus(status.getStatus());
+        examination.setTargetContentId(id);
+        examination.setReason(reason);
+        examination.setUserId(userId);
+        examination.setExamineTime(new Date());
+        contentExaminationService.save(examination);
+    }
+
+    private Book findByContentId(String id) {
+        return findBy("contentId", id);
+    }
+
+    @Override
+    public void passExamination(String id, String reason, String userId) {
+        examinate(id, reason, userId, BookStatus.Serializing);
+    }
+
+    @Override
+    public void rejectExamination(String id, String reason, String userId) {
+        examinate(id, reason, userId, BookStatus.Rejected);
     }
 
     @Override
@@ -105,6 +137,7 @@ public class BookServiceImpl extends AbstractService<String, Book> implements Bo
     }
 
     private void mutate(BookVO bookVO) {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (Objects.nonNull(bookVO)) {
             if (Objects.nonNull(bookVO.getCategoryId())) {
                 bookVO.setCategory(categoryService.findByIdIntegrally(bookVO.getCategoryId()));
@@ -112,6 +145,15 @@ public class BookServiceImpl extends AbstractService<String, Book> implements Bo
             if (Objects.nonNull(bookVO.getCommodityId())) {
                 bookVO.setCommodity(commodityService.findByIdIntegrally(bookVO.getCommodityId()));
             }
+            if (principal instanceof User) {
+                User user = (User) principal;
+                if (Objects.nonNull(bookVO.getCommodityId())) {
+                    bookVO.setJoinedCart(userCartService.isJoined(user.getId(), bookVO.getCommodityId()));
+                }
+                bookVO.setJoinedShelf(bookShelfService.isJoined(user.getId(), bookVO.getId()));
+            }
+            bookVO.setExamination(contentExaminationService.findLastExaminationByContentId(bookVO.getContentId()));
+            bookVO.setReviewRate(avgReviewStars(bookVO.getId()));
             bookVO.setTags(bookTagsService.findByBookIdItegrally(bookVO.getId()));
         }
     }
@@ -119,7 +161,7 @@ public class BookServiceImpl extends AbstractService<String, Book> implements Bo
     @Override
     public BookVO findPublishByIdIntegrally(BookType type, String id) {
         BookVO bookVO = findByIdIntegrally(type, id);
-        if (Objects.equals(bookVO.getStatus(), BookStatus.Serializing.getStatus())|| Objects.equals(bookVO.getStatus(), BookStatus.Ended.getStatus()) || Objects.equals(bookVO.getStatus(), BookStatus.Paused.getStatus())) {
+        if (Objects.equals(bookVO.getStatus(), BookStatus.Serializing.getStatus()) || Objects.equals(bookVO.getStatus(), BookStatus.Ended.getStatus()) || Objects.equals(bookVO.getStatus(), BookStatus.Paused.getStatus())) {
             return bookVO;
         }
         return null;
@@ -190,6 +232,7 @@ public class BookServiceImpl extends AbstractService<String, Book> implements Bo
         filter.put("status", new String[]{BookStatus.Serializing.toString(), BookStatus.Paused.toString(), BookStatus.Ended.toString()});
         return filter;
     }
+
     private Sorter orderByHotDegree(Sorter sorter) {
         sorter = Objects.isNull(sorter) ? new Sorter() : sorter;
         sorter.setField("hotDegree");

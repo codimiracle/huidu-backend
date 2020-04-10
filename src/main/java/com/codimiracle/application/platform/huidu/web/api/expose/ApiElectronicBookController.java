@@ -4,15 +4,16 @@ import com.codimiracle.application.platform.huidu.contract.ApiResponse;
 import com.codimiracle.application.platform.huidu.contract.Filter;
 import com.codimiracle.application.platform.huidu.contract.Page;
 import com.codimiracle.application.platform.huidu.contract.Sorter;
+import com.codimiracle.application.platform.huidu.entity.po.User;
 import com.codimiracle.application.platform.huidu.enumeration.BookType;
 import com.codimiracle.application.platform.huidu.service.BookEpisodeService;
 import com.codimiracle.application.platform.huidu.util.RestfulUtil;
 import com.codimiracle.application.platform.huidu.web.api.base.BookController;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.util.Objects;
 
 /**
  * @author Codimiracle
@@ -28,11 +29,8 @@ public class ApiElectronicBookController {
     private BookEpisodeService bookEpisodeService;
 
     @GetMapping("/{id}")
-    public ApiResponse entity(@PathVariable String id, @RequestParam(value = "reader", required = false) String reader) {
-        if (Objects.nonNull(reader)) {
-            bookController.readsIncrement(id);
-        }
-        return bookController.entity(BookType.ElectronicBook, id);
+    public ApiResponse entity(@AuthenticationPrincipal User user, @PathVariable String id, @RequestParam(value = "details", required = false) boolean details) {
+        return bookController.entity(user, BookType.ElectronicBook, id, details);
     }
 
     @GetMapping("/{id}/last-updated-episode")
@@ -62,7 +60,7 @@ public class ApiElectronicBookController {
     @GetMapping("/search")
     public ApiResponse searchCollection(@RequestParam("q") String query) {
         Filter filter = new Filter();
-        filter.put("name", new String[]{query});
+        filter.put("metadataName", new String[]{query});
         return collection(filter, null, new Page());
     }
 
