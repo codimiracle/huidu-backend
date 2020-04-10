@@ -187,14 +187,10 @@ public class OrderServiceImpl extends AbstractService<String, Order> implements 
     }
 
     @Override
-    public void complete(String user, String orderNumber, OrderStatus valueOfCode) {
-
-    }
-
-    @Override
     public void evaluate(String userId, String orderNumber, Comment comment) {
         Order order = orderMapper.selectByPrimaryKey(orderNumber);
-        order.getDetailsList().forEach((e) -> {
+        List<OrderDetails> list = orderDetailsService.findByOrderNumber(orderNumber);
+        list.forEach((e) -> {
             Book book = bookService.findByCommodityId(e.getCommodityId());
             if (Objects.nonNull(book)) {
                 comment.setOwnerId(userId);
@@ -213,6 +209,13 @@ public class OrderServiceImpl extends AbstractService<String, Order> implements 
         Order order = orderMapper.selectByPrimaryKey(orderNumber);
         if (Objects.isNull(order) || !Objects.equals(order.getOrderNumber(), orderNumber)) {
             throw new ServiceException("找不到订单！");
+        }
+        if (to == OrderStatus.Completed && order.getType() != OrderType.Recharge) {
+            //商品订单
+            List<OrderDetails> orderDetails = orderDetailsService.findByOrderNumber(orderNumber);
+            orderDetails.forEach((od -> {
+                commodityService.incrementSalesById(od.getCommodityId(), od.getQuantity());
+            }));
         }
         orderMapper.changeStatus(orderNumber, from, to);
     }
