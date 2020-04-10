@@ -68,14 +68,19 @@
     </select>
     <select id="selectBySubscriberIdAndCommodityId" resultMap="BaseResultMap">
         <include refid="select_statement_basic"/>
-        AND s.subscriber_id = #{subscriberId} AND s.book_id = #{commodityId}
+        AND s.subscriber_id = #{subscriberId} AND s.commodity_id = #{commodityId}
     </select>
     <select id="selectBySubscriberIdAndContentId" resultMap="BaseResultMap">
         <include refid="select_statement_basic"/>
-        AND s.subscriber_id = #{subscriberId} AND s.book_id = #{contentId}
+        AND s.subscriber_id = #{subscriberId} AND s.content_id = #{contentId}
     </select>
     <select id="selectBySubscriberIdAndType" resultMap="BaseResultMap">
         <include refid="select_statement_basic"/>
         AND s.subscriber_id = #{subscriberId} AND s.type = #{type}
+    </select>
+    <select id="selectBySubscribeTypeAndBookId" resultMap="BaseResultMap">
+        <include refid="select_statement_basic"/>
+        AND s.type = #{type}
+        AND s.book_id = #{bookId}
     </select>
 </mapper>

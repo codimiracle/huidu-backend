@@ -44,7 +44,7 @@ public class SubscribeServiceImpl extends AbstractService<String, Subscribe> imp
     @Resource
     private NotificationTemplate notificationTemplate;
 
-    private void paddingAssociation(SubscribeVO subscribeVO) {
+    private void mutate(SubscribeVO subscribeVO) {
         if (Objects.equals(subscribeVO.getType(), SubscribeType.BookUpdated.getType())) {
             subscribeVO.setBook(bookService.findByIdIntegrally(subscribeVO.getBookId()));
         }
@@ -53,7 +53,7 @@ public class SubscribeServiceImpl extends AbstractService<String, Subscribe> imp
     @Override
     public PageSlice<SubscribeVO> findAllIntegrally(Filter filter, Sorter sorter, Page page) {
         PageSlice<SubscribeVO> slice = extractPageSlice(subscribeMapper.selectAllIntegrally(filter, sorter, page));
-        slice.getList().forEach(this::paddingAssociation);
+        slice.getList().forEach(this::mutate);
         return slice;
     }
 
@@ -96,15 +96,20 @@ public class SubscribeServiceImpl extends AbstractService<String, Subscribe> imp
             update(subscribe);
         }
         // 发出通知
-        Notification notification = notificationTemplate.generateBy(type, subscriberId, targetId);
+        Notification notification = notificationTemplate.generateSubscribeBy(type, subscriberId, targetId);
         notificationService.notify(notification);
+    }
+
+    public List<Subscribe> findBySubscribeTypeAndBookId(SubscribeType subscribeType, String bookId) {
+        return subscribeMapper.selectBySubscribeTypeAndBookId(subscribeType, bookId);
     }
 
     @Override
     public void deleteByIdLogically(String subscribeId) {
         Subscribe subscribe = subscribeMapper.selectByPrimaryKey(subscribeId);
         subscribeMapper.deleteByIdLogically(subscribeId);
-        notificationTemplate.generateCancelBy(subscribe);
+        Notification notification = notificationTemplate.generateCancelBy(subscribe);
+        notificationService.notify(notification);
     }
 
     private List<Subscribe> findBySubscriberIdAndType(String subscriberId, SubscribeType type) {

@@ -23,4 +23,6 @@ public interface SubscribeMapper extends Mapper<Subscribe> {
     List<Subscribe> selectBySubscriberIdAndType(@Param("subscriberId") String subscriberId, @Param("type") SubscribeType type);
 
     void deleteByIdLogically(@Param("subscribeId") String subscribeId);
+
+    List<Subscribe> selectBySubscribeTypeAndBookId(@Param("type") SubscribeType type, @Param("bookId") String bookId);
 }
