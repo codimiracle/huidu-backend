@@ -28,6 +28,7 @@ import lombok.Data;
 public class BookAudioEpisodeDTO {
     private String title;
     private String status;
+    private Integer mediaNumber;
     private String streamUrl;
     private String episodeId;
 }

@@ -14,8 +14,8 @@
         <result column="status" jdbcType="VARCHAR" property="status"/>
         <result column="book_id" jdbcType="INTEGER" property="bookId"/>
         <result column="commodity_id" jdbcType="INTEGER" property="commodityId"/>
+        <result column="content_id" jdbcType="INTEGER" property="contentId"/>
         <result column="stream_url" jdbcType="VARCHAR" property="streamUrl"/>
-        <result column="next_episode_id" jdbcType="INTEGER" property="nextEpisodeId"/>
         <result column="deleted" jdbcType="BIT" property="deleted"/>
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
@@ -29,8 +29,9 @@
         <result column="book_audio_episode_status" jdbcType="VARCHAR" property="status"/>
         <result column="book_audio_episode_book_id" jdbcType="INTEGER" property="bookId"/>
         <result column="book_audio_episode_commodity_id" jdbcType="INTEGER" property="commodityId"/>
+        <result column="book_audio_episode_content_id" jdbcType="INTEGER" property="contentId"/>
         <result column="book_audio_episode_stream_url" jdbcType="VARCHAR" property="streamUrl"/>
-        <result column="book_audio_episode_next_episode_id" jdbcType="INTEGER" property="nextEpisodeId"/>
+        <result column="book_audio_episode_next_episode_id" jdbcType="INTEGER" property="next"/>
         <result column="book_audio_episode_create_time" jdbcType="TIMESTAMP" property="createTime"/>
         <result column="book_audio_episode_update_time" jdbcType="TIMESTAMP" property="updateTime"/>
         <association property="book"
@@ -53,8 +54,8 @@
         bae.status book_audio_episode_status,
         bae.book_id book_audio_episode_book_id,
         bae.commodity_id book_audio_episode_commodity_id,
+        bae.content_id book_audio_episode_content_id,
         bae.stream_url book_audio_episode_stream_url,
-        bae.next_episode_id book_audio_episode_next_episode_id,
         bae.create_time book_audio_episode_create_time,
         bae.update_time book_audio_episode_update_time
         FROM book_audio_episode bae
@@ -111,12 +112,22 @@
         AND bae.media_number = #{mediaNumber}
     </select>
     <select id="selectLastPublishedEpisodeByBookId" resultMap="IntegratedResultMap">
-        <include refid="select_statement_publish" />
+        <include refid="select_statement_publish"/>
         AND bae.book_id = #{bookId}
         ORDER BY bae.update_time DESC
         LIMIT 0,1
     </select>
     <select id="selectAudioEpisodeIdByMediaNumber" resultType="java.lang.String">
-        SELECT bae.id FROM book_audio_episode bae WHERE bae.deleted = 0 AND bae.book_id = #{bookId} AND bae.media_number = #{mediaNumber}
+        SELECT bae.id FROM book_audio_episode bae WHERE bae.deleted = 0 AND bae.book_id = #{bookId} AND bae.media_number
+        = #{mediaNumber}
+    </select>
+    <select id="selectLastEpisodeByBookIdIntegrally" resultMap="IntegratedResultMap">
+        <include refid="select_statement"/>
+        ORDER BY bae.create_time DESC
+        LIMIT 0,1
+    </select>
+    <select id="selectPublishedAudioEpisodeIdByMediaNumber" resultType="java.lang.String">
+        SELECT bae.id FROM book_audio_episode bae WHERE bae.deleted = 0 AND bae.status = 'publish' AND bae.book_id =
+        #{bookId} AND bae.media_number = #{mediaNumber}
     </select>
 </mapper>

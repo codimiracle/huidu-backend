@@ -28,4 +28,8 @@ public interface BookAudioEpisodeMapper extends Mapper<BookAudioEpisode> {
     BookAudioEpisodeVO selectLastPublishedEpisodeByBookId(String bookId);
 
     String selectAudioEpisodeIdByMediaNumber(String bookId, int mediaNumber);
+
+    BookAudioEpisodeVO selectLastEpisodeByBookIdIntegrally(String bookId);
+
+    String selectPublishedAudioEpisodeIdByMediaNumber(String bookId, int mediaNumber);
 }

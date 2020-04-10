@@ -43,6 +43,10 @@ public class BookAudioEpisodeController {
         bookAudioEpisode.setBookId(bookId);
         bookAudioEpisode.setCreateTime(new Date());
         bookAudioEpisode.setUpdateTime(bookAudioEpisode.getCreateTime());
+        BookAudioEpisodeVO existsBookAudioEpisode = bookAudioEpisodeService.findByMediaNumberIntegrally(bookAudioEpisode.getBookId(), bookAudioEpisode.getMediaNumber());
+        if (Objects.nonNull(existsBookAudioEpisode)) {
+            return RestfulUtil.fail("章节号对应的章节已经存在！");
+        }
         if (Objects.nonNull(bookAudioEpisode.getStreamUrl())) {
             bookAudioEpisode.setDuration(getDurationByStreamUrl(bookAudioEpisode.getStreamUrl()));
         }
@@ -51,14 +55,14 @@ public class BookAudioEpisodeController {
     }
 
     private long getDurationByStreamUrl(String streamUrl) {
-        String referenceId = streamUrl.substring(streamUrl.lastIndexOf("/") + 1);
+        String referenceId = streamUrl.substring("reference-data:".length());
         ReferenceData referenceData = referenceDataService.findById(referenceId);
         File file = new File(referenceData.getFilePath());
         AudioFileFormat baseFileFormat = null;
         try {
             baseFileFormat = new MpegAudioFileReader().getAudioFileFormat(file);
             Map properties = baseFileFormat.properties();
-            return (Long) properties.get("duration") / 1000000;
+            return (Long) properties.get("duration") / 1000;
         } catch (UnsupportedAudioFileException | IOException e) {
             e.printStackTrace();
         }
@@ -71,13 +75,18 @@ public class BookAudioEpisodeController {
     }
 
     public ApiResponse update(@PathVariable("id") String id, @Valid @RequestBody BookAudioEpisodeDTO bookAudioEpisodeDTO) {
-        BookAudioEpisode bookAudioEpisode = BookAudioEpisode.from(bookAudioEpisodeDTO);
-        bookAudioEpisode.setId(id);
-        if (Objects.nonNull(bookAudioEpisode.getStreamUrl())) {
-            bookAudioEpisode.setDuration(getDurationByStreamUrl(bookAudioEpisode.getStreamUrl()));
+        BookAudioEpisode bookAudioEpisode = bookAudioEpisodeService.findById(id);
+        BookAudioEpisode updatingBookAudioEpisode = BookAudioEpisode.from(bookAudioEpisodeDTO);
+        updatingBookAudioEpisode.setId(id);
+        BookAudioEpisodeVO existsBookAudioEpisode = bookAudioEpisodeService.findByMediaNumberIntegrally(bookAudioEpisode.getBookId(), updatingBookAudioEpisode.getMediaNumber());
+        if (Objects.nonNull(existsBookAudioEpisode) && !Objects.equals(existsBookAudioEpisode.getId(), id)) {
+            return RestfulUtil.fail("章节号对应的章节已经存在！");
         }
-        bookAudioEpisode.setUpdateTime(new Date());
-        bookAudioEpisodeService.update(bookAudioEpisode);
+        if (Objects.nonNull(updatingBookAudioEpisode.getStreamUrl())) {
+            updatingBookAudioEpisode.setDuration(getDurationByStreamUrl(updatingBookAudioEpisode.getStreamUrl()));
+        }
+        updatingBookAudioEpisode.setUpdateTime(new Date());
+        bookAudioEpisodeService.update(updatingBookAudioEpisode);
         return RestfulUtil.entity(bookAudioEpisodeService.findByIdIntegrally(id));
     }
 
@@ -89,5 +98,10 @@ public class BookAudioEpisodeController {
     public ApiResponse collection(@PathVariable("book_id") String bookId, @RequestParam("filter") Filter filter, @RequestParam("sorter") Sorter sorter, @ModelAttribute Page page) {
         PageSlice<BookAudioEpisodeVO> slice = bookAudioEpisodeService.findAllIntegrally(bookId, filter, sorter, page);
         return RestfulUtil.list(slice);
+    }
+
+    public ApiResponse lastEpisodeNumber(String bookId) {
+        Integer lastMediaNumber = bookAudioEpisodeService.findLastMediaNumberByBookId(bookId);
+        return RestfulUtil.success(lastMediaNumber);
     }
 }

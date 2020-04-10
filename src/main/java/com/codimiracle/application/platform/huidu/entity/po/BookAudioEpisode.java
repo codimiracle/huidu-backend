@@ -24,6 +24,9 @@ public class BookAudioEpisode {
     @Column(name = "owner_id")
     private String ownerId;
 
+    @Column(name = "content_id")
+    private String contentId;
+
     /**
      * 文字章节id
      */
@@ -31,7 +34,7 @@ public class BookAudioEpisode {
     private String episodeId;
 
     @Column(name = "media_number")
-    private String mediaNumber;
+    private Integer mediaNumber;
     /**
      * 持续时间
      */
@@ -53,12 +56,6 @@ public class BookAudioEpisode {
      */
     @Column(name = "stream_url")
     private String streamUrl;
-
-    /**
-     * 下一章节id
-     */
-    @Column(name = "next_episode_id")
-    private Integer nextEpisodeId;
 
     /**
      * 删除标识

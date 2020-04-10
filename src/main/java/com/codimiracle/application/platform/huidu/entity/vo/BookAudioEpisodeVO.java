@@ -55,6 +55,9 @@ public class BookAudioEpisodeVO {
 
     private String commodityId;
 
+    private String contentId;
+
+    private ExaminationVO examination;
     /**
      * 音频流url
      */
