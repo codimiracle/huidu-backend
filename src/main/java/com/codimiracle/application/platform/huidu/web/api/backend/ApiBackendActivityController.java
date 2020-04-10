@@ -2,6 +2,7 @@ package com.codimiracle.application.platform.huidu.web.api.backend;
 
 import com.codimiracle.application.platform.huidu.contract.*;
 import com.codimiracle.application.platform.huidu.entity.dto.ActivityDTO;
+import com.codimiracle.application.platform.huidu.entity.dto.BulkDeletionDTO;
 import com.codimiracle.application.platform.huidu.entity.po.Activity;
 import com.codimiracle.application.platform.huidu.entity.vo.ActivityVO;
 import com.codimiracle.application.platform.huidu.enumeration.ActivityStatus;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import java.util.Arrays;
 import java.util.Date;
 
 /**
@@ -30,6 +32,12 @@ public class ApiBackendActivityController {
         activity.setUpdateTime(activity.getCreateTime());
         activityService.save(activity);
         return RestfulUtil.entity(activityService.findByIdIntegrally(activity.getId()));
+    }
+
+    @DeleteMapping
+    public ApiResponse deleteBulk(@Valid @RequestBody BulkDeletionDTO bulkDeletionDTO) {
+        activityService.deleteByIdsLogically(Arrays.asList(bulkDeletionDTO.getIds()));
+        return RestfulUtil.success();
     }
 
     @DeleteMapping("/{id}")

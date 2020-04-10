@@ -23,6 +23,7 @@ package com.codimiracle.application.platform.huidu.web.api.backend;/*
  */
 
 import com.codimiracle.application.platform.huidu.contract.*;
+import com.codimiracle.application.platform.huidu.entity.dto.BulkDeletionDTO;
 import com.codimiracle.application.platform.huidu.entity.dto.CommentDTO;
 import com.codimiracle.application.platform.huidu.entity.vo.CommentVO;
 import com.codimiracle.application.platform.huidu.entity.vt.Comment;
@@ -49,8 +50,8 @@ public class ApiBackendCommentController {
     }
 
     @DeleteMapping
-    public ApiResponse deleteBulk(String[] ids) {
-        commentService.deleteByIdsLogically(Arrays.asList(ids));
+    public ApiResponse deleteBulk(@Valid @RequestBody BulkDeletionDTO bulkDeletionDTO) {
+        commentService.deleteByIdsLogically(Arrays.asList(bulkDeletionDTO.getIds()));
         return RestfulUtil.success();
     }
 
@@ -71,7 +72,7 @@ public class ApiBackendCommentController {
 
     @GetMapping
     public ApiResponse collection(@RequestParam("filter") Filter filter, @RequestParam("sorter") Sorter sorter, @ModelAttribute Page page) {
-        PageSlice<CommentVO> slice = commentService.findAllIntegrally(filter, sorter, page);
+        PageSlice<CommentVO> slice = commentService.findAllIntegrallyWithTargetContent(filter, sorter, page);
         return RestfulUtil.list(slice);
     }
 }

@@ -1,6 +1,7 @@
 package com.codimiracle.application.platform.huidu.web.api.backend;
 
 import com.codimiracle.application.platform.huidu.contract.*;
+import com.codimiracle.application.platform.huidu.entity.dto.BulkDeletionDTO;
 import com.codimiracle.application.platform.huidu.entity.dto.CommodityDTO;
 import com.codimiracle.application.platform.huidu.entity.po.Commodity;
 import com.codimiracle.application.platform.huidu.entity.vo.CommodityVO;
@@ -37,8 +38,8 @@ public class ApiBackendCommodityController {
     }
 
     @DeleteMapping
-    public ApiResponse delete(String[] ids) {
-        commodityService.deleteByIdsLogically(Arrays.asList(ids));
+    public ApiResponse deleteBulk(@Valid @RequestBody BulkDeletionDTO bulkDeletionDTO) {
+        commodityService.deleteByIdsLogically(Arrays.asList(bulkDeletionDTO.getIds()));
         return RestfulUtil.success();
     }
 
