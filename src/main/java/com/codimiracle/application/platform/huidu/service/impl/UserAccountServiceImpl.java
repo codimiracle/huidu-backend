@@ -9,9 +9,13 @@ import com.codimiracle.application.platform.huidu.enumeration.OrderStatus;
 import com.codimiracle.application.platform.huidu.enumeration.OrderType;
 import com.codimiracle.application.platform.huidu.enumeration.PaymentType;
 import com.codimiracle.application.platform.huidu.mapper.UserAccountMapper;
+import com.codimiracle.application.platform.huidu.service.CommodityService;
+import com.codimiracle.application.platform.huidu.service.OrderDetailsService;
 import com.codimiracle.application.platform.huidu.service.OrderService;
 import com.codimiracle.application.platform.huidu.service.UserAccountService;
 import com.codimiracle.application.platform.huidu.util.HuiduMoneyUtil;
+import com.google.common.collect.Interner;
+import com.google.common.collect.Interners;
 import org.apache.commons.lang3.RandomUtils;
 import org.joda.money.Money;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,12 +35,15 @@ import java.util.List;
 @Transactional
 public class UserAccountServiceImpl extends AbstractService<String, UserAccount> implements UserAccountService {
 
+    Interner<String> orderPaymentLock = Interners.newWeakInterner();
     @Value("${huidu.user-account.portion-number}")
     private Integer portionNumber;
-
     @Resource
     private OrderService orderService;
-
+    @Resource
+    private OrderDetailsService orderDetailsService;
+    @Resource
+    private CommodityService commodityService;
     @Resource
     private UserAccountMapper userAccountMapper;
 
@@ -82,26 +89,30 @@ public class UserAccountServiceImpl extends AbstractService<String, UserAccount>
 
     @Override
     public void pay(String orderNumber, PaymentType type) {
-        Order oringinal = orderService.findByOrderNumber(orderNumber);
-        if (type == PaymentType.Huidu) {
-            // 用户账户付款
-            pay(oringinal.getTotalMoney(), oringinal.getOwnerId());
+        String lock = orderPaymentLock.intern(String.format("order-%s", orderNumber));
+        // 对订单进行加锁
+        synchronized (lock) {
+            Order oringinal = orderService.findByOrderNumber(orderNumber);
+            if (type == PaymentType.Huidu) {
+                // 用户账户付款
+                pay(oringinal.getTotalMoney(), oringinal.getOwnerId());
+            }
+            Order updatingOrder = new Order();
+            updatingOrder.setOrderNumber(orderNumber);
+            updatingOrder.setPayTime(new Date());
+            updatingOrder.setPayType(type);
+            updatingOrder.setStatus(OrderStatus.AwaitingShipment);
+            //充值订单
+            if (oringinal.getType() == OrderType.Recharge) {
+                //完成订单
+                updatingOrder.setDeliverTime(new Date());
+                updatingOrder.setClosingTime(new Date());
+                updatingOrder.setStatus(OrderStatus.Completed);
+                //给用户加帐户
+                refund(oringinal.getTotalMoney(), oringinal.getOwnerId());
+            }
+            orderService.update(updatingOrder);
         }
-        Order updatingOrder = new Order();
-        updatingOrder.setOrderNumber(orderNumber);
-        updatingOrder.setPayTime(new Date());
-        updatingOrder.setPayType(type);
-        updatingOrder.setStatus(OrderStatus.AwaitingShipment);
-        //充值订单
-        if (oringinal.getType() == OrderType.Recharge) {
-            //完成订单
-            updatingOrder.setDeliverTime(new Date());
-            updatingOrder.setClosingTime(new Date());
-            updatingOrder.setStatus(OrderStatus.Completed);
-            //给用户加帐户
-            refund(oringinal.getTotalMoney(), oringinal.getOwnerId());
-        }
-        orderService.update(updatingOrder);
     }
 
     @Override
