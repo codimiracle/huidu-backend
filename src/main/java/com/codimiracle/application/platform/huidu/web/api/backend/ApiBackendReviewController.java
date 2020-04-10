@@ -26,6 +26,7 @@ import com.codimiracle.application.platform.huidu.contract.ApiResponse;
 import com.codimiracle.application.platform.huidu.contract.Filter;
 import com.codimiracle.application.platform.huidu.contract.Page;
 import com.codimiracle.application.platform.huidu.contract.Sorter;
+import com.codimiracle.application.platform.huidu.entity.dto.BulkDeletionDTO;
 import com.codimiracle.application.platform.huidu.entity.vo.ReviewVO;
 import com.codimiracle.application.platform.huidu.service.ReviewService;
 import com.codimiracle.application.platform.huidu.util.RestfulUtil;
@@ -33,6 +34,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
+import java.util.Arrays;
 
 @CrossOrigin
 @RestController
@@ -52,6 +55,12 @@ public class ApiBackendReviewController {
     @DeleteMapping("/{id}")
     public ApiResponse delete(@PathVariable String id) {
         reviewService.deleteByIdLogically(id);
+        return RestfulUtil.success();
+    }
+
+    @DeleteMapping
+    public ApiResponse deleteBulk(@Valid @RequestBody BulkDeletionDTO bulkDeletionDTO) {
+        reviewService.deleteByIdsLogically(Arrays.asList(bulkDeletionDTO.getIds()));
         return RestfulUtil.success();
     }
 

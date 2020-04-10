@@ -1,6 +1,7 @@
 package com.codimiracle.application.platform.huidu.web.api.backend;
 
 import com.codimiracle.application.platform.huidu.contract.*;
+import com.codimiracle.application.platform.huidu.entity.dto.BulkDeletionDTO;
 import com.codimiracle.application.platform.huidu.entity.dto.UserDTO;
 import com.codimiracle.application.platform.huidu.entity.dto.UserResetPasswordDTO;
 import com.codimiracle.application.platform.huidu.entity.po.User;
@@ -29,20 +30,26 @@ public class ApiBackendUserController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @PostMapping
-    public ApiResponse create(@Valid @RequestBody UserDTO userDTO) {
-        User user = User.from(userDTO);
-        userService.save(user);
-        return RestfulUtil.entity(userService.findByIdIntegrally(user.getId()));
-    }
-
     @PostMapping("/{id}/reset-password")
-    public ApiResponse resetPassword(@PathVariable String userId, @Valid @RequestBody UserResetPasswordDTO userResetPasswordDTO) {
+    public ApiResponse resetPassword(@PathVariable("id") String userId, @Valid @RequestBody UserResetPasswordDTO userResetPasswordDTO) {
+        User user = userService.findById(userId);
+        if (Objects.isNull(user)) {
+            return RestfulUtil.fail("用户数据没有找到！");
+        }
         User updatedUser = new User();
-        updatedUser.setId(userId);
+        updatedUser.setEnabled(user.isEnabled());
+        updatedUser.setPassword(userResetPasswordDTO.getPassword());
         updatedUser.setId(userId);
         userService.update(updatedUser);
         return RestfulUtil.success();
+    }
+
+    @PostMapping
+    public ApiResponse create(@Valid @RequestBody UserDTO userDTO) {
+        User user = User.from(userDTO);
+        user.setEnabled(true);
+        userService.save(user);
+        return RestfulUtil.entity(userService.findByIdIntegrally(user.getId()));
     }
 
     @DeleteMapping("/{id}")
@@ -52,17 +59,21 @@ public class ApiBackendUserController {
     }
 
     @DeleteMapping
-    public ApiResponse deleteBulk(String[] ids) {
-        userService.deleteByIdsLogically(Arrays.asList(ids));
+    public ApiResponse deleteBulk(@Valid @RequestBody BulkDeletionDTO bulkDeletionDTO) {
+        userService.deleteByIdsLogically(Arrays.asList(bulkDeletionDTO.getIds()));
         return RestfulUtil.success();
     }
 
     @PutMapping("/{id}")
     public ApiResponse update(@PathVariable String id, @Valid @RequestBody UserDTO userDTO) {
-        User user = User.from(userDTO);
-        Objects.requireNonNull(user);
-        user.setId(id);
-        userService.update(user);
+        User user = userService.findById(id);
+        if (Objects.isNull(user)) {
+            return RestfulUtil.fail("找不到用户数据！");
+        }
+        User updatingUser = User.from(userDTO);
+        Objects.requireNonNull(updatingUser);
+        updatingUser.setId(id);
+        userService.update(updatingUser);
         return RestfulUtil.entity(userService.findByIdIntegrally(id));
     }
 
@@ -70,15 +81,6 @@ public class ApiBackendUserController {
     public ApiResponse entity(@PathVariable String id) {
         UserVO user = userService.findByIdIntegrally(id);
         return RestfulUtil.entity(user);
-    }
-
-    @PutMapping("{id}/reset-password")
-    public ApiResponse resetPassword(@PathVariable String id, @Valid @RequestBody UserDTO userDTO) {
-        User user = new User();
-        user.setId(id);
-        user.setPassword(userDTO.getPassword());
-        userService.save(user);
-        return RestfulUtil.success();
     }
 
     @GetMapping

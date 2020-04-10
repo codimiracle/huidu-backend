@@ -1,6 +1,7 @@
 package com.codimiracle.application.platform.huidu.web.api.backend;
 
 import com.codimiracle.application.platform.huidu.contract.*;
+import com.codimiracle.application.platform.huidu.entity.dto.BulkDeletionDTO;
 import com.codimiracle.application.platform.huidu.entity.dto.TagDTO;
 import com.codimiracle.application.platform.huidu.entity.po.Tag;
 import com.codimiracle.application.platform.huidu.entity.vo.TagVO;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * @author Codimiracle
@@ -24,9 +26,21 @@ public class ApiBackendTagController {
 
     @PostMapping
     public ApiResponse create(@Valid @RequestBody TagDTO tagDTO) {
-        Tag tag = new Tag(tagDTO.getName());
-        tagService.save(tag);
-        return RestfulUtil.success();
+        Tag tag = tagService.findByTagName(tagDTO.getName());
+        if (Objects.nonNull(tag)) {
+            if (tag.isDeleted()) {
+                tag.setDeleted(false);
+                tagService.update(tag);
+
+            } else {
+                return RestfulUtil.fail("标签已存在！");
+            }
+        } else {
+            tag = new Tag();
+            tag.setName(tagDTO.getName());
+            tagService.save(tag);
+        }
+        return RestfulUtil.entity(tagService.findByIdIntegrally(tag.getId()));
     }
 
     @DeleteMapping("/{id}")
@@ -36,23 +50,43 @@ public class ApiBackendTagController {
     }
 
     @DeleteMapping
-    public ApiResponse delete(String[] ids) {
-        tagService.deleteByIdsLogically(Arrays.asList(ids));
+    public ApiResponse deleteBulk(@Valid @RequestBody BulkDeletionDTO bulkDeletionDTO) {
+        tagService.deleteByIdsLogically(Arrays.asList(bulkDeletionDTO.getIds()));
         return RestfulUtil.success();
     }
 
     @PutMapping("/{id}")
     public ApiResponse update(@PathVariable String id, @Valid @RequestBody TagDTO tagDTO) {
-        Tag tag = new Tag(tagDTO.getName());
-        tag.setId(id);
-        tagService.update(tag);
-        return RestfulUtil.success();
+        Tag tag = tagService.findByTagName(tagDTO.getName());
+        if (Objects.nonNull(tag)) {
+            if (tag.isDeleted()) {
+                tag.setDeleted(false);
+                tagService.update(tag);
+            } else {
+                return RestfulUtil.fail("标签名称已经存在！");
+            }
+        } else {
+            tag = new Tag(tagDTO.getName());
+            tag.setId(id);
+            tagService.update(tag);
+        }
+        return RestfulUtil.entity(tagService.findByIdIntegrally(id));
     }
 
     @GetMapping("/{id}")
     public ApiResponse entity(@PathVariable String id) {
         TagVO tagVO = tagService.findByIdIntegrally(id);
-        return RestfulUtil.success(tagVO);
+        return RestfulUtil.entity(tagVO);
+    }
+
+    @GetMapping("/exists")
+    public ApiResponse exists(@RequestParam("name") String name) {
+        Tag tag = tagService.findByTagName(name);
+        if (Objects.nonNull(tag)) {
+            return RestfulUtil.success();
+        } else {
+            return RestfulUtil.fontFound();
+        }
     }
 
     @GetMapping("/suggestion")

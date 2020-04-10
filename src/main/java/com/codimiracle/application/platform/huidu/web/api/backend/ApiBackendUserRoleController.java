@@ -1,6 +1,7 @@
 package com.codimiracle.application.platform.huidu.web.api.backend;
 
 import com.codimiracle.application.platform.huidu.contract.*;
+import com.codimiracle.application.platform.huidu.entity.dto.BulkDeletionDTO;
 import com.codimiracle.application.platform.huidu.entity.dto.UserRoleDTO;
 import com.codimiracle.application.platform.huidu.entity.po.UserRole;
 import com.codimiracle.application.platform.huidu.entity.vo.UserRoleVO;
@@ -37,8 +38,8 @@ public class ApiBackendUserRoleController {
     }
 
     @DeleteMapping
-    public ApiResponse deleteBulk(String[] ids) {
-        userRoleService.deleteByIdsLogically(Arrays.asList(ids));
+    public ApiResponse deleteBulk(@Valid @RequestBody BulkDeletionDTO bulkDeletionDTO) {
+        userRoleService.deleteByIdsLogically(Arrays.asList(bulkDeletionDTO.getIds()));
         return RestfulUtil.success();
     }
 
