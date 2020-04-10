@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.Objects;
 
 
 /**
@@ -30,11 +31,14 @@ public class BookShelfCellServiceImpl extends AbstractService<String, BookShelfC
     private HistoryService historyService;
 
     private void mutate(BookShelfCellVO bookShelfCellVO) {
-        bookShelfCellVO.setBook(bookService.findByIdIntegrally(null, bookShelfCellVO.getBookId()));
-        String ownerId = bookShelfCellVO.getShelf().getOwnerId();
-        HistoryVO historyVO = historyService.findLastReadByUserIdAndBookIdIntegrallyOrFirstEpisode(ownerId, bookShelfCellVO.getBookId());
-        bookShelfCellVO.setHistoryId(historyVO.getId());
-        bookShelfCellVO.setHistory(historyVO);
+        if (Objects.nonNull(bookShelfCellVO)) {
+            bookShelfCellVO.setBook(bookService.findByIdIntegrally(null, bookShelfCellVO.getBookId()));
+            String ownerId = bookShelfCellVO.getShelf().getOwnerId();
+            HistoryVO historyVO = historyService.findLastReadByUserIdAndBookIdIntegrallyOrFirstEpisode(ownerId, bookShelfCellVO.getBookId());
+            bookShelfCellVO.setProgress(historyService.findReadingProgressByUserIdAndBookId(bookShelfCellVO.getShelf().getOwnerId(), bookShelfCellVO.getBookId()));
+            bookShelfCellVO.setHistoryId(historyVO.getId());
+            bookShelfCellVO.setHistory(historyVO);
+        }
     }
 
     @Override

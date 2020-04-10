@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface BookShelfMapper extends Mapper<BookShelf> {
     List<BookShelf> selectByUserId(String userId);
+
+    Boolean existsByUserIdAndBookId(String userId, String bookId);
 }

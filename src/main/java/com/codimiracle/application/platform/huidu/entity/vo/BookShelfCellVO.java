@@ -42,6 +42,7 @@ public class BookShelfCellVO {
 
     private String historyId;
     private HistoryVO history;
+    private Float progress;
 
     private boolean finished;
 }
