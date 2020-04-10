@@ -30,9 +30,11 @@ import com.codimiracle.application.platform.huidu.entity.vt.Comment;
 import com.codimiracle.application.platform.huidu.enumeration.ContentStatus;
 import com.codimiracle.application.platform.huidu.helper.CommentExaminator;
 import com.codimiracle.application.platform.huidu.service.CommentService;
+import com.codimiracle.application.platform.huidu.service.ContentService;
 import com.codimiracle.application.platform.huidu.service.SettingsService;
 import com.codimiracle.application.platform.huidu.util.RestfulUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -47,8 +49,14 @@ import static com.codimiracle.application.platform.huidu.enumeration.Settings.CO
 @RestController
 @RequestMapping("/api/contents/{content_id}/comments")
 public class ApiCommentController {
+    @Value("${huidu.notification.system-notifier}")
+    private String systemNotifierId;
+
     @Resource
     private CommentService commentService;
+
+    @Resource
+    private ContentService contentService;
 
     @Resource
     private SettingsService settingsService;
@@ -68,21 +76,15 @@ public class ApiCommentController {
         comment.setCreateTime(new Date());
         comment.setUpdateTime(comment.getCreateTime());
         // 自动评审
+        commentService.save(comment);
         boolean isAutoExamination = Objects.equals(settingsService.retrive(COMMENT_EXAMINATION), "auto");
         if (isAutoExamination && commentExaminator.isApproval(comment)) {
-            comment.setStatus(ContentStatus.Publish);
+            contentService.acceptById(comment.getId(), "自动评审通过", systemNotifierId);
         } else {
-            comment.setStatus(ContentStatus.Rejected);
+            contentService.rejectById(comment.getId(), "自动评审不通过", systemNotifierId);
         }
         //保存评论
-        commentService.save(comment);
         return RestfulUtil.entity(commentService.findByIdIntegrally(comment.getId()));
-    }
-
-    @DeleteMapping("/{id}")
-    public ApiResponse delete(@PathVariable String id) {
-        commentService.deleteByIdLogically(id);
-        return RestfulUtil.success();
     }
 
     @GetMapping("/{id}")
