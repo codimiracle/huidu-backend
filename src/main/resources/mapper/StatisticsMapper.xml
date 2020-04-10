@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.codimiracle.application.platform.huidu.mapper.StatisticsMapper">
+    <resultMap id="SalesResultMap" type="com.codimiracle.application.platform.huidu.entity.vo.PaperBookSalesVO">
+        <result column="sales_date" property="date"/>
+        <result column="sales_quantity" property="quantity"/>
+        <result column="sales_amount" property="amount"/>
+    </resultMap>
+
+    <resultMap id="CategoryCountResultMap"
+               type="com.codimiracle.application.platform.huidu.entity.vo.BookCategoryCountVO">
+        <result column="type" property="type"/>
+        <result column="count" property="count"/>
+    </resultMap>
+
+    <resultMap id="UserBookPreference" type="com.codimiracle.application.platform.huidu.entity.vo.UserBookPreferenceVO">
+        <result column="tag_name" property="tagName"/>
+        <result column="score" property="score"/>
+        <result column="count" property="count"/>
+    </resultMap>
+    <select id="findPaperBookSalesBetween" resultMap="SalesResultMap">
+        SELECT DATE(o.create_time) sales_date , SUM(o.total_money) sales_amount, SUM(od.quantity) sales_quantity FROM
+        `order` o LEFT JOIN order_details od ON o.order_number = od.order_number WHERE o.status = 'completed' AND o.type
+        !='recharge' GROUP BY DATE(o.create_time);
+    </select>
+    <select id="findBookCategoryCount" resultMap="CategoryCountResultMap">
+        SELECT b.type type, count(b.id) count FROM book b WHERE b.deleted = 0 GROUP BY b.type
+    </select>
+    <select id="findUserBookPreference" resultMap="UserBookPreference">
+        SELECT t.name tag_name, count(uf.user_id) count, avg(uf.score) score FROM user_figure uf LEFT JOIN tag t ON
+        uf.tag_id = t.id WHERE uf.deleted = 0 GROUP BY uf.tag_id ORDER BY score DESC
+    </select>
+</mapper>
