@@ -29,9 +29,9 @@ public class ArrivedHistoryServiceImpl extends AbstractService<String, ArrivedHi
         if (Objects.nonNull(arrivedHistory)) {
             Calendar calendar = Calendar.getInstance();
             calendar.setTimeInMillis(signingDate.getTime());
-            LocalDate signingLocalDate = LocalDate.of(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_YEAR));
+            LocalDate signingLocalDate = LocalDate.of(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH));
             calendar.setTimeInMillis(arrivedHistory.getSignTime().getTime());
-            LocalDate lastSignedLocalDate = LocalDate.of(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_YEAR));
+            LocalDate lastSignedLocalDate = LocalDate.of(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH));
             if (signingLocalDate.compareTo(lastSignedLocalDate) == 0) {
                 //已经签到了
                 return arrivedHistory;
