@@ -34,6 +34,11 @@ public class ApiBackendDashboardController {
         return RestfulUtil.success(list);
     }
 
+    @GetMapping("/platform-statistics")
+    public ApiResponse platformStatistics() {
+        return RestfulUtil.success(statisticsService.statisticsPlatformData());
+    }
+
     @GetMapping("/book-category-count")
     public ApiResponse statisticsBookCategoryCount() {
         List<BookCategoryCountVO> list = statisticsService.statisticsBookCategoryCount();

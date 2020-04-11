@@ -1,17 +1,14 @@
 package com.codimiracle.application.platform.huidu.service.impl;
 
-import com.codimiracle.application.platform.huidu.entity.vo.BookCategoryCountVO;
-import com.codimiracle.application.platform.huidu.entity.vo.PaperBookSalesVO;
-import com.codimiracle.application.platform.huidu.entity.vo.UserBookPreferenceVO;
+import com.codimiracle.application.platform.huidu.entity.vo.*;
 import com.codimiracle.application.platform.huidu.enumeration.BookType;
 import com.codimiracle.application.platform.huidu.mapper.StatisticsMapper;
 import com.codimiracle.application.platform.huidu.service.StatisticsService;
 import org.apache.commons.lang3.time.DateFormatUtils;
-import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.text.ParseException;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -26,24 +23,24 @@ public class StatisticsServiceImpl implements StatisticsService {
         // 找出一周的销量
         Calendar calendar = Calendar.getInstance();
         Date end = calendar.getTime();
-        calendar.set(Calendar.DAY_OF_MONTH, calendar.get(Calendar.DAY_OF_MONTH) - 7);
+        calendar.set(Calendar.DAY_OF_MONTH, calendar.get(Calendar.DAY_OF_MONTH) - 6);
         Date start = calendar.getTime();
         Map<String, PaperBookSalesVO> map = new HashMap<>();
-        String dayAndMonth = DateFormatUtils.format(end, "yyyy-MM");
-        String format = dayAndMonth + "-%02d";
-        IntStream.range(end.getDate() - 7, end.getDate()).forEach((date) -> {
-            String key = String.format(format, date);
+        String pattern = "yyyy-MM-dd";
+        IntStream.range(0, 7).forEach((times) -> {
+            calendar.setTime(start);
+            calendar.set(Calendar.DAY_OF_MONTH, calendar.get(Calendar.DAY_OF_MONTH) + times);
+            Date date = calendar.getTime();
+            String key = DateFormatUtils.format(date, pattern);
             PaperBookSalesVO paperBookSalesVO = new PaperBookSalesVO();
-            try {
-                paperBookSalesVO.setDate(DateUtils.parseDate(key, "yyyy-MM-dd"));
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-            map.put(String.format(key, date), paperBookSalesVO);
+            paperBookSalesVO.setQuantity(0);
+            paperBookSalesVO.setAmount(BigDecimal.ZERO);
+            paperBookSalesVO.setDate(date);
+            map.put(key, paperBookSalesVO);
         });
         List<PaperBookSalesVO> paperBookSalesList = statisticsMapper.findPaperBookSalesBetween(start, end);
         paperBookSalesList.forEach((e) -> {
-            map.put(DateFormatUtils.format(e.getDate(), "yyyy-MM-dd"), e);
+            map.put(DateFormatUtils.format(e.getDate(), pattern), e);
         });
         return map.values().stream().sorted(Comparator.comparing(PaperBookSalesVO::getDate)).collect(Collectors.toList());
     }
@@ -65,5 +62,25 @@ public class StatisticsServiceImpl implements StatisticsService {
     @Override
     public List<UserBookPreferenceVO> statisticsUserBookPreference() {
         return statisticsMapper.findUserBookPreference();
+    }
+
+    @Override
+    public PlatformDataVO statisticsPlatformData() {
+        return statisticsMapper.statisticsPlatformData();
+    }
+
+    @Override
+    public CreativeDataVO statisticsCreativeStatistics(String userId) {
+        return statisticsMapper.statisticsCreativeStatistics(userId);
+    }
+
+    @Override
+    public List<BookReadingStatisticsVO> statisticsBookReadingStatistics(String userId) {
+        return statisticsMapper.statisticsBookReadingStatistics(userId);
+    }
+
+    @Override
+    public List<CreativeCategoryVO> statisticsCreativeCategory(String userId) {
+        return statisticsMapper.statisticsCreativeCategory(userId);
     }
 }

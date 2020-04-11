@@ -1,8 +1,6 @@
 package com.codimiracle.application.platform.huidu.service;
 
-import com.codimiracle.application.platform.huidu.entity.vo.BookCategoryCountVO;
-import com.codimiracle.application.platform.huidu.entity.vo.PaperBookSalesVO;
-import com.codimiracle.application.platform.huidu.entity.vo.UserBookPreferenceVO;
+import com.codimiracle.application.platform.huidu.entity.vo.*;
 
 import java.util.List;
 
@@ -13,4 +11,11 @@ public interface StatisticsService {
 
     List<UserBookPreferenceVO> statisticsUserBookPreference();
 
+    PlatformDataVO statisticsPlatformData();
+
+    CreativeDataVO statisticsCreativeStatistics(String userId);
+
+    List<BookReadingStatisticsVO> statisticsBookReadingStatistics(String userId);
+
+    List<CreativeCategoryVO> statisticsCreativeCategory(String userId);
 }

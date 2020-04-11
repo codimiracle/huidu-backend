@@ -18,10 +18,40 @@
         <result column="score" property="score"/>
         <result column="count" property="count"/>
     </resultMap>
+
+    <resultMap id="platformStatisticsResultMap"
+               type="com.codimiracle.application.platform.huidu.entity.vo.PlatformDataVO">
+        <result column="user_count" property="userCount"/>
+        <result column="book_count" property="bookCount"/>
+        <result column="order_count" property="orderCount"/>
+        <result column="order_amount" property="orderAmount"/>
+    </resultMap>
+
+    <resultMap id="creativeStatisticsResultMap"
+               type="com.codimiracle.application.platform.huidu.entity.vo.CreativeDataVO">
+        <result column="audio_book_count" property="audioBookCount"/>
+        <result column="electronic_book_count" property="electronicBookCount"/>
+        <result column="episode_count" property="episodeCount"/>
+        <result column="episode_total_times" property="episodeTotalTimes"/>
+        <result column="episode_total_words" property="episodeTotalWords"/>
+    </resultMap>
+    <resultMap id="bookReadingStatisticsResultMap"
+               type="com.codimiracle.application.platform.huidu.entity.vo.BookReadingStatisticsVO">
+        <result column="ebook_name" property="ebookName"/>
+        <result column="audio_book_name" property="audioBookName"/>
+        <result column="book_reads" property="bookReads"/>
+        <result column="book_episodes" property="bookEpisodes"/>
+    </resultMap>
+    <resultMap id="creativeCategoryResultMap"
+               type="com.codimiracle.application.platform.huidu.entity.vo.CreativeCategoryVO">
+        <result column="category_name" property="categoryName"/>
+        <result column="book_count" property="bookCount"/>
+    </resultMap>
+
     <select id="findPaperBookSalesBetween" resultMap="SalesResultMap">
         SELECT DATE(o.create_time) sales_date , SUM(o.total_money) sales_amount, SUM(od.quantity) sales_quantity FROM
         `order` o LEFT JOIN order_details od ON o.order_number = od.order_number WHERE o.status = 'completed' AND o.type
-        !='recharge' GROUP BY DATE(o.create_time);
+        !='recharge' AND o.create_time &gt; #{start} AND o.create_time &lt;= #{end} GROUP BY DATE(o.create_time);
     </select>
     <select id="findBookCategoryCount" resultMap="CategoryCountResultMap">
         SELECT b.type type, count(b.id) count FROM book b WHERE b.deleted = 0 GROUP BY b.type
@@ -29,5 +59,41 @@
     <select id="findUserBookPreference" resultMap="UserBookPreference">
         SELECT t.name tag_name, count(uf.user_id) count, avg(uf.score) score FROM user_figure uf LEFT JOIN tag t ON
         uf.tag_id = t.id WHERE uf.deleted = 0 GROUP BY uf.tag_id ORDER BY score DESC
+    </select>
+    <select id="statisticsPlatformData" resultMap="platformStatisticsResultMap">
+        SELECT
+        (SELECT count(0) FROM user u WHERE u.deleted = 0) user_count,
+        (SELECT count(0) FROM book b WHERE b.deleted = 0) book_count,
+        sum(o.total_money) order_amount, count(0) order_count
+        FROM `order` o WHERE o.status = 'completed'
+    </select>
+    <select id="statisticsCreativeStatistics" resultMap="creativeStatisticsResultMap">
+        SELECT
+        (SELECT count(0) FROM book b LEFT JOIN content c ON b.content_id = c.id WHERE b.deleted = 0 AND b.type =
+        'electronic-book' AND c.owner_id = #{userId}) electronic_book_count,
+        (SELECT count(0) FROM book b LEFT JOIN content c ON b.content_id = c.id WHERE b.deleted = 0 AND b.type =
+        'audio-book' AND c.owner_id = #{userId}) audio_book_count,
+        SUM(b.episodes) episode_count,
+        SUM(bm.words) episode_total_words,
+        SUM(bae.duration) episode_total_times
+        FROM book b LEFT JOIN content c ON b.content_id = c.id LEFT JOIN book_metadata bm ON bm.id = b.metadata_id LEFT
+        JOIN book_audio_episode bae ON bae.book_id = b.id WHERE c.owner_id = #{userId} AND bae.deleted = 0 AND b.deleted
+        = 0
+    </select>
+    <select id="statisticsBookReadingStatistics" resultMap="bookReadingStatisticsResultMap">
+        SELECT
+        bm.name ebook_name,
+        b.title audio_book_name,
+        b.episodes book_episodes,
+        b.reads book_reads
+        FROM book b LEFT JOIN category cat ON b.category_id = cat.id LEFT JOIN content c ON b.content_id = c.id LEFT
+        JOIN book_metadata bm ON bm.id = b.metadata_id WHERE c.owner_id = #{userId} AND b.deleted = 0
+    </select>
+    <select id="statisticsCreativeCategory" resultMap="creativeCategoryResultMap">
+        SELECT
+        cat.name category_name,
+        count(0) book_count
+        FROM book b LEFT JOIN category cat ON b.category_id = cat.id LEFT JOIN content c ON b.content_id = c.id WHERE
+        c.owner_id = #{userId} AND b.deleted = 0 GROUP BY cat.id
     </select>
 </mapper>

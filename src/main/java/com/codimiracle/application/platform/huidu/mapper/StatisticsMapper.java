@@ -1,8 +1,7 @@
 package com.codimiracle.application.platform.huidu.mapper;
 
-import com.codimiracle.application.platform.huidu.entity.vo.BookCategoryCountVO;
-import com.codimiracle.application.platform.huidu.entity.vo.PaperBookSalesVO;
-import com.codimiracle.application.platform.huidu.entity.vo.UserBookPreferenceVO;
+import com.codimiracle.application.platform.huidu.entity.vo.*;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
 import java.util.List;
@@ -14,4 +13,11 @@ public interface StatisticsMapper {
 
     List<UserBookPreferenceVO> findUserBookPreference();
 
+    PlatformDataVO statisticsPlatformData();
+
+    CreativeDataVO statisticsCreativeStatistics(@Param("userId") String userId);
+
+    List<BookReadingStatisticsVO> statisticsBookReadingStatistics(@Param("userId") String userId);
+
+    List<CreativeCategoryVO> statisticsCreativeCategory(String userId);
 }
