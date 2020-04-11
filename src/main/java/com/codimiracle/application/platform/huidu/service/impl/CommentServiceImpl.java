@@ -55,7 +55,8 @@ public class CommentServiceImpl extends AbstractUnsupportedOperationServiece<Str
     @Resource
     private ContentLikesService contentLikesService;
 
-    private void updateStatistics(Comment comment) {
+    @Override
+    public void updateStatistics(Comment comment) {
         Content targetContent = contentService.findById(comment.getTargetContentId());
         if (comment.getStatus() == ContentStatus.Publish) {
             contentService.commentsIncrement(comment.getTargetContentId());
@@ -97,9 +98,9 @@ public class CommentServiceImpl extends AbstractUnsupportedOperationServiece<Str
 
     @Override
     public void save(Comment entity) {
-        updateStatistics(entity);
         saveContentPart(entity);
         saveArticlePart(entity);
+        updateStatistics(entity);
         saveMentionPart(entity);
     }
 

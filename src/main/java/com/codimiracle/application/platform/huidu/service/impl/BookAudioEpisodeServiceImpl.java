@@ -42,6 +42,8 @@ public class BookAudioEpisodeServiceImpl extends AbstractService<String, BookAud
     @Resource
     private SubscribeService subscribeService;
     @Resource
+    private BookMetadataService bookMetadataService;
+    @Resource
     private ContentExaminationService contentExaminationService;
 
     @Resource
@@ -49,11 +51,26 @@ public class BookAudioEpisodeServiceImpl extends AbstractService<String, BookAud
     @Resource
     private CommodityService commodityService;
 
+    private void updateStatistics(ContentStatus originalStatus, BookAudioEpisode bookAudioEpisode) {
+        //转为发布状态
+        if (!Objects.equals(originalStatus.getStatus(), ContentStatus.Publish) && Objects.equals(bookAudioEpisode.getStatus(), ContentStatus.Publish)) {
+            bookService.incrementEpisodes(bookAudioEpisode.getBookId());
+        }
+        //由发布转为其它状态
+        if (Objects.equals(originalStatus.getStatus(), ContentStatus.Publish) && !Objects.equals(bookAudioEpisode.getStatus(), ContentStatus.Publish)) {
+            bookService.decrementEpisodes(bookAudioEpisode.getBookId());
+        }
+    }
+
     @Override
     public void update(BookAudioEpisode model) {
         BookAudioEpisode bookAudioEpisode = findById(model.getId());
+        if (Objects.isNull(bookAudioEpisode)) {
+            throw new ServiceException("无法处理该请求！");
+        }
+        updateStatistics(bookAudioEpisode.getStatus(), model);
         //修改为发布状态时发送通知
-        if (Objects.nonNull(bookAudioEpisode) && !Objects.equals(model.getStatus(), bookAudioEpisode.getStatus()) && !Objects.equals(model.getStatus(), ContentStatus.Publish)) {
+        if (!Objects.equals(bookAudioEpisode.getStatus(), ContentStatus.Publish) && Objects.equals(model.getStatus(), ContentStatus.Publish)) {
             List<Subscribe> subscribes = subscribeService.findBySubscribeTypeAndBookId(SubscribeType.BookUpdated, bookAudioEpisode.getBookId());
             subscribes.stream().map(e -> notificationTemplate.generateNotificationBy(SubscribeType.BookUpdated, e.getSubscriberId(), e.getBookId(), bookAudioEpisode.getTitle())).forEach(notification -> notificationService.notify(notification));
         }
@@ -124,9 +141,9 @@ public class BookAudioEpisodeServiceImpl extends AbstractService<String, BookAud
         return bookAudioEpisodeMapper.selectLastPublishedEpisodeByBookId(bookId);
     }
 
-    private void examinate(String contentId, String reason, String userId, BookAudioEpisodeStatus status) {
+    private void examinate(String contentId, String reason, String userId, ContentStatus status) {
         BookAudioEpisode bookAudioEpisode = findByContentId(contentId);
-        if (!Objects.equals(bookAudioEpisode.getStatus(), BookAudioEpisodeStatus.Examining)) {
+        if (!Objects.equals(bookAudioEpisode.getStatus(), ContentStatus.Examining)) {
             throw new ServiceException("无法审查该内容！");
         }
         ContentExamination examination = new ContentExamination();
@@ -150,12 +167,12 @@ public class BookAudioEpisodeServiceImpl extends AbstractService<String, BookAud
 
     @Override
     public void passExamination(String contentId, String reason, String userId) {
-        examinate(contentId, reason, userId, BookAudioEpisodeStatus.Publish);
+        examinate(contentId, reason, userId, ContentStatus.Publish);
     }
 
     @Override
     public void rejectExamination(String contentId, String reason, String userId) {
-        examinate(contentId, reason, userId, BookAudioEpisodeStatus.Rejected);
+        examinate(contentId, reason, userId, ContentStatus.Rejected);
     }
 
     @Override

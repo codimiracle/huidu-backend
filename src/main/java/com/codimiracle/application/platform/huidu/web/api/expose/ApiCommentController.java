@@ -80,6 +80,7 @@ public class ApiCommentController {
         boolean isAutoExamination = Objects.equals(settingsService.retrive(COMMENT_EXAMINATION), "auto");
         if (isAutoExamination && commentExaminator.isApproval(comment)) {
             contentService.acceptById(comment.getId(), "自动评审通过", systemNotifierId);
+            commentService.updateStatistics(comment);
         } else {
             contentService.rejectById(comment.getId(), "自动评审不通过", systemNotifierId);
         }

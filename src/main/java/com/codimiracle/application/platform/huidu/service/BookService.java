@@ -60,4 +60,10 @@ public interface BookService extends Service<String, Book> {
     PageSlice<BookVO> findAllUsingUserFigureByBookType(BookType type, String userId, Filter filter, Sorter sorter, Page page);
 
     Float avgReviewStars(String bookId);
+
+    String findMetadataIdByBookId(String bookId);
+
+    void incrementEpisodes(String bookId);
+
+    void decrementEpisodes(String bookId);
 }

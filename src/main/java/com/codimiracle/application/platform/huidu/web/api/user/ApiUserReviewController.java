@@ -124,8 +124,8 @@ public class ApiUserReviewController {
     @GetMapping("/{id}")
     public ApiResponse entity(@AuthenticationPrincipal User user, @PathVariable("id") String id) {
         ReviewVO reviewVO = reviewService.findByIdIntegrally(id);
-        if (Objects.isNull(reviewVO) || Objects.equals(reviewVO.getOwner().getId(), user.getId())) {
-            return RestfulUtil.fail("找不到对应的话题！");
+        if (Objects.isNull(reviewVO) || !Objects.equals(reviewVO.getOwner().getId(), user.getId())) {
+            return RestfulUtil.fail("找不到对应的点评！");
         }
         return RestfulUtil.entity(reviewVO);
     }

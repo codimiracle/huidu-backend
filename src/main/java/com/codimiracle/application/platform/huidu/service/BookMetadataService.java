@@ -14,4 +14,8 @@ public interface BookMetadataService extends Service<String, BookMetadata> {
     void deleteByIdsLogically(List<String> ids);
 
     PageSlice<BookMetadataVO> findAllIntegrally(Filter filter, Sorter sorter, Page page);
+
+    void incrementWordsBy(String metadataId, Integer words);
+
+    void decrementWordsBy(String metadataId, Integer words);
 }

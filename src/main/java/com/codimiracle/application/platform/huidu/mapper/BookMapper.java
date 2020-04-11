@@ -47,4 +47,10 @@ public interface BookMapper extends Mapper<Book> {
 
     Float avgReviewRate(String bookId);
 
+    String selectMetadataIdByBookId(String bookId);
+
+    void incrementEpisodes(String bookId);
+
+    void decrementEpisodes(String bookId);
+
 }

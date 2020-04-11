@@ -343,13 +343,15 @@
         <include refid="select_statement"/>
         AND b.id IN (
         SELECT bt.book_id FROM book_tags bt WHERE bt.tag_id IN (
-            SELECT uf.tag_id FROM user_figure uf <if test="userId != null">WHERE uf.user_id = #{userId}</if> GROUP By
-                uf.tag_id ORDER BY avg(uf.score) DESC
-            )
+        <if test="userId != null">
+            <include
+                    refid="com.codimiracle.application.platform.huidu.mapper.UserFigureMapper.maybelike_category_id_for_user"/>
+        </if>
         )
         <if test="filter != null">
             <if test="filter.status != null and filter.status.length gt 0">
-                AND b.status IN <foreach collection="filter.status" open="(" close=")" item="item">#{item}</foreach>
+                AND b.status IN
+                <foreach collection="filter.status" open="(" close=")" item="item">#{item}</foreach>
             </if>
         </if>
     </select>
@@ -358,14 +360,25 @@
         AND b.id IN (
             SELECT bt.book_id FROM book_tags bt WHERE bt.tag_id IN (
                 SELECT uf.tag_id FROM user_figure uf WHERE uf.tag_id IN (
-                    SELECT btx.tag_id FROM book_tags btx LEFT JOIN history h ON btx.book_id = h.book_id WHERE DATE(h.read_time) = DATE(NOW()) GROUP BY btx.tag_id
-                ) <if test="userId != null">AND uf.user_id = #{userId}</if> GROUP By uf.tag_id ORDER BY avg(uf.score) DESC
-            )
+        SELECT btx.tag_id FROM book_tags btx LEFT JOIN history h ON btx.book_id = h.book_id WHERE DATE(h.read_time) =
+        DATE(NOW()) GROUP BY btx.tag_id
+        ) <if test="userId != null">AND uf.user_id = #{userId}</if> GROUP By uf.tag_id ORDER BY avg(uf.score) DESC
+        )
         )
         <if test="filter != null">
             <if test="filter.status != null and filter.status.length gt 0">
-                AND b.status IN <foreach collection="filter.status" open="(" close=")" item="item">#{item}</foreach>
+                AND b.status IN
+                <foreach collection="filter.status" open="(" close=")" item="item">#{item}</foreach>
             </if>
         </if>
     </select>
+    <select id="selectMetadataIdByBookId" resultType="java.lang.String">
+        SELECT b.metadata_id FROM book b WHERE b.id = #{bookId}
+    </select>
+    <update id="incrementEpisodes">
+        UPDATE book b SET b.episodes = b.episodes + 1 WHERE = #{bookId}
+    </update>
+    <update id="decrementEpisodes">
+        UPDATE book b SET b.episodes = b.episodes - 1 WHERE = #{bookId}
+    </update>
 </mapper>

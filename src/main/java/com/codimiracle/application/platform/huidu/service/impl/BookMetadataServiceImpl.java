@@ -37,4 +37,14 @@ public class BookMetadataServiceImpl extends AbstractService<String, BookMetadat
     public PageSlice<BookMetadataVO> findAllIntegrally(Filter filter, Sorter sorter, Page page) {
         return extractPageSlice(bookMetadataMapper.selectAllIntegrally(filter, sorter, page));
     }
+
+    @Override
+    public void incrementWordsBy(String bookId, Integer words) {
+        bookMetadataMapper.incrementWordsBy(bookId, words);
+    }
+
+    @Override
+    public void decrementWordsBy(String metadataId, Integer words) {
+        bookMetadataMapper.decrementWordsBy(metadataId, words);
+    }
 }

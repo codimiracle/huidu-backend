@@ -92,7 +92,7 @@ public class ApiRecommendationController {
     @GetMapping("/discover")
     public ApiResponse recommendsForDiscover(@AuthenticationPrincipal User user) {
         DiscoverVO discoverVO = new DiscoverVO();
-        Page firstPage = new Page();
+        Page firstPage = new Page(1, 4);
         Sorter newCollection = new Sorter();
         newCollection.setField("id");
         newCollection.setOrder("descend");

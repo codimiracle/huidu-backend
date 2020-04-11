@@ -32,6 +32,8 @@ import java.util.List;
  * @author Codimiracle
  */
 public interface CommentService extends Service<String, Comment> {
+    void updateStatistics(Comment comment);
+
     CommentVO findByIdIntegrally(String id);
 
     PageSlice<CommentVO> findAllIntegrally(Filter filter, Sorter sorter, Page page);

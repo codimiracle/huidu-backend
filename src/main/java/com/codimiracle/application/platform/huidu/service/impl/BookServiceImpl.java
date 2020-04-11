@@ -189,7 +189,12 @@ public class BookServiceImpl extends AbstractService<String, Book> implements Bo
 
     @Override
     public void deleteByIdLogically(String id) {
-        bookMapper.deleteByIdLogically(id);
+        Book book = findById(id);
+        if (Objects.nonNull(book)) {
+            // 同时删除响应的内容
+            contentService.deleteByIdLogically(book.getContentId());
+            bookMapper.deleteByIdLogically(id);
+        }
     }
 
     @Override
@@ -299,4 +304,18 @@ public class BookServiceImpl extends AbstractService<String, Book> implements Bo
         return bookMapper.avgReviewRate(bookId);
     }
 
+    @Override
+    public String findMetadataIdByBookId(String bookId) {
+        return bookMapper.selectMetadataIdByBookId(bookId);
+    }
+
+    @Override
+    public void incrementEpisodes(String bookId) {
+        bookMapper.incrementEpisodes(bookId);
+    }
+
+    @Override
+    public void decrementEpisodes(String bookId) {
+        bookMapper.incrementEpisodes(bookId);
+    }
 }

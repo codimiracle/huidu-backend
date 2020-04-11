@@ -30,9 +30,10 @@ import java.util.Objects;
 public class BookEpisodeServiceImpl extends AbstractService<String, BookEpisode> implements BookEpisodeService {
     @Resource
     private BookEpisodeMapper bookEpisodeMapper;
-
     @Resource
     private BookService bookService;
+    @Resource
+    private BookMetadataService bookMetadataService;
     @Resource
     private ContentService contentService;
     @Resource
@@ -76,10 +77,31 @@ public class BookEpisodeServiceImpl extends AbstractService<String, BookEpisode>
         super.save(model);
     }
 
+    private void updateStatistics(ContentStatus originalStatus, BookEpisode bookEpisode) {
+        //转为发布状态
+        if (!Objects.equals(originalStatus.getStatus(), ContentStatus.Publish) && Objects.equals(bookEpisode.getStatus(), ContentStatus.Publish)) {
+            String metadataId = bookService.findMetadataIdByBookId(bookEpisode.getBookId());
+            if (Objects.nonNull(metadataId)) {
+                bookMetadataService.incrementWordsBy(metadataId, bookEpisode.getWords());
+            }
+            bookService.incrementEpisodes(bookEpisode.getBookId());
+        }
+        //由发布转为其它状态
+        if (Objects.equals(originalStatus.getStatus(), ContentStatus.Publish) && !Objects.equals(bookEpisode.getStatus(), ContentStatus.Publish)) {
+            String metadataId = bookService.findMetadataIdByBookId(bookEpisode.getBookId());
+            if (Objects.nonNull(metadataId)) {
+                bookMetadataService.decrementWordsBy(metadataId, bookEpisode.getWords());
+            }
+            bookService.decrementEpisodes(bookEpisode.getBookId());
+        }
+    }
+
     @Override
     public void update(BookEpisode model) {
         BookEpisode bookEpisode = findById(model.getId());
-        //修改为发布状态时发送通知
+        // 更新统计信息
+        updateStatistics(bookEpisode.getStatus(), model);
+        //初次修改为发布状态时发送通知
         if (Objects.nonNull(bookEpisode) && !Objects.equals(model.getStatus(), bookEpisode.getStatus()) && !Objects.equals(model.getStatus(), ContentStatus.Publish)) {
             List<Subscribe> subscribes = subscribeService.findBySubscribeTypeAndBookId(SubscribeType.BookUpdated, bookEpisode.getBookId());
             subscribes.stream().map(e -> notificationTemplate.generateNotificationBy(SubscribeType.BookUpdated, e.getSubscriberId(), e.getBookId(), bookEpisode.getTitle())).forEach(notification -> notificationService.notify(notification));

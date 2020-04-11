@@ -1,7 +1,7 @@
 package com.codimiracle.application.platform.huidu.entity.po;
 
 import com.codimiracle.application.platform.huidu.entity.dto.BookAudioEpisodeDTO;
-import com.codimiracle.application.platform.huidu.enumeration.BookAudioEpisodeStatus;
+import com.codimiracle.application.platform.huidu.enumeration.ContentStatus;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
 
@@ -43,7 +43,7 @@ public class BookAudioEpisode {
     /**
      * 章节状态（Draft: 草稿, Examining: 审批, rejected: 驳回, Publish: 发布）
      */
-    private BookAudioEpisodeStatus status;
+    private ContentStatus status;
 
     @Column(name = "book_id")
     private String bookId;
@@ -80,7 +80,7 @@ public class BookAudioEpisode {
         }
         BookAudioEpisode bookAudioEpisode = new BookAudioEpisode();
         BeanUtils.copyProperties(bookAudioEpisodeDTO, bookAudioEpisode);
-        bookAudioEpisode.setStatus(BookAudioEpisodeStatus.valueOfCode(bookAudioEpisodeDTO.getStatus()));
+        bookAudioEpisode.setStatus(ContentStatus.valueOfCode(bookAudioEpisodeDTO.getStatus()));
         return bookAudioEpisode;
     }
 }

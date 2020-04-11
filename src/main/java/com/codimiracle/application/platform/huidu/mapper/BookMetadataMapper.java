@@ -18,4 +18,8 @@ public interface BookMetadataMapper extends Mapper<BookMetadata> {
     void deleteByIdLogically(String id);
 
     void deleteByIdsLogically(List<String> ids);
+
+    void incrementWordsBy(@Param("metadataId") String metadataId, @Param("words") Integer words);
+
+    void decrementWordsBy(@Param("metadataId") String metadataId, @Param("words") Integer words);
 }

@@ -25,17 +25,26 @@
         SET deleted = 1
         WHERE id = #{id}
     </update>
+
     <update id="deleteByIdsLogically">
         UPDATE book_metadata SET deleted = 1 WHERE id IN
         <foreach collection="list" item="item" open="(" close=")" separator=",">#{item}</foreach>
     </update>
+
+    <update id="incrementWordsBy">
+        UPDATE book_metadata bm SET bm.words = bm.words + #{words} WHERE bm.id = #{metadataId}
+    </update>
+    <update id="decrementWordsBy">
+        UPDATE book_metadata bm SET bm.words = bm.words - #{words} WHERE bm.id = #{metadataId}
+    </update>
+
     <sql id="select_statement">
-        SELECT bm.id          book_metadata_id,
-               bm.name        book_metadata_name,
-               bm.cover       book_metadata_cover,
-               bm.description book_metadata_description,
-               bm.words       book_metadata_words,
-               bm.author      book_metadata_author
+        SELECT bm.id book_metadata_id,
+        bm.name book_metadata_name,
+        bm.cover book_metadata_cover,
+        bm.description book_metadata_description,
+        bm.words book_metadata_words,
+        bm.author book_metadata_author
         FROM book_metadata bm
         WHERE bm.deleted = 0
     </sql>
