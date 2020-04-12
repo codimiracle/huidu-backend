@@ -83,7 +83,7 @@
                 AND o.order_number = #{filter.orderNumber[0]}
             </if>
             <if test="filter.owner != null and filter.owner.length gt 0">
-                AND u.nickname LIKE concat('%', #{filter.owner}, '%')
+                AND u.nickname LIKE concat('%', #{filter.owner[0]}, '%')
             </if>
             <if test="filter.type != null and filter.type.length gt 0">
                 AND o.type IN

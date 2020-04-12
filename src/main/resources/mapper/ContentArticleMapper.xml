@@ -97,7 +97,7 @@
                 <if test="sorter.order == 'descend'">DESC</if>
             </if>
             <if test="sorter.field == 'hot_degree'">
-                ORDER BY (c.likes * 3 + c.reads + c.comments) * c.rate
+                ORDER BY (c.likes * 3 + c.reads + c.comments) + c.rate * 5
                 <if test="sorter.order == 'descend'">DESC</if>
             </if>
         </if>

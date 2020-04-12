@@ -82,7 +82,7 @@
         FROM book b
         WHERE b.type = #{bookType}
         AND b.deleted = 0
-        AND b.status = 'publish')
+        AND b.status != 'examining')
     </select>
     <select id="selectCollectionStatisticsByCollectionId" resultMap="StatisticsResultMap">
         <include refid="com.codimiracle.application.platform.huidu.mapper.BookMapper.select_statement_without_type"/>

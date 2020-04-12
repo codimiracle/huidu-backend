@@ -27,7 +27,7 @@ public class BuryingPointServiceImpl implements BuryingPointService {
     @Resource
     private BookTagsService bookTagsService;
 
-    private void forTag(String userId, String tagId, float weight) {
+    private void forTagRaw(String userId, String tagId, float weight) {
         String lock = figureUpdatingLock.intern(String.format("user-%s-figure-tag-%s", userId, tagId));
         synchronized (lock) {
             // 用户或标签无效啥都不干
@@ -42,28 +42,34 @@ public class BuryingPointServiceImpl implements BuryingPointService {
                 figureTag.setScore(BigDecimal.valueOf(weight));
                 userFigureService.save(figureTag);
             } else {
-                //从新启用画像标签
+                //重新启用画像标签
                 if (figureTag.isDeleted()) {
                     FigureTag updatingFigureTag = new FigureTag();
                     updatingFigureTag.setId(figureTag.getId());
                     updatingFigureTag.setDeleted(false);
-                    updatingFigureTag.setScore(BigDecimal.ZERO);
                     userFigureService.update(updatingFigureTag);
                 }
-                userFigureService.incrementScoreBy(figureTag.getTagId(), weight);
+                userFigureService.incrementScoreBy(figureTag.getId(), weight);
             }
         }
     }
 
     @Override
+    public void forTag(String userId, String tagId, Float score) {
+        if (Objects.nonNull(score)) {
+            forTagRaw(userId, tagId, score);
+        }
+    }
+
+    @Override
     public void forTag(String userId, String tagId) {
-        forTag(userId, tagId, TAG_ACCESS_WEIGHT);
+        forTagRaw(userId, tagId, TAG_ACCESS_WEIGHT);
     }
 
     private void forBook(String userId, String bookId, float weight) {
         List<BookTags> bookTagList = bookTagsService.findByBookId(bookId);
         bookTagList.forEach((bookTags) -> {
-            forTag(userId, bookTags.getTagId(), weight);
+            forTagRaw(userId, bookTags.getTagId(), weight);
         });
     }
 

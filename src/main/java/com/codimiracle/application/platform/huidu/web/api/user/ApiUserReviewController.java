@@ -70,19 +70,19 @@ public class ApiUserReviewController {
 
     private boolean checkBookIsRead(String userId, String bookId) {
         Book book = bookService.findById(bookId);
-        if (book.getStatus() != BookStatus.Paused || book.getStatus() != BookStatus.Ended) {
+        if (book.getStatus() != BookStatus.Paused && book.getStatus() != BookStatus.Ended) {
             return false;
         }
         if (book.getType() == BookType.ElectronicBook) {
             BookEpisodeVO lastEpisode = bookEpisodeService.findLastPublishedEpisodeByBookId(bookId);
             History history = historyService.findByUserIdAndBookIdAndEpisodeId(userId, bookId, lastEpisode.getId());
-            int progress = Math.round(history.getProgress() * 100);
-            return Objects.equals(history.getEpisodeId(), lastEpisode.getId()) && progress == 100;
+            int progress = Math.round(history.getProgress());
+            return Objects.equals(history.getEpisodeId(), lastEpisode.getId()) && progress >= 100;
         } else if (book.getType() == BookType.AudioBook) {
             BookAudioEpisodeVO lastEpisode = bookAudioEpisodeService.findLastPublishedEpisodeByBookId(bookId);
             History history = historyService.findByUserIdAndBookIdAndAudioEpisodeId(userId, bookId, lastEpisode.getId());
-            int progress = Math.round(history.getProgress() * 100);
-            return Objects.equals(history.getAudioEpisodeId(), lastEpisode.getId()) && progress == 100;
+            int progress = Math.round(history.getProgress());
+            return Objects.equals(history.getAudioEpisodeId(), lastEpisode.getId()) && progress >= 100;
         } else {
             return false;
         }

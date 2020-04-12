@@ -116,7 +116,7 @@
         UPDATE book
         SET deleted = 1
         WHERE id IN
-        <foreach collection="list" separator="," open="(" close=")" item="item">#{item}</foreach>
+        <foreach collection="list" open="(" close=")" separator="," item="item">#{item}</foreach>
     </update>
     <update id="readsIncrement">
         UPDATE book b
@@ -158,11 +158,17 @@
                 AND bm.author LIKE concat('%', #{filter.metadataAuthor[0]}, '%')
             </if>
             <if test="filter.publishYear != null and filter.publishYear.length gt 0">
-                AND bm.publishYear = #{filter.publishYear[0]}
+                AND b.publish_year = #{filter.publishYear[0]}
+            </if>
+            <if test="filter.categoryId != null and filter.categoryId.length gt 0">
+                AND b.category_id = #{filter.categoryId[0]}
+            </if>
+            <if test="filter.tagId != null and filter.tagId.length gt 0">
+                AND b.id IN (SELECT bt.book_id FROM book_tags bt WHERE bt.tag_id = #{filter.tagId[0]})
             </if>
             <if test="filter.status != null and filter.status.length gt 0">
                 AND b.status IN
-                <foreach collection="filter.status" item="item" open="(" close=")" separator=",">#{item}</foreach>
+                <foreach collection="filter.status" item="item" open="(" separator="," close=")" >#{item}</foreach>
             </if>
             <if test="filter.commodityStatus != null and filter.commodityStatus.length gt 0">
                 AND c.status IN
@@ -187,7 +193,7 @@
                 <if test="sorter.order == 'descend'">DESC</if>
             </if>
             <if test="sorter.field == 'hot_degree'">
-                ORDER BY (ct.likes * 3 + (b.reads + b.plays) * 2 + ct.comments) * ct.rate
+                ORDER BY (ct.likes * 3 + (b.reads + b.plays) * 2 + ct.comments) + ct.rate * 5
                 <if test="sorter.order == 'descend'">DESC</if>
             </if>
         </if>
@@ -255,7 +261,7 @@
                 AND b.type = #{filter.type[0]}
             </if>
             <if test="filter.status != null and filter.status.length gt 0">
-                AND b.status IN <foreach collection="filter.status" open="(" close=")" item="item">#{item}</foreach>
+                AND b.status IN <foreach collection="filter.status" open="(" close=")"  separator="," item="item">#{item}</foreach>
             </if>
         </if>
         <if test="sorter != null">
@@ -282,7 +288,7 @@
                 AND b.type = #{filter.type[0]}
             </if>
             <if test="filter.status != null and filter.status.length gt 0">
-                AND b.status IN <foreach collection="filter.status" open="(" close=")" item="item">#{item}</foreach>
+                AND b.status IN <foreach collection="filter.status" open="(" close=")" separator="," item="item">#{item}</foreach>
             </if>
         </if>
     </select>
@@ -298,7 +304,7 @@
                 AND b.type = #{filter.type[0]}
             </if>
             <if test="filter.status != null and filter.status.length gt 0">
-                AND b.status IN <foreach collection="filter.status" open="(" close=")" item="item">#{item}</foreach>
+                AND b.status IN <foreach collection="filter.status" open="(" close=")" separator="," item="item">#{item}</foreach>
             </if>
         </if>
     </select>
@@ -317,7 +323,7 @@
                 AND b.type = #{filter.type[0]}
             </if>
             <if test="filter.status != null and filter.status.length gt 0">
-                AND b.status IN <foreach collection="filter.status" open="(" close=")" item="item">#{item}</foreach>
+                AND b.status IN <foreach collection="filter.status" open="(" close=")" separator="," item="item">#{item}</foreach>
             </if>
         </if>
     </select>
@@ -334,7 +340,7 @@
                 AND b.type = #{filter.type[0]}
             </if>
             <if test="filter.status != null and filter.status.length gt 0">
-                AND b.status IN <foreach collection="filter.status" open="(" close=")" item="item">#{item}</foreach>
+                AND b.status IN <foreach collection="filter.status" open="(" close=")" separator="," item="item">#{item}</foreach>
             </if>
         </if>
     </select>
@@ -342,33 +348,48 @@
     <select id="selectAllUsingUserFigureByBookType" resultMap="IntegratedResultMap">
         <include refid="select_statement"/>
         AND b.id IN (
-        SELECT bt.book_id FROM book_tags bt WHERE bt.tag_id IN (
-        <if test="userId != null">
-            <include
-                    refid="com.codimiracle.application.platform.huidu.mapper.UserFigureMapper.maybelike_category_id_for_user"/>
-        </if>
+            SELECT bt.book_id FROM book_tags bt WHERE bt.deleted = 0 AND bt.tag_id IN (<if test="userId != null">
+                <include
+                        refid="com.codimiracle.application.platform.huidu.mapper.UserFigureMapper.maybelike_tag_id_for_user"/>
+            </if>
+            <if test="userId == null">
+                <include
+                        refid="com.codimiracle.application.platform.huidu.mapper.UserFigureMapper.maybelike_tag_id_for_anonymous"/>
+            </if>
+            )
         )
         <if test="filter != null">
             <if test="filter.status != null and filter.status.length gt 0">
                 AND b.status IN
-                <foreach collection="filter.status" open="(" close=")" item="item">#{item}</foreach>
+                <foreach collection="filter.status" open="(" close=")" separator="," item="item">#{item}</foreach>
             </if>
         </if>
     </select>
+    <sql id="today_reading_tags">
+        SELECT
+            btx.tag_id
+        FROM
+            book_tags btx LEFT JOIN history h ON btx.book_id = h.book_id WHERE DATE(h.read_time) = DATE(NOW()) GROUP BY btx.tag_id
+    </sql>
+    <sql id="today_reading_tags_for_any_user">
+        SELECT
+            uf.tag_id
+        FROM
+            user_figure uf
+        WHERE uf.tag_id IN (<include refid="today_reading_tags" />)
+        <if test="userId != null">AND uf.user_id = #{userId}</if> GROUP By uf.tag_id ORDER BY avg(uf.score) DESC
+    </sql>
     <select id="selectAllUsingUserFigureByHistoryToday" resultMap="IntegratedResultMap">
         <include refid="select_statement_without_type"/>
         AND b.id IN (
             SELECT bt.book_id FROM book_tags bt WHERE bt.tag_id IN (
-                SELECT uf.tag_id FROM user_figure uf WHERE uf.tag_id IN (
-        SELECT btx.tag_id FROM book_tags btx LEFT JOIN history h ON btx.book_id = h.book_id WHERE DATE(h.read_time) =
-        DATE(NOW()) GROUP BY btx.tag_id
-        ) <if test="userId != null">AND uf.user_id = #{userId}</if> GROUP By uf.tag_id ORDER BY avg(uf.score) DESC
-        )
+                <include refid="today_reading_tags_for_any_user" />
+            )
         )
         <if test="filter != null">
             <if test="filter.status != null and filter.status.length gt 0">
                 AND b.status IN
-                <foreach collection="filter.status" open="(" close=")" item="item">#{item}</foreach>
+                <foreach collection="filter.status" open="(" close=")" separator="," item="item">#{item}</foreach>
             </if>
         </if>
     </select>
@@ -376,9 +397,9 @@
         SELECT b.metadata_id FROM book b WHERE b.id = #{bookId}
     </select>
     <update id="incrementEpisodes">
-        UPDATE book b SET b.episodes = b.episodes + 1 WHERE = #{bookId}
+        UPDATE book b SET b.episodes = b.episodes + 1 WHERE b.id = #{bookId}
     </update>
     <update id="decrementEpisodes">
-        UPDATE book b SET b.episodes = b.episodes - 1 WHERE = #{bookId}
+        UPDATE book b SET b.episodes = b.episodes - 1 WHERE b.id = #{bookId}
     </update>
 </mapper>

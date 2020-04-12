@@ -27,8 +27,8 @@
         LEFT JOIN tag t ON uf.tag_id = t.id
         WHERE uf.deleted = 0 AND t.deleted = 0
     </sql>
-    <update id="deleteByIdIntegrally">
-        UPDATE user_figure uf SET uf.deleted = 1 WHERE uf.id = #{figureId}
+    <update id="deleteByIdLogically">
+        UPDATE user_figure uf SET uf.deleted = 1, uf.score = 0 WHERE uf.id = #{figureId}
     </update>
     <update id="incrementScoreBy">
         UPDATE user_figure uf SET uf.score = uf.score + #{weight} WHERE uf.id = #{figureTagId}
@@ -64,6 +64,12 @@
         SELECT DISTINCT ufs.user_id FROM user_figure ufm LEFT JOIN user_figure ufs ON ufm.tag_id = ufs.tag_id WHERE
         ufm.deleted = 0 AND ufs.deleted = 0 AND ufm.user_id = #{userId} AND ufs.user_id != #{userId} AND ufs.score >=
         ufm.score
+    </sql>
+    <sql id="maybelike_tag_id_for_user">
+        SELECT tag_id FROM user_figure ufm WHERE ufm.deleted = 0 AND ufm.user_id = #{userId} ORDER BY ufm.score DESC
+    </sql>
+    <sql id="maybelike_tag_id_for_anonymous">
+        SELECT tag_id FROM user_figure ufm WHERE ufm.deleted = 0 GROUP BY ufm.tag_id ORDER BY avg(ufm.score) DESC
     </sql>
     <sql id="maybelike_category_id_for_user">
         SELECT ct.category_id FROM category_tags ct LEFT JOIN user_figure ufm ON ct.tag_id = ufm.tag_id WHERE ct.deleted

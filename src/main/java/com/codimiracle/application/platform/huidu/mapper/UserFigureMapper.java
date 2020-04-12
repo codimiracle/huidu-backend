@@ -15,7 +15,7 @@ import java.util.List;
 public interface UserFigureMapper extends Mapper<FigureTag> {
     List<FigureTagVO> selectAllTagIntegrally(@Param("filter") Filter filter, @Param("sorter") Sorter sorter, @Param("page") Page page);
 
-    void deleteByIdIntegrally(@Param("figureId") String figureTagId);
+    void deleteByIdLogically(@Param("figureId") String figureTagId);
 
     List<UserProtectedVO> selectSimilarUserByUserIdProtectly(@Param("userId") String userId, @Param("filter") Filter filter, @Param("sorter") Sorter sorter, @Param("page") Page page);
 
@@ -27,7 +27,7 @@ public interface UserFigureMapper extends Mapper<FigureTag> {
 
     List<CategoryVO> selectSametasteCategoryByAvgIntegrally();
 
-    void incrementScoreBy(String figureTagId, float weight);
+    void incrementScoreBy(@Param("figureTagId") String figureTagId, @Param("weight") float weight);
 
     void deleteByIdsLogically(List<String> ids);
 }

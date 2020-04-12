@@ -22,6 +22,7 @@ import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author Codimiracle
@@ -52,7 +53,7 @@ public class ApiArrivedHistoryController {
             //当天签到
             ArrivedHistory signed = arrivedHistoryService.signin(user.getId(),
                     arrivingDTO.getMotto(), arrivingDTO.getDate());
-            return RestfulUtil.entity(signed);
+            return RestfulUtil.entity(arrivedHistoryService.findByThatDayIntegrally(user.getId(), new Date()));
         } else if (nowDate.compareTo(signedDate) < 0) {
             return RestfulUtil.fail("不能进行未来签到！");
         }

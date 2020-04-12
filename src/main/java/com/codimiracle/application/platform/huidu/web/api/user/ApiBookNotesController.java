@@ -38,7 +38,7 @@ public class ApiBookNotesController {
         bookNotes.setCreateTime(new Date());
         bookNotes.setUpdateTime(bookNotes.getCreateTime());
         bookNotesService.save(bookNotes);
-        return RestfulUtil.success();
+        return RestfulUtil.entity(bookNotesService.findByIdIntegrally(bookNotes.getId()));
     }
 
     @DeleteMapping("/{book_id}/notes/{id}")

@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -55,6 +56,9 @@ public class OrderServiceImpl extends AbstractService<String, Order> implements 
 
     @Resource
     private CommentService commentService;
+
+    @Resource
+    private ContentService contentService;
 
     @Autowired
     private ShipmentCalculator shipmentCalculator;
@@ -139,7 +143,7 @@ public class OrderServiceImpl extends AbstractService<String, Order> implements 
 
     @Override
     public synchronized void chargebackByOrderNumber(String orderNumber) {
-        OrderVO orderVO = orderMapper.selectByOrderNumberIntegrally(orderNumber);
+        OrderVO orderVO = findByOrderNumberIntegrally(orderNumber);
         if (Objects.isNull(orderVO)) {
             throw new ServiceException("订单不存在");
         }
@@ -196,6 +200,15 @@ public class OrderServiceImpl extends AbstractService<String, Order> implements 
                 comment.setOwnerId(userId);
                 comment.setTargetContentId(book.getContentId());
                 commentService.save(comment);
+                Commodity updatingCommodity = new Commodity();
+                Content content = contentService.findById(book.getContentId());
+                updatingCommodity.setId(e.getCommodityId());
+                if (content.getComments() > 0) {
+                    updatingCommodity.setRate(content.getRate() + comment.getRate() / 2);
+                } else {
+                    updatingCommodity.setRate(content.getRate() + comment.getRate());
+                }
+                commodityService.update(updatingCommodity);
                 // 复用同一条评论
                 comment.setId(null);
             }
@@ -210,7 +223,15 @@ public class OrderServiceImpl extends AbstractService<String, Order> implements 
         if (Objects.isNull(order) || !Objects.equals(order.getOrderNumber(), orderNumber)) {
             throw new ServiceException("找不到订单！");
         }
+        // 取消订单
+        if (OrderStatus.Canceled == to && OrderStatus.Canceled != from) {
+            chargebackByOrderNumber(orderNumber);
+        }
         if (to == OrderStatus.Completed && order.getType() != OrderType.Recharge) {
+            Order updatingOrder = new Order();
+            updatingOrder.setOrderNumber(orderNumber);
+            updatingOrder.setClosingTime(new Date());
+            update(updatingOrder);
             //商品订单
             List<OrderDetails> orderDetails = orderDetailsService.findByOrderNumber(orderNumber);
             orderDetails.forEach((od -> {

@@ -62,7 +62,7 @@ public class CategoryServiceImpl extends AbstractService<String, Category> imple
 
     @Override
     public List<CategoryVO> findRelativeCategoriesByBookType(BookType bookType) {
-        return categoryMapper.selectRelativeCategoriesByBookType(bookType);
+        return mutate(categoryMapper.selectRelativeCategoriesByBookType(bookType));
     }
 
     @Override
@@ -74,6 +74,11 @@ public class CategoryServiceImpl extends AbstractService<String, Category> imple
         if (Objects.nonNull(categoryVO)) {
             categoryVO.setTags(categoryTagsService.findTagByCategoryId(categoryVO.getId()));
         }
+    }
+
+    private List<CategoryVO> mutate(List<CategoryVO> list) {
+        list.forEach(this::mutate);
+        return list;
     }
 
     @Override

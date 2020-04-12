@@ -56,8 +56,8 @@ public class UserFigureServiceImpl extends AbstractService<String, FigureTag> im
     }
 
     @Override
-    public void deleteByIdIntegrally(String figureTagId) {
-        userFigureMapper.deleteByIdIntegrally(figureTagId);
+    public void deleteByIdLogically(String figureTagId) {
+        userFigureMapper.deleteByIdLogically(figureTagId);
     }
 
     @Override

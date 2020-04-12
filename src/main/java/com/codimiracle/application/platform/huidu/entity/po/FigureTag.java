@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 public class FigureTag {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private String id;
 
     @Column(name = "tag_id")
     private String tagId;

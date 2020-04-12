@@ -1,11 +1,14 @@
 package com.codimiracle.application.platform.huidu.web.api.user;
 
+import com.codimiracle.application.platform.huidu.contract.ApiResponse;
+import com.codimiracle.application.platform.huidu.entity.po.User;
+import com.codimiracle.application.platform.huidu.service.BuryingPointService;
 import com.codimiracle.application.platform.huidu.service.UserFigureService;
+import com.codimiracle.application.platform.huidu.util.RestfulUtil;
 import com.codimiracle.application.platform.huidu.web.api.base.BookController;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
@@ -13,15 +16,13 @@ import javax.annotation.Resource;
 @RestController
 @RequestMapping("/api/user/burying-points")
 public class ApiUserBuryingPointController {
-    @Autowired
-    private ApiHistoryController apiHistoryController;
-
-    @Autowired
-    private ApiBookShelfController apiBookShelfController;
-
-    @Autowired
-    private BookController bookController;
 
     @Resource
-    private UserFigureService figureService;
+    private BuryingPointService buryingPointService;
+
+    @GetMapping("hit-tag")
+    public ApiResponse hitTag(@AuthenticationPrincipal User user, @RequestParam("tag_id") String tagId, @RequestParam("score") Float score) {
+        buryingPointService.forTag(user.getId(), tagId, score);
+        return RestfulUtil.success();
+    }
 }

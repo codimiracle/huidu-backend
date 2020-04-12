@@ -47,7 +47,7 @@ public class ApiBackendUserFigureTagsController {
 
     @DeleteMapping("/{id}")
     public ApiResponse delete(@PathVariable("id") String figureTagId) {
-        userFigureService.deleteByIdIntegrally(figureTagId);
+        userFigureService.deleteByIdLogically(figureTagId);
         return RestfulUtil.success();
     }
 

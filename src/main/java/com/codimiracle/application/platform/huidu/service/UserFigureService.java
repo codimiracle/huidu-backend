@@ -15,7 +15,7 @@ public interface UserFigureService extends Service<String, FigureTag> {
 
     PageSlice<FigureTagVO> findAllTagIntegrally(Filter filter, Sorter sorter, Page page);
 
-    void deleteByIdIntegrally(String figureTagId);
+    void deleteByIdLogically(String figureTagId);
 
     PageSlice<UserProtectedVO> findSimilarUserByUserIdProtectly(String userId, Filter filter, Sorter sorter, Page page);
 
