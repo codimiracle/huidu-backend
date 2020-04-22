@@ -35,7 +35,7 @@ public class ApiBookEpisodeController {
     @GetMapping("/first-episode")
     public ApiResponse firstEpisode(@AuthenticationPrincipal User user, @PathVariable("book_id") String bookId) {
         BookEpisodeVO episodeVO = bookEpisodeService.findByEpisodeNumberIntegrally(bookId, 1);
-        if (!Objects.equals(episodeVO.getStatus(), ContentStatus.Publish.toString())) {
+        if (Objects.nonNull(episodeVO) && !Objects.equals(episodeVO.getStatus(), ContentStatus.Publish.toString())) {
             return RestfulUtil.entity(null);
         }
         return RestfulUtil.entity(episodeVO);

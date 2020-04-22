@@ -31,7 +31,7 @@ public class ApiBookAudioEpisodeController {
     public ApiResponse firstEpisode(@AuthenticationPrincipal User user, @PathVariable("book_id") String bookId) {
         //返回第一章
         BookAudioEpisodeVO bookAudioEpisodeVO = bookAudioEpisodeService.findByMediaNumberIntegrally(bookId, 1);
-        if (!Objects.equals(bookAudioEpisodeVO.getStatus(), BookAudioEpisodeStatus.Publish.toString())) {
+        if (Objects.nonNull(bookAudioEpisodeVO) && !Objects.equals(bookAudioEpisodeVO.getStatus(), BookAudioEpisodeStatus.Publish.toString())) {
             return RestfulUtil.entity(null);
         }
         return RestfulUtil.entity(bookAudioEpisodeVO);
