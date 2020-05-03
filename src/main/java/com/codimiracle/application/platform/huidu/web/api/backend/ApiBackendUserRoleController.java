@@ -1,12 +1,12 @@
 package com.codimiracle.application.platform.huidu.web.api.backend;
 
-import com.codimiracle.application.platform.huidu.contract.*;
 import com.codimiracle.application.platform.huidu.entity.dto.BulkDeletionDTO;
 import com.codimiracle.application.platform.huidu.entity.dto.UserRoleDTO;
 import com.codimiracle.application.platform.huidu.entity.po.UserRole;
 import com.codimiracle.application.platform.huidu.entity.vo.UserRoleVO;
 import com.codimiracle.application.platform.huidu.service.UserRoleService;
 import com.codimiracle.application.platform.huidu.util.RestfulUtil;
+import com.codimiracle.web.basic.contract.*;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;

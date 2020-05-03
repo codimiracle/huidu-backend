@@ -20,6 +20,27 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.codimiracle.web</groupId>
+            <artifactId>basic-contract</artifactId>
+            <version>1.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.codimiracle.web</groupId>
+            <artifactId>mybatis-contract</artifactId>
+            <version>1.2.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.codimiracle.web.middleware</groupId>
+            <artifactId>content-middleware</artifactId>
+            <version>0.2.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.codimiracle.web.middleware</groupId>
+            <artifactId>notification-middleware</artifactId>
+            <version>0.1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
         </dependency>
@@ -62,26 +83,6 @@
             <version>2.0.1</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.mybatis</groupId>
-            <artifactId>mybatis-spring</artifactId>
-            <version>2.0.3</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mybatis</groupId>
-            <artifactId>mybatis</artifactId>
-            <version>3.5.1</version>
-        </dependency>
-        <dependency>
-            <groupId>tk.mybatis</groupId>
-            <artifactId>mapper</artifactId>
-            <version>3.4.2</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.pagehelper</groupId>
-            <artifactId>pagehelper</artifactId>
-            <version>4.2.1</version>
-        </dependency>
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>

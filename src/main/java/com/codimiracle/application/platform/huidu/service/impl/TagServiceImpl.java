@@ -1,11 +1,11 @@
 package com.codimiracle.application.platform.huidu.service.impl;
 
-import com.codimiracle.application.platform.huidu.contract.*;
 import com.codimiracle.application.platform.huidu.entity.po.Tag;
 import com.codimiracle.application.platform.huidu.entity.vo.TagVO;
 import com.codimiracle.application.platform.huidu.mapper.TagMapper;
 import com.codimiracle.application.platform.huidu.service.CategoryTagsService;
 import com.codimiracle.application.platform.huidu.service.TagService;
+import com.codimiracle.web.mybatis.contract.support.vo.AbstractService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,7 +19,7 @@ import java.util.List;
  */
 @Service
 @Transactional
-public class TagServiceImpl extends AbstractService<String, Tag> implements TagService {
+public class TagServiceImpl extends AbstractService<String, Tag, TagVO> implements TagService {
     @Resource
     private TagMapper tagMapper;
 
@@ -31,16 +31,6 @@ public class TagServiceImpl extends AbstractService<String, Tag> implements TagS
         TagVO tagVO = tagMapper.selectByIdIntegrally(id);
         tagVO.setCategories(categoryTagsService.findCategoryByTagId(tagVO.getId()));
         return tagVO;
-    }
-
-    @Override
-    public PageSlice<TagVO> findAllIntegrally(Filter filter, Sorter sorter, Page page) {
-        PageSlice<TagVO> slice = extractPageSlice(tagMapper.selectAllIntegrally(filter, sorter, page));
-        List<TagVO> list = slice.getList();
-        list.stream().forEach(tagVO -> {
-            tagVO.setCategories(categoryTagsService.findCategoryByTagId(tagVO.getId()));
-        });
-        return slice;
     }
 
     @Override

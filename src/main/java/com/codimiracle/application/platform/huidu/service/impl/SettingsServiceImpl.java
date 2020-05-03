@@ -1,9 +1,9 @@
 package com.codimiracle.application.platform.huidu.service.impl;
 
-import com.codimiracle.application.platform.huidu.contract.AbstractService;
 import com.codimiracle.application.platform.huidu.entity.po.Setting;
 import com.codimiracle.application.platform.huidu.mapper.SettingsMapper;
 import com.codimiracle.application.platform.huidu.service.SettingsService;
+import com.codimiracle.web.mybatis.contract.AbstractService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,7 +31,7 @@ public class SettingsServiceImpl extends AbstractService<String, Setting> implem
     }
 
     @Override
-    public String retrive(String name) {
+    public String retrieve(String name) {
         Setting setting = findBy("name", name);
         if (Objects.nonNull(setting)) {
             return setting.getValue();

@@ -1,6 +1,5 @@
 package com.codimiracle.application.platform.huidu.web.api.user;
 
-import com.codimiracle.application.platform.huidu.contract.ApiResponse;
 import com.codimiracle.application.platform.huidu.entity.dto.OrderringDTO;
 import com.codimiracle.application.platform.huidu.entity.dto.PayingDTO;
 import com.codimiracle.application.platform.huidu.entity.dto.RechargeDTO;
@@ -13,6 +12,7 @@ import com.codimiracle.application.platform.huidu.service.OrderService;
 import com.codimiracle.application.platform.huidu.service.UserAccountService;
 import com.codimiracle.application.platform.huidu.util.RestfulUtil;
 import com.codimiracle.application.platform.huidu.web.api.base.OrderController;
+import com.codimiracle.web.basic.contract.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;

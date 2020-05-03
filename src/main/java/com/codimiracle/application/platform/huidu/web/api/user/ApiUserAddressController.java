@@ -1,12 +1,12 @@
 package com.codimiracle.application.platform.huidu.web.api.user;
 
-import com.codimiracle.application.platform.huidu.contract.*;
 import com.codimiracle.application.platform.huidu.entity.po.Address;
 import com.codimiracle.application.platform.huidu.entity.po.User;
 import com.codimiracle.application.platform.huidu.entity.vo.AddressDTO;
 import com.codimiracle.application.platform.huidu.entity.vo.AddressVO;
 import com.codimiracle.application.platform.huidu.service.AddressService;
 import com.codimiracle.application.platform.huidu.util.RestfulUtil;
+import com.codimiracle.web.basic.contract.*;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 

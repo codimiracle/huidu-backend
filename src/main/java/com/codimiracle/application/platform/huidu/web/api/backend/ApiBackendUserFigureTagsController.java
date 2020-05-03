@@ -1,6 +1,5 @@
 package com.codimiracle.application.platform.huidu.web.api.backend;
 
-import com.codimiracle.application.platform.huidu.contract.*;
 import com.codimiracle.application.platform.huidu.entity.dto.BulkDeletionDTO;
 import com.codimiracle.application.platform.huidu.entity.dto.FigureTagsDTO;
 import com.codimiracle.application.platform.huidu.entity.po.FigureTag;
@@ -10,6 +9,7 @@ import com.codimiracle.application.platform.huidu.service.TagService;
 import com.codimiracle.application.platform.huidu.service.UserFigureService;
 import com.codimiracle.application.platform.huidu.util.RestfulUtil;
 import com.codimiracle.application.platform.huidu.util.TagUtil;
+import com.codimiracle.web.basic.contract.*;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -72,7 +72,7 @@ public class ApiBackendUserFigureTagsController {
     public ApiResponse collection(@PathVariable("user_id") String userId, @RequestParam("filter") Filter filter, @RequestParam("sorter") Sorter sorter, @ModelAttribute Page page) {
         filter = Objects.isNull(filter) ? new Filter() : filter;
         filter.put("userId", new String[]{userId});
-        PageSlice<FigureTagVO> slice = userFigureService.findAllTagIntegrally(filter, sorter, page);
+        PageSlice<FigureTagVO> slice = userFigureService.findAllIntegrally(filter, sorter, page);
         return RestfulUtil.list(slice);
     }
 }

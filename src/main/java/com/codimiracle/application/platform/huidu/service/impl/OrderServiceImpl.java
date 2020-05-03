@@ -1,15 +1,19 @@
 package com.codimiracle.application.platform.huidu.service.impl;
 
-import com.codimiracle.application.platform.huidu.contract.*;
 import com.codimiracle.application.platform.huidu.entity.po.*;
 import com.codimiracle.application.platform.huidu.entity.vo.OrderVO;
-import com.codimiracle.application.platform.huidu.entity.vt.Comment;
 import com.codimiracle.application.platform.huidu.enumeration.CommodityStatus;
 import com.codimiracle.application.platform.huidu.enumeration.OrderStatus;
 import com.codimiracle.application.platform.huidu.enumeration.OrderType;
 import com.codimiracle.application.platform.huidu.helper.ShipmentCalculator;
 import com.codimiracle.application.platform.huidu.mapper.OrderMapper;
 import com.codimiracle.application.platform.huidu.service.*;
+import com.codimiracle.web.middleware.content.pojo.po.Comment;
+import com.codimiracle.web.middleware.content.pojo.po.Content;
+import com.codimiracle.web.middleware.content.service.CommentService;
+import com.codimiracle.web.middleware.content.service.ContentService;
+import com.codimiracle.web.mybatis.contract.ServiceException;
+import com.codimiracle.web.mybatis.contract.support.vo.AbstractService;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +33,7 @@ import java.util.Optional;
  */
 @Service
 @Transactional
-public class OrderServiceImpl extends AbstractService<String, Order> implements OrderService {
+public class OrderServiceImpl extends AbstractService<String, Order, OrderVO> implements OrderService {
     @Resource
     private OrderMapper orderMapper;
 
@@ -203,11 +207,11 @@ public class OrderServiceImpl extends AbstractService<String, Order> implements 
                 Commodity updatingCommodity = new Commodity();
                 Content content = contentService.findById(book.getContentId());
                 updatingCommodity.setId(e.getCommodityId());
-                if (content.getComments() > 0) {
-                    updatingCommodity.setRate(content.getRate() + comment.getRate() / 2);
-                } else {
-                    updatingCommodity.setRate(content.getRate() + comment.getRate());
-                }
+//                if (content.getComments() > 0) {
+//                    updatingCommodity.setRate(content.getRate() + comment.getRate() / 2);
+//                } else {
+//                    updatingCommodity.setRate(content.getRate() + comment.getRate());
+//                }
                 commodityService.update(updatingCommodity);
                 // 复用同一条评论
                 comment.setId(null);
@@ -248,18 +252,13 @@ public class OrderServiceImpl extends AbstractService<String, Order> implements 
         return orderVO;
     }
 
-    private void mutate(OrderVO orderVO) {
+    protected OrderVO mutate(OrderVO orderVO) {
         if (Objects.nonNull(orderVO.getLogisticsInformationId())) {
             orderVO.setLogisticsInformation(logisticsInformationService.findByIdIntegrally(orderVO.getLogisticsInformationId()));
         }
         orderVO.setDetailsList(orderDetailsService.findByOrderNumberIntegrally(orderVO.getOrderNumber()));
+        return orderVO;
     }
 
-    @Override
-    public PageSlice<OrderVO> findAllIntegrally(Filter filter, Sorter sorter, Page page) {
-        PageSlice<OrderVO> slice = extractPageSlice(orderMapper.selectAllIntegrally(filter, sorter, page));
-        slice.getList().forEach(this::mutate);
-        return slice;
-    }
 
 }

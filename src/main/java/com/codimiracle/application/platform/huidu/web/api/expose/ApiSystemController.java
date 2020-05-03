@@ -22,8 +22,6 @@ package com.codimiracle.application.platform.huidu.web.api.expose;/*
  * SOFTWARE.
  */
 
-import com.codimiracle.application.platform.huidu.contract.ApiResponse;
-import com.codimiracle.application.platform.huidu.contract.Page;
 import com.codimiracle.application.platform.huidu.entity.dto.SiginUpDTO;
 import com.codimiracle.application.platform.huidu.entity.dto.SignInDTO;
 import com.codimiracle.application.platform.huidu.entity.embedded.HotCommunity;
@@ -35,10 +33,13 @@ import com.codimiracle.application.platform.huidu.entity.vo.CategoryVO;
 import com.codimiracle.application.platform.huidu.entity.vo.RealtimeVO;
 import com.codimiracle.application.platform.huidu.entity.vo.UserTokenVO;
 import com.codimiracle.application.platform.huidu.enumeration.ActivityStatus;
-import com.codimiracle.application.platform.huidu.helper.NotificationTemplate;
 import com.codimiracle.application.platform.huidu.service.*;
 import com.codimiracle.application.platform.huidu.util.RestfulUtil;
 import com.codimiracle.application.platform.huidu.util.StringifizationUtil;
+import com.codimiracle.web.basic.contract.ApiResponse;
+import com.codimiracle.web.basic.contract.Page;
+import com.codimiracle.web.middleware.content.service.ReferenceService;
+import com.codimiracle.web.notification.middleware.template.NotificationTemplate;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -93,11 +94,7 @@ public class ApiSystemController {
     private UserFigureService userFigureService;
 
     @Resource
-    private ContentReferenceService contentReferenceService;
-
-    @Resource
-    private NotificationService notificationService;
-
+    private ReferenceService referenceService;
     @Resource
     private NotificationTemplate notificationTemplate;
 
@@ -144,7 +141,7 @@ public class ApiSystemController {
         }
         user.setRoleId(role.getId());
         userService.save(user);
-        notificationService.notify(notificationTemplate.generateNormal(user.getId(), "欢迎注册荟读账号"));
+        notificationTemplate.sendPlaintext(notificationTemplate.getDefaultSenderId(), user.getId(), "欢迎注册荟读账号");
         return RestfulUtil.success();
     }
 
@@ -185,17 +182,17 @@ public class ApiSystemController {
     @GetMapping("realtime")
     public ApiResponse realtime(@AuthenticationPrincipal User user) {
         RealtimeVO realtimeVO = new RealtimeVO();
-        int number = Integer.valueOf(settingsService.retrive(ACTIVITY_NUMBER));
+        int number = Integer.valueOf(settingsService.retrieve(ACTIVITY_NUMBER));
         realtimeVO.setActivities(activityService.findByStatusIntegrally(ActivityStatus.Activated, number));
-        List<String> categoryIds = StringifizationUtil.toList(settingsService.retrive(COMPREHENSIVE_PAGE_CATEGORIES));
+        List<String> categoryIds = StringifizationUtil.toList(settingsService.retrieve(COMPREHENSIVE_PAGE_CATEGORIES));
         realtimeVO.setCategories(categoryService.findByIdsIntegrally(categoryIds));
-        List<String> collectionIds = StringifizationUtil.toList(settingsService.retrive(COMPREHENSIVE_PAGE_COLLECTIONS));
+        List<String> collectionIds = StringifizationUtil.toList(settingsService.retrieve(COMPREHENSIVE_PAGE_COLLECTIONS));
         realtimeVO.setSections(categoryService.findByIdsIntegrally(collectionIds));
         HotCommunity hotCommunity = new HotCommunity();
         realtimeVO.setCommunity(hotCommunity);
         hotCommunity.setHotTopics(topicService.findHotIntegrally(null, null, new Page()).getList());
         hotCommunity.setHotReviews(reviewService.findHotReviewIntegrally(null, null, new Page()).getList());
-        hotCommunity.setFocus(contentReferenceService.findCommunityFocusIntegrally(null, null, new Page()).getList());
+        //hotCommunity.setFocus(referenceService.findCommunityFocusIntegrally(null, null, new Page()).getList());
         PersonalRecommendation personalRecommendation = new PersonalRecommendation();
         realtimeVO.setRecommendations(personalRecommendation);
         List<CategoryVO> similarCategories;

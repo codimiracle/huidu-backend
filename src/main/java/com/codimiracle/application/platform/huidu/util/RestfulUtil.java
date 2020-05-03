@@ -1,8 +1,8 @@
 package com.codimiracle.application.platform.huidu.util;
 
-import com.codimiracle.application.platform.huidu.contract.ApiResponse;
 import com.codimiracle.application.platform.huidu.contract.EntityData;
-import com.codimiracle.application.platform.huidu.contract.PageSlice;
+import com.codimiracle.web.basic.contract.ApiResponse;
+import com.codimiracle.web.basic.contract.PageSlice;
 
 public class RestfulUtil {
     public static <T> ApiResponse<T> success() {

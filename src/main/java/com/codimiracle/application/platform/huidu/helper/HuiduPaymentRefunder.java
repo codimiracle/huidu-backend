@@ -22,9 +22,9 @@ package com.codimiracle.application.platform.huidu.helper;/*
  * SOFTWARE.
  */
 
-import com.codimiracle.application.platform.huidu.contract.ServiceException;
 import com.codimiracle.application.platform.huidu.enumeration.PaymentType;
 import com.codimiracle.application.platform.huidu.service.UserAccountService;
+import com.codimiracle.web.mybatis.contract.ServiceException;
 import org.joda.money.Money;
 import org.springframework.stereotype.Component;
 

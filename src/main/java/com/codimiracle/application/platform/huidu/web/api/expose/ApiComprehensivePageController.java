@@ -22,14 +22,14 @@ package com.codimiracle.application.platform.huidu.web.api.expose;/*
  * SOFTWARE.
  */
 
-import com.codimiracle.application.platform.huidu.contract.ApiResponse;
-import com.codimiracle.application.platform.huidu.contract.PageSlice;
 import com.codimiracle.application.platform.huidu.entity.dto.ComprehensivePageDTO;
 import com.codimiracle.application.platform.huidu.entity.vo.CategoryVO;
 import com.codimiracle.application.platform.huidu.service.CategoryService;
 import com.codimiracle.application.platform.huidu.service.SettingsService;
 import com.codimiracle.application.platform.huidu.util.RestfulUtil;
 import com.codimiracle.application.platform.huidu.util.StringifizationUtil;
+import com.codimiracle.web.basic.contract.ApiResponse;
+import com.codimiracle.web.basic.contract.PageSlice;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -58,7 +58,7 @@ public class ApiComprehensivePageController {
 
     @GetMapping("/api/comprehensive-page/categories")
     public ApiResponse categories() {
-        String ids = settingsService.retrive(COMPREHENSIVE_PAGE_CATEGORIES);
+        String ids = settingsService.retrieve(COMPREHENSIVE_PAGE_CATEGORIES);
         List<CategoryVO> categories = categoryService.findByIdsIntegrally(StringifizationUtil.toList(ids));
         PageSlice<CategoryVO> slice = new PageSlice<>();
         slice.setList(categories);
@@ -66,7 +66,7 @@ public class ApiComprehensivePageController {
     }
     @GetMapping("/api/comprehensive-page/collections")
     public ApiResponse collections() {
-        String ids = settingsService.retrive(COMPREHENSIVE_PAGE_COLLECTIONS);
+        String ids = settingsService.retrieve(COMPREHENSIVE_PAGE_COLLECTIONS);
         List<CategoryVO> categories = categoryService.findByIdsIntegrally(StringifizationUtil.toList(ids));
         PageSlice<CategoryVO> slice = new PageSlice<>();
         slice.setList(categories);

@@ -22,7 +22,7 @@ package com.codimiracle.application.platform.huidu.helper;/*
  * SOFTWARE.
  */
 
-import com.codimiracle.application.platform.huidu.entity.vt.Comment;
+import com.codimiracle.web.middleware.content.pojo.po.Comment;
 
 public interface CommentExaminator {
     public boolean isApproval(Comment comment);

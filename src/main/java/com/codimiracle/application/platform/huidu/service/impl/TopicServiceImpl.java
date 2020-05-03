@@ -22,19 +22,22 @@ package com.codimiracle.application.platform.huidu.service.impl;/*
  * SOFTWARE.
  */
 
-import com.codimiracle.application.platform.huidu.contract.*;
-import com.codimiracle.application.platform.huidu.entity.po.Content;
-import com.codimiracle.application.platform.huidu.entity.po.ContentArticle;
-import com.codimiracle.application.platform.huidu.entity.po.ContentReference;
-import com.codimiracle.application.platform.huidu.entity.vo.ArticleVO;
 import com.codimiracle.application.platform.huidu.entity.vo.TopicVO;
 import com.codimiracle.application.platform.huidu.entity.vt.Topic;
-import com.codimiracle.application.platform.huidu.enumeration.ContentType;
-import com.codimiracle.application.platform.huidu.service.ContentArticleService;
-import com.codimiracle.application.platform.huidu.service.ContentReferenceService;
-import com.codimiracle.application.platform.huidu.service.ContentService;
 import com.codimiracle.application.platform.huidu.service.TopicService;
 import com.codimiracle.application.platform.huidu.util.ReferenceUtil;
+import com.codimiracle.web.basic.contract.Filter;
+import com.codimiracle.web.basic.contract.Page;
+import com.codimiracle.web.basic.contract.PageSlice;
+import com.codimiracle.web.basic.contract.Sorter;
+import com.codimiracle.web.middleware.content.pojo.po.Content;
+import com.codimiracle.web.middleware.content.pojo.po.ContentArticle;
+import com.codimiracle.web.middleware.content.pojo.po.ContentReference;
+import com.codimiracle.web.middleware.content.pojo.vo.ContentArticleVO;
+import com.codimiracle.web.middleware.content.service.ArticleService;
+import com.codimiracle.web.middleware.content.service.ContentService;
+import com.codimiracle.web.middleware.content.service.ReferenceService;
+import com.codimiracle.web.mybatis.contract.AbstractUnsupportedOperationService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,13 +50,13 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
-public class TopicServiceImpl extends AbstractUnsupportedOperationServiece<String, Topic> implements TopicService {
+public class TopicServiceImpl extends AbstractUnsupportedOperationService<String, Topic> implements TopicService {
     @Resource
     ContentService contentService;
     @Resource
-    ContentArticleService contentArticleService;
+    ArticleService contentArticleService;
     @Resource
-    ContentReferenceService contentReferenceService;
+    ReferenceService contentReferenceService;
 
     private void saveContentPart(Topic topic) {
         Content content = new Content();
@@ -96,9 +99,9 @@ public class TopicServiceImpl extends AbstractUnsupportedOperationServiece<Strin
         // 新引用
         List<ContentReference> newContentReference = topic.getReferenceList().stream().filter(contentReference -> Objects.isNull(contentReference.getId())).collect(Collectors.toList());
         //重用旧引用
-        Map<String, ContentReference> reusingContentReferenceMap = topic.getReferenceList().stream().collect(Collectors.toMap(contentReference -> String.format("%s-%s", contentReference.getType(), contentReference.getRefId()), c -> c));
+        Map<String, ContentReference> reusingContentReferenceMap = topic.getReferenceList().stream().collect(Collectors.toMap(contentReference -> String.format("%s-%s", contentReference.getReferenceTargetType(), contentReference.getReferenceTargetId()), c -> c));
         allContentReference.forEach(r -> {
-            String key = String.format("%s-%s", r.getType(), r.getRefId());
+            String key = String.format("%s-%s", r.getReferenceTargetType(), r.getReferenceTargetId());
             if (!reusingContentReferenceMap.containsKey(key)) {
                 r.setDeleted(true);
             } else {
@@ -137,22 +140,17 @@ public class TopicServiceImpl extends AbstractUnsupportedOperationServiece<Strin
         return topic;
     }
 
-    @Override
-    public int deleteByIdLogically(String id) {
-        return contentService.deleteByIdLogically(id);
-    }
-
-    private TopicVO mutate(ArticleVO articleVO) {
+    private TopicVO mutate(ContentArticleVO articleVO) {
         if (Objects.isNull(articleVO)) {
             return null;
         }
         TopicVO topicVO = new TopicVO();
         BeanUtils.copyProperties(articleVO, topicVO);
-        topicVO.setReferences(contentReferenceService.findByContentIdIntegrally(articleVO.getContentId()));
+        topicVO.setReferenceList(contentReferenceService.findByContentIdIntegrally(articleVO.getContentId()));
         return topicVO;
     }
 
-    private PageSlice<TopicVO> mutate(PageSlice<ArticleVO> slice) {
+    private PageSlice<TopicVO> mutate(PageSlice<ContentArticleVO> slice) {
         PageSlice<TopicVO> mutateSlice = new PageSlice<>();
         mutateSlice.setList(slice.getList().stream().map(this::mutate).collect(Collectors.toList()));
         mutateSlice.setPage(slice.getPage());
@@ -163,29 +161,38 @@ public class TopicServiceImpl extends AbstractUnsupportedOperationServiece<Strin
 
     @Override
     public TopicVO findByIdIntegrally(String id) {
-        ArticleVO articleVO = contentArticleService.findByIdIntegrally(ContentType.Topic, id);
-        return mutate(articleVO);
+//        ContentArticleVO articleVO = contentArticleService.findByIdIntegrally(ContentType.Topic, id);
+//        return mutate(articleVO);
+        return null;
     }
 
     @Override
     public PageSlice<TopicVO> findAllIntegrally(Filter filter, Sorter sorter, Page page) {
-        PageSlice<ArticleVO> slice = contentArticleService.findAllIntegrally(ContentType.Topic, filter, sorter, page);
-        return mutate(slice);
+//        PageSlice<ContentArticleVO> slice = contentArticleService.findAllIntegrally(ContentType.Topic, filter, sorter, page);
+//        return mutate(slice);
+        return null;
     }
 
     @Override
     public PageSlice<TopicVO> findHotIntegrally(Filter filter, Sorter sorter, Page page) {
-        return mutate(contentArticleService.findHotIntegrally(ContentType.Topic, filter, sorter, page));
+        //return mutate(contentArticleService.findHotIntegrally(ContentType.Topic, filter, sorter, page));
+        return null;
     }
 
     @Override
     public PageSlice<TopicVO> findFocusTopicByReferenceIdIntegrally(String bookId, Filter filter, Sorter sorter, Page page) {
-        PageSlice<ArticleVO> slice = contentArticleService.findFocusArticleByTypeAndReferenceId(ContentType.Topic, "book", bookId, filter, sorter, page);
-        return mutate(slice);
+        //PageSlice<ContentArticleVO> slice = contentArticleService.findFocusArticleByTypeAndReferenceId(ContentType.Topic, "book", bookId, filter, sorter, page);
+        //return mutate(slice);
+        return null;
+    }
+
+    @Override
+    public void deleteById(String id) {
+        contentService.deleteByIdLogically(id);
     }
 
     @Override
     public void deleteByIdsLogically(List<String> ids) {
-        contentService.deleteByIdsLogically(ids);
+        ids.forEach(contentService::deleteByIdLogically);
     }
 }

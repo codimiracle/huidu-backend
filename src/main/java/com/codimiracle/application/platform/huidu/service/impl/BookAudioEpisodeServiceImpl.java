@@ -1,19 +1,25 @@
 package com.codimiracle.application.platform.huidu.service.impl;
 
-import com.codimiracle.application.platform.huidu.contract.*;
 import com.codimiracle.application.platform.huidu.entity.po.BookAudioEpisode;
-import com.codimiracle.application.platform.huidu.entity.po.Content;
-import com.codimiracle.application.platform.huidu.entity.po.ContentExamination;
-import com.codimiracle.application.platform.huidu.entity.po.Subscribe;
 import com.codimiracle.application.platform.huidu.entity.vo.BookAudioEpisodeVO;
 import com.codimiracle.application.platform.huidu.entity.vt.AudioCatalogs;
 import com.codimiracle.application.platform.huidu.enumeration.BookAudioEpisodeStatus;
 import com.codimiracle.application.platform.huidu.enumeration.ContentStatus;
 import com.codimiracle.application.platform.huidu.enumeration.ContentType;
-import com.codimiracle.application.platform.huidu.enumeration.SubscribeType;
-import com.codimiracle.application.platform.huidu.helper.NotificationTemplate;
 import com.codimiracle.application.platform.huidu.mapper.BookAudioEpisodeMapper;
 import com.codimiracle.application.platform.huidu.service.*;
+import com.codimiracle.web.basic.contract.Filter;
+import com.codimiracle.web.basic.contract.Page;
+import com.codimiracle.web.basic.contract.PageSlice;
+import com.codimiracle.web.basic.contract.Sorter;
+import com.codimiracle.web.middleware.content.pojo.po.Content;
+import com.codimiracle.web.middleware.content.pojo.po.ContentExamination;
+import com.codimiracle.web.middleware.content.service.ContentService;
+import com.codimiracle.web.middleware.content.service.ExaminationService;
+import com.codimiracle.web.mybatis.contract.ServiceException;
+import com.codimiracle.web.mybatis.contract.support.vo.AbstractService;
+import com.codimiracle.web.notification.middleware.template.NotificationTemplate;
+import com.codimiracle.web.notification.middleware.template.SubscriptionTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,7 +34,7 @@ import java.util.Objects;
  */
 @Service
 @Transactional
-public class BookAudioEpisodeServiceImpl extends AbstractService<String, BookAudioEpisode> implements BookAudioEpisodeService {
+public class BookAudioEpisodeServiceImpl extends AbstractService<String, BookAudioEpisode, BookAudioEpisodeVO> implements BookAudioEpisodeService {
     @Resource
     private BookAudioEpisodeMapper bookAudioEpisodeMapper;
     @Resource
@@ -38,13 +44,11 @@ public class BookAudioEpisodeServiceImpl extends AbstractService<String, BookAud
     @Resource
     private NotificationTemplate notificationTemplate;
     @Resource
-    private NotificationService notificationService;
-    @Resource
-    private SubscribeService subscribeService;
+    private SubscriptionTemplate subscriptionTemplate;
     @Resource
     private BookMetadataService bookMetadataService;
     @Resource
-    private ContentExaminationService contentExaminationService;
+    private ExaminationService examinationService;
 
     @Resource
     private BookService bookService;
@@ -71,8 +75,7 @@ public class BookAudioEpisodeServiceImpl extends AbstractService<String, BookAud
         updateStatistics(bookAudioEpisode.getStatus(), model);
         //修改为发布状态时发送通知
         if (!Objects.equals(bookAudioEpisode.getStatus(), ContentStatus.Publish) && Objects.equals(model.getStatus(), ContentStatus.Publish)) {
-            List<Subscribe> subscribes = subscribeService.findBySubscribeTypeAndBookId(SubscribeType.BookUpdated, bookAudioEpisode.getBookId());
-            subscribes.stream().map(e -> notificationTemplate.generateNotificationBy(SubscribeType.BookUpdated, e.getSubscriberId(), e.getBookId(), bookAudioEpisode.getTitle())).forEach(notification -> notificationService.notify(notification));
+            // TODO
         }
         super.update(model);
     }
@@ -80,43 +83,27 @@ public class BookAudioEpisodeServiceImpl extends AbstractService<String, BookAud
     @Override
     public void save(BookAudioEpisode model) {
         Content content = new Content();
-        content.setType(ContentType.AudioEpisode);
+        content.setType(ContentType.AudioEpisode.toString());
         content.setOwnerId(model.getOwnerId());
-        content.setCreateTime(new Date());
-        content.setUpdateTime(content.getCreateTime());
         contentService.save(content);
         model.setContentId(content.getId());
         super.save(model);
     }
 
-    private BookAudioEpisodeVO mutate(BookAudioEpisodeVO bookAudioEpisodeVO) {
+    protected BookAudioEpisodeVO mutate(BookAudioEpisodeVO bookAudioEpisodeVO) {
         if (Objects.nonNull(bookAudioEpisodeVO)) {
             bookAudioEpisodeVO.setBook(bookService.findByIdIntegrally(bookAudioEpisodeVO.getBookId()));
             bookAudioEpisodeVO.setCommodity(commodityService.findByIdIntegrally(bookAudioEpisodeVO.getCommodityId()));
             bookAudioEpisodeVO.setEpisode(bookEpisodeService.findByIdIntegrally(bookAudioEpisodeVO.getEpisodeId()));
             bookAudioEpisodeVO.setNext(bookAudioEpisodeMapper.selectPublishedAudioEpisodeIdByMediaNumber(bookAudioEpisodeVO.getBookId(), bookAudioEpisodeVO.getMediaNumber() + 1));
-            bookAudioEpisodeVO.setExamination(contentExaminationService.findLastExaminationByContentId(bookAudioEpisodeVO.getContentId()));
+            bookAudioEpisodeVO.setExamination(examinationService.findLastByContentIdIntegrally(bookAudioEpisodeVO.getContentId()));
         }
         return bookAudioEpisodeVO;
     }
 
     @Override
     public PageSlice<BookAudioEpisodeVO> findAllIntegrally(String bookId, Filter filter, Sorter sorter, Page page) {
-        PageSlice<BookAudioEpisodeVO> bookAudioEpisodeVOPageSlice = extractPageSlice(bookAudioEpisodeMapper.selectAllIntegrally(bookId, filter, sorter, page));
-        bookAudioEpisodeVOPageSlice.getList().forEach((this::mutate));
-        return bookAudioEpisodeVOPageSlice;
-    }
-
-    @Override
-    public BookAudioEpisodeVO findByIdIntegrally(String id) {
-        BookAudioEpisodeVO bookAudioEpisodeVO = bookAudioEpisodeMapper.selectByIdIntegrally(id);
-        mutate(bookAudioEpisodeVO);
-        return bookAudioEpisodeVO;
-    }
-
-    @Override
-    public void deleteByIdLogically(String id) {
-        bookAudioEpisodeMapper.deleteByIdLogically(id);
+        return null;
     }
 
     @Override
@@ -151,9 +138,9 @@ public class BookAudioEpisodeServiceImpl extends AbstractService<String, BookAud
         examination.setToStatus(status.getStatus());
         examination.setTargetContentId(contentId);
         examination.setReason(reason);
-        examination.setUserId(userId);
-        examination.setExamineTime(new Date());
-        contentExaminationService.save(examination);
+        examination.setExaminerId(userId);
+        examination.setExaminedAt(new Date());
+        examinationService.save(examination);
 
         BookAudioEpisode updatingBookAudioEpisode = new BookAudioEpisode();
         updatingBookAudioEpisode.setId(bookAudioEpisode.getId());

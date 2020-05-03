@@ -1,11 +1,11 @@
 package com.codimiracle.application.platform.huidu.service.impl;
 
-import com.codimiracle.application.platform.huidu.contract.AbstractService;
 import com.codimiracle.application.platform.huidu.entity.po.CategoryTags;
 import com.codimiracle.application.platform.huidu.entity.vo.CategoryVO;
 import com.codimiracle.application.platform.huidu.entity.vo.TagVO;
 import com.codimiracle.application.platform.huidu.mapper.CategoryTagsMapper;
 import com.codimiracle.application.platform.huidu.service.CategoryTagsService;
+import com.codimiracle.web.mybatis.contract.AbstractService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

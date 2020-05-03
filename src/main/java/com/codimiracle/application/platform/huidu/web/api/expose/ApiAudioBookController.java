@@ -1,14 +1,14 @@
 package com.codimiracle.application.platform.huidu.web.api.expose;
 
-import com.codimiracle.application.platform.huidu.contract.ApiResponse;
-import com.codimiracle.application.platform.huidu.contract.Filter;
-import com.codimiracle.application.platform.huidu.contract.Page;
-import com.codimiracle.application.platform.huidu.contract.Sorter;
 import com.codimiracle.application.platform.huidu.entity.po.User;
 import com.codimiracle.application.platform.huidu.enumeration.BookType;
 import com.codimiracle.application.platform.huidu.service.BookAudioEpisodeService;
 import com.codimiracle.application.platform.huidu.util.RestfulUtil;
 import com.codimiracle.application.platform.huidu.web.api.base.BookController;
+import com.codimiracle.web.basic.contract.ApiResponse;
+import com.codimiracle.web.basic.contract.Filter;
+import com.codimiracle.web.basic.contract.Page;
+import com.codimiracle.web.basic.contract.Sorter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;

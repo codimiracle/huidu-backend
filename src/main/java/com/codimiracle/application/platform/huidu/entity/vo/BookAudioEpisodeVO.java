@@ -22,6 +22,7 @@ package com.codimiracle.application.platform.huidu.entity.vo;/*
  * SOFTWARE.
  */
 
+import com.codimiracle.web.middleware.content.pojo.vo.ContentExaminationVO;
 import lombok.Data;
 
 import java.util.Date;
@@ -57,7 +58,7 @@ public class BookAudioEpisodeVO {
 
     private String contentId;
 
-    private ExaminationVO examination;
+    private ContentExaminationVO examination;
     /**
      * 音频流url
      */

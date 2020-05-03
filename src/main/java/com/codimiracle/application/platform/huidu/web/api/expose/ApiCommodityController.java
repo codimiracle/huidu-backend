@@ -1,11 +1,11 @@
 package com.codimiracle.application.platform.huidu.web.api.expose;
 
-import com.codimiracle.application.platform.huidu.contract.*;
 import com.codimiracle.application.platform.huidu.entity.dto.CommodityDTO;
 import com.codimiracle.application.platform.huidu.entity.po.Commodity;
 import com.codimiracle.application.platform.huidu.entity.vo.CommodityVO;
 import com.codimiracle.application.platform.huidu.service.CommodityService;
 import com.codimiracle.application.platform.huidu.util.RestfulUtil;
+import com.codimiracle.web.basic.contract.*;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;

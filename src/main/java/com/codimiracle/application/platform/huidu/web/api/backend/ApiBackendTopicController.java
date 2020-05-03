@@ -22,17 +22,17 @@ package com.codimiracle.application.platform.huidu.web.api.backend;/*
  * SOFTWARE.
  */
 
-import com.codimiracle.application.platform.huidu.contract.ApiResponse;
-import com.codimiracle.application.platform.huidu.contract.Filter;
-import com.codimiracle.application.platform.huidu.contract.Page;
-import com.codimiracle.application.platform.huidu.contract.Sorter;
 import com.codimiracle.application.platform.huidu.entity.dto.BulkDeletionDTO;
 import com.codimiracle.application.platform.huidu.entity.dto.ExaminationDTO;
 import com.codimiracle.application.platform.huidu.entity.po.User;
 import com.codimiracle.application.platform.huidu.entity.vo.TopicVO;
-import com.codimiracle.application.platform.huidu.service.ContentArticleService;
 import com.codimiracle.application.platform.huidu.service.TopicService;
 import com.codimiracle.application.platform.huidu.util.RestfulUtil;
+import com.codimiracle.web.basic.contract.ApiResponse;
+import com.codimiracle.web.basic.contract.Filter;
+import com.codimiracle.web.basic.contract.Page;
+import com.codimiracle.web.basic.contract.Sorter;
+import com.codimiracle.web.middleware.content.service.ExaminationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -51,7 +51,7 @@ public class ApiBackendTopicController {
     private TopicService topicService;
 
     @Resource
-    private ContentArticleService contentArticleService;
+    private ExaminationService examinationService;
 
     @GetMapping("/{id}")
     public ApiResponse entity(@PathVariable String id) {
@@ -73,13 +73,13 @@ public class ApiBackendTopicController {
 
     @PostMapping("/{id}/accept")
     public ApiResponse accept(@AuthenticationPrincipal User user, @PathVariable("id") String topicId, @Valid @RequestBody ExaminationDTO examinationDTO) {
-        contentArticleService.passExamination(topicId, examinationDTO.getReason(), user.getId());
+        examinationService.accept(topicId, user.getId(), examinationDTO.getReason());
         return RestfulUtil.success();
     }
 
     @PostMapping("/{id}/reject")
     public ApiResponse reject(@AuthenticationPrincipal User user, @PathVariable("id") String topicId, @Valid @RequestBody ExaminationDTO examinationDTO) {
-        contentArticleService.rejectExamination(topicId, examinationDTO.getReason(), user.getId());
+        examinationService.reject(topicId, user.getId(),  examinationDTO.getReason());
         return RestfulUtil.success();
     }
 

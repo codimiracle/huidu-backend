@@ -1,11 +1,11 @@
 package com.codimiracle.application.platform.huidu.web.api.expose;
 
-import com.codimiracle.application.platform.huidu.contract.ApiResponse;
-import com.codimiracle.application.platform.huidu.contract.Page;
-import com.codimiracle.application.platform.huidu.contract.PageSlice;
-import com.codimiracle.application.platform.huidu.entity.po.Subscribe;
-import com.codimiracle.application.platform.huidu.service.SubscribeService;
 import com.codimiracle.application.platform.huidu.util.RestfulUtil;
+import com.codimiracle.web.basic.contract.ApiResponse;
+import com.codimiracle.web.basic.contract.Page;
+import com.codimiracle.web.basic.contract.PageSlice;
+import com.codimiracle.web.notification.middleware.pojo.po.Subscription;
+import com.codimiracle.web.notification.middleware.service.SubscriptionService;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -19,35 +19,35 @@ import javax.validation.Valid;
 @RequestMapping("/api/subscribe")
 public class ApiSubscribeController {
     @Resource
-    private SubscribeService subscribeService;
+    private SubscriptionService subscriptionService;
 
     @PostMapping
-    public ApiResponse create(@Valid @RequestBody Subscribe subscribe) {
-        subscribeService.save(subscribe);
+    public ApiResponse create(@Valid @RequestBody Subscription subscription) {
+        subscriptionService.save(subscription);
         return RestfulUtil.success();
     }
 
     @DeleteMapping("/{id}")
     public ApiResponse delete(@PathVariable String id) {
-        subscribeService.deleteById(id);
+        subscriptionService.deleteById(id);
         return RestfulUtil.success();
     }
 
     @PutMapping("/{id}")
-    public ApiResponse update(@Valid @RequestBody Subscribe subscribe) {
-        subscribeService.update(subscribe);
+    public ApiResponse update(@Valid @RequestBody Subscription subscription) {
+        subscriptionService.update(subscription);
         return RestfulUtil.success();
     }
 
     @GetMapping("/{id}")
     public ApiResponse entity(@PathVariable String id) {
-        Subscribe subscribe = subscribeService.findById(id);
-        return RestfulUtil.success(subscribe);
+        Subscription subscription = subscriptionService.findById(id);
+        return RestfulUtil.success(subscription);
     }
 
     @GetMapping
     public ApiResponse collection(@ModelAttribute Page page) {
-        PageSlice<Subscribe> slice = subscribeService.findAll(page);
+        PageSlice<Subscription> slice = subscriptionService.findAll(page);
         return RestfulUtil.list(slice);
     }
 }

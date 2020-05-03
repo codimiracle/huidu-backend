@@ -3,15 +3,13 @@ package com.codimiracle.application.platform.huidu.entity.po;
 import com.codimiracle.application.platform.huidu.entity.dto.BookDTO;
 import com.codimiracle.application.platform.huidu.enumeration.BookStatus;
 import com.codimiracle.application.platform.huidu.enumeration.BookType;
-import com.codimiracle.application.platform.huidu.util.TagUtil;
+import com.codimiracle.web.middleware.content.pojo.po.Content;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
 
 import javax.persistence.*;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Data
 public class Book {

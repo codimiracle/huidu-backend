@@ -1,11 +1,11 @@
 package com.codimiracle.application.platform.huidu.web.api.expose;
 
-import com.codimiracle.application.platform.huidu.contract.*;
 import com.codimiracle.application.platform.huidu.entity.dto.TagDTO;
 import com.codimiracle.application.platform.huidu.entity.po.Tag;
 import com.codimiracle.application.platform.huidu.entity.vo.TagVO;
 import com.codimiracle.application.platform.huidu.service.TagService;
 import com.codimiracle.application.platform.huidu.util.RestfulUtil;
+import com.codimiracle.web.basic.contract.*;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;

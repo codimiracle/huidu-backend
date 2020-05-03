@@ -1,18 +1,24 @@
 package com.codimiracle.application.platform.huidu.service.impl;
 
-import com.codimiracle.application.platform.huidu.contract.*;
 import com.codimiracle.application.platform.huidu.entity.po.BookEpisode;
-import com.codimiracle.application.platform.huidu.entity.po.Content;
-import com.codimiracle.application.platform.huidu.entity.po.ContentExamination;
-import com.codimiracle.application.platform.huidu.entity.po.Subscribe;
 import com.codimiracle.application.platform.huidu.entity.vo.BookEpisodeVO;
 import com.codimiracle.application.platform.huidu.entity.vt.Catalogs;
 import com.codimiracle.application.platform.huidu.enumeration.ContentStatus;
 import com.codimiracle.application.platform.huidu.enumeration.ContentType;
-import com.codimiracle.application.platform.huidu.enumeration.SubscribeType;
-import com.codimiracle.application.platform.huidu.helper.NotificationTemplate;
 import com.codimiracle.application.platform.huidu.mapper.BookEpisodeMapper;
 import com.codimiracle.application.platform.huidu.service.*;
+import com.codimiracle.web.basic.contract.Filter;
+import com.codimiracle.web.basic.contract.Page;
+import com.codimiracle.web.basic.contract.PageSlice;
+import com.codimiracle.web.basic.contract.Sorter;
+import com.codimiracle.web.middleware.content.pojo.po.Content;
+import com.codimiracle.web.middleware.content.pojo.po.ContentExamination;
+import com.codimiracle.web.middleware.content.service.ContentService;
+import com.codimiracle.web.middleware.content.service.ExaminationService;
+import com.codimiracle.web.mybatis.contract.ServiceException;
+import com.codimiracle.web.mybatis.contract.support.vo.AbstractService;
+import com.codimiracle.web.notification.middleware.service.SubscriptionService;
+import com.codimiracle.web.notification.middleware.template.NotificationTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,7 +33,7 @@ import java.util.Objects;
  */
 @Service
 @Transactional
-public class BookEpisodeServiceImpl extends AbstractService<String, BookEpisode> implements BookEpisodeService {
+public class BookEpisodeServiceImpl extends AbstractService<String, BookEpisode, BookEpisodeVO> implements BookEpisodeService {
     @Resource
     private BookEpisodeMapper bookEpisodeMapper;
     @Resource
@@ -37,11 +43,9 @@ public class BookEpisodeServiceImpl extends AbstractService<String, BookEpisode>
     @Resource
     private ContentService contentService;
     @Resource
-    private NotificationService notificationService;
+    private SubscriptionService subscriptionService;
     @Resource
-    private SubscribeService subscribeService;
-    @Resource
-    private ContentExaminationService contentExaminationService;
+    private ExaminationService examinationService;
     @Resource
     private NotificationTemplate notificationTemplate;
 
@@ -50,28 +54,22 @@ public class BookEpisodeServiceImpl extends AbstractService<String, BookEpisode>
     @Resource
     private CategoryService categoryService;
 
-    private BookEpisodeVO mutate(BookEpisodeVO episodeVO) {
+    @Override
+    protected BookEpisodeVO mutate(BookEpisodeVO episodeVO) {
         if (Objects.nonNull(episodeVO)) {
             episodeVO.setBook(bookService.findByIdIntegrally(episodeVO.getBookId()));
             episodeVO.setCommodity(commodityService.findByIdIntegrally(episodeVO.getCommodityId()));
             episodeVO.setNext(bookEpisodeMapper.selectEpisodeIdByEpisodeNumber(episodeVO.getBookId(), episodeVO.getEpisodeNumber() + 1));
-            episodeVO.setExamination(contentExaminationService.findLastExaminationByContentId(episodeVO.getContentId()));
+            episodeVO.setExamination(examinationService.findLastByContentIdIntegrally(episodeVO.getContentId()));
         }
         return episodeVO;
-    }
-
-    private PageSlice<BookEpisodeVO> mutate(PageSlice<BookEpisodeVO> slice) {
-        slice.getList().forEach(this::mutate);
-        return slice;
     }
 
     @Override
     public void save(BookEpisode model) {
         Content content = new Content();
         content.setOwnerId(model.getOwnerId());
-        content.setType(ContentType.Episode);
-        content.setCreateTime(new Date());
-        content.setUpdateTime(content.getCreateTime());
+        content.setType(ContentType.Episode.toString());
         contentService.save(content);
         model.setContentId(content.getId());
         super.save(model);
@@ -103,8 +101,7 @@ public class BookEpisodeServiceImpl extends AbstractService<String, BookEpisode>
         updateStatistics(bookEpisode.getStatus(), model);
         //初次修改为发布状态时发送通知
         if (Objects.nonNull(bookEpisode) && !Objects.equals(model.getStatus(), bookEpisode.getStatus()) && !Objects.equals(model.getStatus(), ContentStatus.Publish)) {
-            List<Subscribe> subscribes = subscribeService.findBySubscribeTypeAndBookId(SubscribeType.BookUpdated, bookEpisode.getBookId());
-            subscribes.stream().map(e -> notificationTemplate.generateNotificationBy(SubscribeType.BookUpdated, e.getSubscriberId(), e.getBookId(), bookEpisode.getTitle())).forEach(notification -> notificationService.notify(notification));
+            //TODO
         }
         super.update(model);
     }
@@ -176,9 +173,9 @@ public class BookEpisodeServiceImpl extends AbstractService<String, BookEpisode>
         examination.setToStatus(status.getStatus());
         examination.setTargetContentId(contentId);
         examination.setReason(reason);
-        examination.setUserId(userId);
-        examination.setExamineTime(new Date());
-        contentExaminationService.save(examination);
+        examination.setExaminerId(userId);
+        examination.setExaminedAt(new Date());
+        examinationService.save(examination);
 
         BookEpisode updatingBookEpisode = new BookEpisode();
         updatingBookEpisode.setId(bookEpisode.getId());

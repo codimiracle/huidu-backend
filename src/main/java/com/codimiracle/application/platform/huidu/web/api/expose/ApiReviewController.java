@@ -22,15 +22,15 @@ package com.codimiracle.application.platform.huidu.web.api.expose;/*
  * SOFTWARE.
  */
 
-import com.codimiracle.application.platform.huidu.contract.ApiResponse;
-import com.codimiracle.application.platform.huidu.contract.Filter;
-import com.codimiracle.application.platform.huidu.contract.Page;
-import com.codimiracle.application.platform.huidu.contract.Sorter;
 import com.codimiracle.application.platform.huidu.entity.vo.ReviewVO;
 import com.codimiracle.application.platform.huidu.enumeration.ContentStatus;
 import com.codimiracle.application.platform.huidu.service.ReviewService;
 import com.codimiracle.application.platform.huidu.util.FilterUtil;
 import com.codimiracle.application.platform.huidu.util.RestfulUtil;
+import com.codimiracle.web.basic.contract.ApiResponse;
+import com.codimiracle.web.basic.contract.Filter;
+import com.codimiracle.web.basic.contract.Page;
+import com.codimiracle.web.basic.contract.Sorter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
@@ -64,7 +64,7 @@ public class ApiReviewController {
     @GetMapping
     public ApiResponse collection(@RequestParam("filter") Filter filter, @RequestParam("sorter") Sorter sorter, @ModelAttribute Page page) {
         filter = FilterUtil.ensureNotNull(filter);
-        filter.filter("status", ContentStatus.Publish.toString());
+        filter.put("status", new String[]{ContentStatus.Publish.toString()});
         sorter = Objects.isNull(sorter) ? new Sorter() : sorter;
         sorter.setField("createTime");
         sorter.setOrder("descend");

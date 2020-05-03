@@ -1,12 +1,24 @@
 package com.codimiracle.application.platform.huidu.service.impl;
 
-import com.codimiracle.application.platform.huidu.contract.*;
-import com.codimiracle.application.platform.huidu.entity.po.*;
+import com.codimiracle.application.platform.huidu.entity.po.Book;
+import com.codimiracle.application.platform.huidu.entity.po.BookTags;
+import com.codimiracle.application.platform.huidu.entity.po.Tag;
+import com.codimiracle.application.platform.huidu.entity.po.User;
 import com.codimiracle.application.platform.huidu.entity.vo.BookVO;
 import com.codimiracle.application.platform.huidu.enumeration.BookStatus;
 import com.codimiracle.application.platform.huidu.enumeration.BookType;
 import com.codimiracle.application.platform.huidu.mapper.BookMapper;
 import com.codimiracle.application.platform.huidu.service.*;
+import com.codimiracle.web.basic.contract.Filter;
+import com.codimiracle.web.basic.contract.Page;
+import com.codimiracle.web.basic.contract.PageSlice;
+import com.codimiracle.web.basic.contract.Sorter;
+import com.codimiracle.web.middleware.content.pojo.po.Content;
+import com.codimiracle.web.middleware.content.pojo.po.ContentExamination;
+import com.codimiracle.web.middleware.content.service.ContentService;
+import com.codimiracle.web.middleware.content.service.ExaminationService;
+import com.codimiracle.web.mybatis.contract.ServiceException;
+import com.codimiracle.web.mybatis.contract.support.vo.AbstractService;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,7 +33,7 @@ import java.util.stream.Collectors;
  */
 @Service
 @Transactional
-public class BookServiceImpl extends AbstractService<String, Book> implements BookService {
+public class BookServiceImpl extends AbstractService<String, Book, BookVO> implements BookService {
     @Resource
     private BookMapper bookMapper;
     @Resource
@@ -39,7 +51,7 @@ public class BookServiceImpl extends AbstractService<String, Book> implements Bo
     @Resource
     private UserCartService userCartService;
     @Resource
-    private ContentExaminationService contentExaminationService;
+    private ExaminationService examinationService;
     @Resource
     private BookShelfService bookShelfService;
 
@@ -76,9 +88,9 @@ public class BookServiceImpl extends AbstractService<String, Book> implements Bo
         examination.setToStatus(status.getStatus());
         examination.setTargetContentId(id);
         examination.setReason(reason);
-        examination.setUserId(userId);
-        examination.setExamineTime(new Date());
-        contentExaminationService.save(examination);
+        examination.setExaminerId(userId);
+        examination.setExaminedAt(new Date());
+        examinationService.save(examination);
     }
 
     private Book findByContentId(String id) {
@@ -113,7 +125,6 @@ public class BookServiceImpl extends AbstractService<String, Book> implements Bo
         }
         Content content = new Content();
         content.setId(model.getId());
-        content.setUpdateTime(new Date());
         contentService.update(content);
         super.update(model);
     }
@@ -136,7 +147,7 @@ public class BookServiceImpl extends AbstractService<String, Book> implements Bo
         bookTagsList.forEach(bookTagsService::save);
     }
 
-    private void mutate(BookVO bookVO) {
+    protected BookVO mutate(BookVO bookVO) {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (Objects.nonNull(bookVO)) {
             if (Objects.nonNull(bookVO.getCategoryId())) {
@@ -152,10 +163,11 @@ public class BookServiceImpl extends AbstractService<String, Book> implements Bo
                 }
                 bookVO.setJoinedShelf(bookShelfService.isJoined(user.getId(), bookVO.getId()));
             }
-            bookVO.setExamination(contentExaminationService.findLastExaminationByContentId(bookVO.getContentId()));
+            bookVO.setExamination(examinationService.findLastByContentIdIntegrally(bookVO.getContentId()));
             bookVO.setReviewRate(avgReviewStars(bookVO.getId()));
             bookVO.setTags(bookTagsService.findByBookIdItegrally(bookVO.getId()));
         }
+        return bookVO;
     }
 
     @Override

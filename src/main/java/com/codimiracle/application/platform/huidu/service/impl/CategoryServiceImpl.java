@@ -1,6 +1,5 @@
 package com.codimiracle.application.platform.huidu.service.impl;
 
-import com.codimiracle.application.platform.huidu.contract.*;
 import com.codimiracle.application.platform.huidu.entity.po.Category;
 import com.codimiracle.application.platform.huidu.entity.po.CategoryTags;
 import com.codimiracle.application.platform.huidu.entity.po.Tag;
@@ -12,6 +11,11 @@ import com.codimiracle.application.platform.huidu.mapper.CategoryMapper;
 import com.codimiracle.application.platform.huidu.service.CategoryService;
 import com.codimiracle.application.platform.huidu.service.CategoryTagsService;
 import com.codimiracle.application.platform.huidu.service.TagService;
+import com.codimiracle.web.basic.contract.Filter;
+import com.codimiracle.web.basic.contract.Page;
+import com.codimiracle.web.basic.contract.PageSlice;
+import com.codimiracle.web.basic.contract.Sorter;
+import com.codimiracle.web.mybatis.contract.support.vo.AbstractService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,7 +31,7 @@ import java.util.stream.Collectors;
  */
 @Service
 @Transactional
-public class CategoryServiceImpl extends AbstractService<String, Category> implements CategoryService {
+public class CategoryServiceImpl extends AbstractService<String, Category, CategoryVO> implements CategoryService {
     @Resource
     CategoryTagsService categoryTagsService;
     @Resource
@@ -62,7 +66,9 @@ public class CategoryServiceImpl extends AbstractService<String, Category> imple
 
     @Override
     public List<CategoryVO> findRelativeCategoriesByBookType(BookType bookType) {
-        return mutate(categoryMapper.selectRelativeCategoriesByBookType(bookType));
+        List<CategoryVO> list = categoryMapper.selectRelativeCategoriesByBookType(bookType);
+        list.forEach(this::mutate);
+        return list;
     }
 
     @Override
@@ -70,15 +76,11 @@ public class CategoryServiceImpl extends AbstractService<String, Category> imple
         return extractPageSlice(categoryMapper.selectCollectionStatisticsByCollectionId(collectionId, filter, sorter, page));
     }
 
-    private void mutate(CategoryVO categoryVO) {
+    protected CategoryVO mutate(CategoryVO categoryVO) {
         if (Objects.nonNull(categoryVO)) {
             categoryVO.setTags(categoryTagsService.findTagByCategoryId(categoryVO.getId()));
         }
-    }
-
-    private List<CategoryVO> mutate(List<CategoryVO> list) {
-        list.forEach(this::mutate);
-        return list;
+        return categoryVO;
     }
 
     @Override

@@ -22,16 +22,18 @@ package com.codimiracle.application.platform.huidu.service;/*
  * SOFTWARE.
  */
 
-import com.codimiracle.application.platform.huidu.contract.*;
 import com.codimiracle.application.platform.huidu.entity.vo.ReviewVO;
 import com.codimiracle.application.platform.huidu.entity.vt.Review;
+import com.codimiracle.web.basic.contract.Filter;
+import com.codimiracle.web.basic.contract.Page;
+import com.codimiracle.web.basic.contract.PageSlice;
+import com.codimiracle.web.basic.contract.Sorter;
+import com.codimiracle.web.mybatis.contract.support.vo.Service;
 
 import java.util.List;
 
-public interface ReviewService extends Service<String, Review> {
+public interface ReviewService extends Service<String, Review, ReviewVO> {
     ReviewVO findByIdIntegrally(String id);
-
-    int deleteByIdLogically(String id);
 
     PageSlice<ReviewVO> findHotIntegrally(Filter filter, Sorter sorter, Page page);
 

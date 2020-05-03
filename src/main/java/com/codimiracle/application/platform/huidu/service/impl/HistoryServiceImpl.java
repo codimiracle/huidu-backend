@@ -1,6 +1,6 @@
 package com.codimiracle.application.platform.huidu.service.impl;
 
-import com.codimiracle.application.platform.huidu.contract.*;
+import com.codimiracle.application.platform.huidu.contract.Conditioner;
 import com.codimiracle.application.platform.huidu.entity.po.Book;
 import com.codimiracle.application.platform.huidu.entity.po.History;
 import com.codimiracle.application.platform.huidu.entity.vo.BookAudioEpisodeVO;
@@ -12,6 +12,11 @@ import com.codimiracle.application.platform.huidu.enumeration.BookType;
 import com.codimiracle.application.platform.huidu.enumeration.ContentStatus;
 import com.codimiracle.application.platform.huidu.mapper.HistoryMapper;
 import com.codimiracle.application.platform.huidu.service.*;
+import com.codimiracle.web.basic.contract.Filter;
+import com.codimiracle.web.basic.contract.Page;
+import com.codimiracle.web.basic.contract.PageSlice;
+import com.codimiracle.web.basic.contract.Sorter;
+import com.codimiracle.web.mybatis.contract.support.vo.AbstractService;
 import com.google.common.collect.Interner;
 import com.google.common.collect.Interners;
 import org.apache.ibatis.exceptions.TooManyResultsException;
@@ -31,7 +36,7 @@ import java.util.Optional;
  */
 @Service
 @Transactional
-public class HistoryServiceImpl extends AbstractService<String, History> implements HistoryService {
+public class HistoryServiceImpl extends AbstractService<String, History, HistoryVO> implements HistoryService {
     Interner<String> historyAccessingLock = Interners.newWeakInterner();
     @Resource
     private HistoryMapper historyMapper;
@@ -46,7 +51,8 @@ public class HistoryServiceImpl extends AbstractService<String, History> impleme
     @Resource
     private BuryingPointService buryingPointService;
 
-    private HistoryVO mutate(HistoryVO historyVO) {
+    @Override
+    protected HistoryVO mutate(HistoryVO historyVO) {
         if (Objects.nonNull(historyVO)) {
             historyVO.setBook(bookService.findByIdIntegrally(null, historyVO.getBookId()));
             if (Objects.nonNull(historyVO.getEpisodeId())) {
@@ -133,11 +139,6 @@ public class HistoryServiceImpl extends AbstractService<String, History> impleme
         List<HistoryVO> historyList = historyMapper.selectThatDayByUserIdIntegrally(userId, now);
         historyList.forEach((this::mutate));
         return historyList;
-    }
-
-    @Override
-    public void deleteByIdLogically(String id) {
-        historyMapper.deleteByIdLogically(id);
     }
 
     @Override

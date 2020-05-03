@@ -23,6 +23,7 @@ package com.codimiracle.application.platform.huidu.entity.vo;/*
  */
 
 import com.codimiracle.application.platform.huidu.entity.embedded.ContentSource;
+import com.codimiracle.web.middleware.content.pojo.vo.ContentExaminationVO;
 import lombok.Data;
 
 import java.util.Date;
@@ -45,7 +46,7 @@ public class BookEpisodeVO {
 
     private Integer episodeNumber;
 
-    private ExaminationVO examination;
+    private ContentExaminationVO examination;
 
     private UserProtectedVO owner;
 

@@ -1,8 +1,8 @@
 package com.codimiracle.application.platform.huidu.web;
 
-import com.codimiracle.application.platform.huidu.contract.ApiResponse;
-import com.codimiracle.application.platform.huidu.contract.ServiceException;
 import com.codimiracle.application.platform.huidu.util.RestfulUtil;
+import com.codimiracle.web.basic.contract.ApiResponse;
+import com.codimiracle.web.mybatis.contract.ServiceException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.converter.HttpMessageNotReadableException;

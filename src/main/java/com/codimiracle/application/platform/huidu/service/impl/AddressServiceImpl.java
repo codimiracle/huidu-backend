@@ -1,10 +1,11 @@
 package com.codimiracle.application.platform.huidu.service.impl;
 
-import com.codimiracle.application.platform.huidu.contract.*;
 import com.codimiracle.application.platform.huidu.entity.po.Address;
 import com.codimiracle.application.platform.huidu.entity.vo.AddressVO;
 import com.codimiracle.application.platform.huidu.mapper.AddressMapper;
 import com.codimiracle.application.platform.huidu.service.AddressService;
+import com.codimiracle.web.mybatis.contract.ServiceException;
+import com.codimiracle.web.mybatis.contract.support.vo.AbstractService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,23 +18,13 @@ import java.util.Objects;
  */
 @Service
 @Transactional
-public class AddressServiceImpl extends AbstractService<String, Address> implements AddressService {
+public class AddressServiceImpl extends AbstractService<String, Address, AddressVO> implements AddressService {
     @Resource
     private AddressMapper addressMapper;
 
     @Override
     public AddressVO findByIdIntegrally(String id) {
         return addressMapper.selectByIdIntegrally(id);
-    }
-
-    @Override
-    public PageSlice<AddressVO> findAllIntegrally(Filter filter, Sorter sorter, Page page) {
-        return extractPageSlice(addressMapper.selectAllIntegrally(filter, sorter, page));
-    }
-
-    @Override
-    public void deleteByIdLogically(String id) {
-        addressMapper.deleteByIdLogically(id);
     }
 
     @Override

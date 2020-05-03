@@ -1,8 +1,5 @@
 package com.codimiracle.application.platform.huidu.service.impl;
 
-import com.codimiracle.application.platform.huidu.contract.AbstractService;
-import com.codimiracle.application.platform.huidu.contract.Page;
-import com.codimiracle.application.platform.huidu.contract.PageSlice;
 import com.codimiracle.application.platform.huidu.entity.po.User;
 import com.codimiracle.application.platform.huidu.entity.po.UserToken;
 import com.codimiracle.application.platform.huidu.entity.vo.UserProtectedVO;
@@ -10,6 +7,9 @@ import com.codimiracle.application.platform.huidu.entity.vo.UserTokenVO;
 import com.codimiracle.application.platform.huidu.mapper.UserTokenMapper;
 import com.codimiracle.application.platform.huidu.service.UserService;
 import com.codimiracle.application.platform.huidu.service.UserTokenService;
+import com.codimiracle.web.basic.contract.Page;
+import com.codimiracle.web.basic.contract.PageSlice;
+import com.codimiracle.web.mybatis.contract.support.vo.AbstractService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,7 +20,7 @@ import java.util.UUID;
 
 @Service
 @Transactional
-public class UserTokenServiceImpl extends AbstractService<String, UserToken> implements UserTokenService {
+public class UserTokenServiceImpl extends AbstractService<String, UserToken, UserTokenVO> implements UserTokenService {
     private final long WEEK = 604800000;
     private final long MONTH = 2592000000L;
     @Resource

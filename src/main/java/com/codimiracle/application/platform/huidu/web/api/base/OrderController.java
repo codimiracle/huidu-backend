@@ -1,6 +1,6 @@
 package com.codimiracle.application.platform.huidu.web.api.base;
 
-import com.codimiracle.application.platform.huidu.contract.*;
+import com.codimiracle.application.platform.huidu.converter.CommentConverter;
 import com.codimiracle.application.platform.huidu.entity.dto.CommentDTO;
 import com.codimiracle.application.platform.huidu.entity.dto.LogisticsInformationDTO;
 import com.codimiracle.application.platform.huidu.entity.dto.OrderringDTO;
@@ -10,7 +10,6 @@ import com.codimiracle.application.platform.huidu.entity.po.Order;
 import com.codimiracle.application.platform.huidu.entity.po.OrderDetails;
 import com.codimiracle.application.platform.huidu.entity.po.User;
 import com.codimiracle.application.platform.huidu.entity.vo.OrderVO;
-import com.codimiracle.application.platform.huidu.entity.vt.Comment;
 import com.codimiracle.application.platform.huidu.enumeration.OrderStatus;
 import com.codimiracle.application.platform.huidu.service.BookService;
 import com.codimiracle.application.platform.huidu.service.LogisticsInformationService;
@@ -18,6 +17,9 @@ import com.codimiracle.application.platform.huidu.service.OrderService;
 import com.codimiracle.application.platform.huidu.util.HuiduMoneyUtil;
 import com.codimiracle.application.platform.huidu.util.OrderNumberUtil;
 import com.codimiracle.application.platform.huidu.util.RestfulUtil;
+import com.codimiracle.web.basic.contract.*;
+import com.codimiracle.web.middleware.content.pojo.po.Comment;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
@@ -39,6 +41,9 @@ public class OrderController {
     private OrderService orderService;
     @Resource
     private BookService bookService;
+
+    @Autowired
+    private CommentConverter converter;
 
     @Resource
     private LogisticsInformationService logisticsInformationService;
@@ -107,7 +112,7 @@ public class OrderController {
     }
 
     public ApiResponse evaluate(User user, String orderNumber, CommentDTO commentDTO) {
-        Comment comment = Comment.from(commentDTO);
+        Comment comment = converter.convert(commentDTO);
         orderService.evaluate(user.getId(), orderNumber, comment);
         return RestfulUtil.success();
     }

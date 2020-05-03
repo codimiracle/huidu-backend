@@ -1,11 +1,11 @@
 package com.codimiracle.application.platform.huidu.service.impl;
 
-import com.codimiracle.application.platform.huidu.contract.AbstractService;
 import com.codimiracle.application.platform.huidu.contract.Conditioner;
 import com.codimiracle.application.platform.huidu.entity.po.BookTags;
 import com.codimiracle.application.platform.huidu.entity.vo.TagVO;
 import com.codimiracle.application.platform.huidu.mapper.BookTagsMapper;
 import com.codimiracle.application.platform.huidu.service.BookTagsService;
+import com.codimiracle.web.mybatis.contract.AbstractService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Condition;

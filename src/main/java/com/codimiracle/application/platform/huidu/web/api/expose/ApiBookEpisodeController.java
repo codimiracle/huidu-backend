@@ -1,12 +1,12 @@
 package com.codimiracle.application.platform.huidu.web.api.expose;
 
-import com.codimiracle.application.platform.huidu.contract.*;
 import com.codimiracle.application.platform.huidu.entity.po.User;
 import com.codimiracle.application.platform.huidu.entity.vo.BookEpisodeVO;
 import com.codimiracle.application.platform.huidu.enumeration.ContentStatus;
 import com.codimiracle.application.platform.huidu.service.BookEpisodeService;
 import com.codimiracle.application.platform.huidu.service.HistoryService;
 import com.codimiracle.application.platform.huidu.util.RestfulUtil;
+import com.codimiracle.web.basic.contract.*;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 

@@ -23,9 +23,9 @@ package com.codimiracle.application.platform.huidu.entity.vt;/*
  */
 
 import com.codimiracle.application.platform.huidu.entity.dto.TopicDTO;
-import com.codimiracle.application.platform.huidu.entity.po.ContentReference;
 import com.codimiracle.application.platform.huidu.enumeration.ContentStatus;
 import com.codimiracle.application.platform.huidu.enumeration.ContentType;
+import com.codimiracle.web.middleware.content.pojo.po.ContentReference;
 import lombok.Data;
 
 import javax.persistence.Column;
@@ -154,8 +154,8 @@ public class Topic {
         topic.setWords(topicDTO.getWords());
         topic.setReferenceList(Arrays.stream(topicDTO.getReferences()).map(bookId -> {
             ContentReference reference = new ContentReference();
-            reference.setRefId(bookId);
-            reference.setType(ContentType.Book);
+            reference.setReferenceTargetId(bookId);
+            reference.setReferenceTargetType(ContentType.Book.toString());
             return reference;
         }).collect(Collectors.toList()));
         return topic;

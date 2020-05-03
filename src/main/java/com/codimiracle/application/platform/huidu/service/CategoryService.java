@@ -1,11 +1,15 @@
 package com.codimiracle.application.platform.huidu.service;
 
-import com.codimiracle.application.platform.huidu.contract.*;
 import com.codimiracle.application.platform.huidu.entity.po.Category;
 import com.codimiracle.application.platform.huidu.entity.vo.CategoryVO;
 import com.codimiracle.application.platform.huidu.entity.vo.CollectionStatisticsVO;
 import com.codimiracle.application.platform.huidu.enumeration.BookType;
 import com.codimiracle.application.platform.huidu.enumeration.CategoryType;
+import com.codimiracle.web.basic.contract.Filter;
+import com.codimiracle.web.basic.contract.Page;
+import com.codimiracle.web.basic.contract.PageSlice;
+import com.codimiracle.web.basic.contract.Sorter;
+import com.codimiracle.web.mybatis.contract.support.vo.Service;
 
 import java.util.List;
 
@@ -13,7 +17,7 @@ import java.util.List;
 /**
  * @author Codimiracle
  */
-public interface CategoryService extends Service<String, Category> {
+public interface CategoryService extends Service<String, Category, CategoryVO> {
 
     CategoryVO findByIdIntegrally(String id);
 

@@ -22,6 +22,9 @@ package com.codimiracle.application.platform.huidu.entity.vo;/*
  * SOFTWARE.
  */
 
+import com.codimiracle.web.middleware.content.pojo.vo.ContentExaminationVO;
+import com.codimiracle.web.middleware.content.pojo.vo.ContentRateVO;
+import com.codimiracle.web.middleware.content.pojo.vo.ContentVO;
 import lombok.Data;
 
 import java.util.List;
@@ -48,12 +51,13 @@ public class BookVO extends ContentVO {
     private List<TagVO> tags;
     private Integer plays;
     private Integer reads;
-    private ExaminationVO examination;
+    private ContentExaminationVO examination;
     private Float reviewRate;
     private boolean joinedCart;
     private boolean joinedShelf;
 
     public float getAvgRate() {
-        return Optional.ofNullable(reviewRate).orElse(0.0f) + Optional.ofNullable(getRate()).orElse(0.0f) / 2;
+        float rate = Optional.ofNullable(getRate()).map(ContentRateVO::getRate).orElse(0.0f);
+        return Optional.ofNullable(reviewRate).orElse(0.0f) + rate / 2;
     }
 }

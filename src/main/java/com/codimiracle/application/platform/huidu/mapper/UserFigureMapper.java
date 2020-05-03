@@ -1,21 +1,19 @@
 package com.codimiracle.application.platform.huidu.mapper;
 
-import com.codimiracle.application.platform.huidu.contract.Filter;
-import com.codimiracle.application.platform.huidu.contract.Mapper;
-import com.codimiracle.application.platform.huidu.contract.Page;
-import com.codimiracle.application.platform.huidu.contract.Sorter;
 import com.codimiracle.application.platform.huidu.entity.po.FigureTag;
 import com.codimiracle.application.platform.huidu.entity.vo.CategoryVO;
 import com.codimiracle.application.platform.huidu.entity.vo.FigureTagVO;
 import com.codimiracle.application.platform.huidu.entity.vo.UserProtectedVO;
+import com.codimiracle.web.basic.contract.Filter;
+import com.codimiracle.web.basic.contract.Page;
+import com.codimiracle.web.basic.contract.Sorter;
+import com.codimiracle.web.mybatis.contract.support.vo.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
-public interface UserFigureMapper extends Mapper<FigureTag> {
+public interface UserFigureMapper extends Mapper<FigureTag, FigureTagVO> {
     List<FigureTagVO> selectAllTagIntegrally(@Param("filter") Filter filter, @Param("sorter") Sorter sorter, @Param("page") Page page);
-
-    void deleteByIdLogically(@Param("figureId") String figureTagId);
 
     List<UserProtectedVO> selectSimilarUserByUserIdProtectly(@Param("userId") String userId, @Param("filter") Filter filter, @Param("sorter") Sorter sorter, @Param("page") Page page);
 

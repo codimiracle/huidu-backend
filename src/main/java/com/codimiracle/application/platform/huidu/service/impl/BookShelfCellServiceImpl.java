@@ -1,6 +1,5 @@
 package com.codimiracle.application.platform.huidu.service.impl;
 
-import com.codimiracle.application.platform.huidu.contract.*;
 import com.codimiracle.application.platform.huidu.entity.po.BookShelfCell;
 import com.codimiracle.application.platform.huidu.entity.vo.BookShelfCellVO;
 import com.codimiracle.application.platform.huidu.entity.vo.HistoryVO;
@@ -8,6 +7,7 @@ import com.codimiracle.application.platform.huidu.mapper.BookShelfCellMapper;
 import com.codimiracle.application.platform.huidu.service.BookService;
 import com.codimiracle.application.platform.huidu.service.BookShelfCellService;
 import com.codimiracle.application.platform.huidu.service.HistoryService;
+import com.codimiracle.web.mybatis.contract.support.vo.AbstractService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,7 +20,7 @@ import java.util.Objects;
  */
 @Service
 @Transactional
-public class BookShelfCellServiceImpl extends AbstractService<String, BookShelfCell> implements BookShelfCellService {
+public class BookShelfCellServiceImpl extends AbstractService<String, BookShelfCell, BookShelfCellVO> implements BookShelfCellService {
     @Resource
     private BookShelfCellMapper bookShelfCellMapper;
 
@@ -30,7 +30,7 @@ public class BookShelfCellServiceImpl extends AbstractService<String, BookShelfC
     @Resource
     private HistoryService historyService;
 
-    private void mutate(BookShelfCellVO bookShelfCellVO) {
+    protected BookShelfCellVO mutate(BookShelfCellVO bookShelfCellVO) {
         if (Objects.nonNull(bookShelfCellVO)) {
             bookShelfCellVO.setBook(bookService.findByIdIntegrally(null, bookShelfCellVO.getBookId()));
             String ownerId = bookShelfCellVO.getShelf().getOwnerId();
@@ -39,13 +39,7 @@ public class BookShelfCellServiceImpl extends AbstractService<String, BookShelfC
             bookShelfCellVO.setHistoryId(historyVO.getId());
             bookShelfCellVO.setHistory(historyVO);
         }
-    }
-
-    @Override
-    public PageSlice<BookShelfCellVO> findAllIntegrally(Filter filter, Sorter sorter, Page page) {
-        PageSlice<BookShelfCellVO> slice = extractPageSlice(bookShelfCellMapper.findAllIntegrally(filter, sorter, page));
-        slice.getList().forEach(this::mutate);
-        return slice;
+        return bookShelfCellVO;
     }
 
     @Override

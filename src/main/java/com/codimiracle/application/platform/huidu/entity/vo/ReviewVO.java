@@ -22,11 +22,13 @@ package com.codimiracle.application.platform.huidu.entity.vo;/*
  * SOFTWARE.
  */
 
+import com.codimiracle.web.middleware.content.pojo.vo.CommentVO;
+import com.codimiracle.web.middleware.content.pojo.vo.ContentArticleVO;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
-public class ReviewVO extends ArticleVO {
+public class ReviewVO extends ContentArticleVO {
     List<CommentVO> hotCommentList;
 }

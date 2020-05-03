@@ -1,11 +1,11 @@
 package com.codimiracle.application.platform.huidu.service.impl;
 
-import com.codimiracle.application.platform.huidu.contract.AbstractService;
 import com.codimiracle.application.platform.huidu.contract.Conditioner;
 import com.codimiracle.application.platform.huidu.entity.po.OrderDetails;
 import com.codimiracle.application.platform.huidu.entity.vo.OrderDetailsVO;
 import com.codimiracle.application.platform.huidu.mapper.OrderDetailsMapper;
 import com.codimiracle.application.platform.huidu.service.OrderDetailsService;
+import com.codimiracle.web.mybatis.contract.support.vo.AbstractService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Condition;
@@ -19,7 +19,7 @@ import java.util.List;
  */
 @Service
 @Transactional
-public class OrderDetailsServiceImpl extends AbstractService<String, OrderDetails> implements OrderDetailsService {
+public class OrderDetailsServiceImpl extends AbstractService<String, OrderDetails, OrderDetailsVO> implements OrderDetailsService {
     @Resource
     private OrderDetailsMapper orderDetailsMapper;
 

@@ -22,6 +22,7 @@ package com.codimiracle.application.platform.huidu.entity.vo;/*
  * SOFTWARE.
  */
 
+import com.codimiracle.web.middleware.content.pojo.vo.ContentArticleVO;
 import lombok.Data;
 
 import java.util.List;
@@ -30,6 +31,6 @@ import java.util.List;
  * @author Codimiracle
  */
 @Data
-public class TopicVO extends ArticleVO {
+public class TopicVO extends ContentArticleVO {
     List<UserProtectedVO> participants;
 }

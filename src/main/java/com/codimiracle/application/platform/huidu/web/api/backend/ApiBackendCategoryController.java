@@ -1,6 +1,5 @@
 package com.codimiracle.application.platform.huidu.web.api.backend;
 
-import com.codimiracle.application.platform.huidu.contract.*;
 import com.codimiracle.application.platform.huidu.entity.dto.BulkDeletionDTO;
 import com.codimiracle.application.platform.huidu.entity.dto.CategoryDTO;
 import com.codimiracle.application.platform.huidu.entity.po.Category;
@@ -10,6 +9,7 @@ import com.codimiracle.application.platform.huidu.service.CategoryService;
 import com.codimiracle.application.platform.huidu.service.TagService;
 import com.codimiracle.application.platform.huidu.util.RestfulUtil;
 import com.codimiracle.application.platform.huidu.util.TagUtil;
+import com.codimiracle.web.basic.contract.*;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;

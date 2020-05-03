@@ -1,9 +1,9 @@
 package com.codimiracle.application.platform.huidu.service;
 
-import com.codimiracle.application.platform.huidu.contract.Service;
 import com.codimiracle.application.platform.huidu.entity.po.UserAccount;
 import com.codimiracle.application.platform.huidu.entity.vo.UserAccountVO;
 import com.codimiracle.application.platform.huidu.enumeration.PaymentType;
+import com.codimiracle.web.mybatis.contract.Service;
 import org.joda.money.Money;
 
 import java.util.List;

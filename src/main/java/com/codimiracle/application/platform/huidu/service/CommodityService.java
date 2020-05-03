@@ -1,8 +1,12 @@
 package com.codimiracle.application.platform.huidu.service;
 
-import com.codimiracle.application.platform.huidu.contract.*;
 import com.codimiracle.application.platform.huidu.entity.po.Commodity;
 import com.codimiracle.application.platform.huidu.entity.vo.CommodityVO;
+import com.codimiracle.web.basic.contract.Filter;
+import com.codimiracle.web.basic.contract.Page;
+import com.codimiracle.web.basic.contract.PageSlice;
+import com.codimiracle.web.basic.contract.Sorter;
+import com.codimiracle.web.mybatis.contract.support.vo.Service;
 
 import java.util.List;
 
@@ -10,7 +14,7 @@ import java.util.List;
 /**
  * @author Codimiracle
  */
-public interface CommodityService extends Service<String, Commodity> {
+public interface CommodityService extends Service<String, Commodity, CommodityVO> {
 
     CommodityVO findByIdIntegrally(String id);
 

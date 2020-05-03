@@ -1,6 +1,5 @@
 package com.codimiracle.application.platform.huidu.web.api.user;
 
-import com.codimiracle.application.platform.huidu.contract.*;
 import com.codimiracle.application.platform.huidu.entity.dto.BookNotesDTO;
 import com.codimiracle.application.platform.huidu.entity.po.BookNotes;
 import com.codimiracle.application.platform.huidu.entity.po.User;
@@ -8,6 +7,7 @@ import com.codimiracle.application.platform.huidu.entity.vo.BookNotesVO;
 import com.codimiracle.application.platform.huidu.entity.vt.BookNoteCollection;
 import com.codimiracle.application.platform.huidu.service.BookNotesService;
 import com.codimiracle.application.platform.huidu.util.RestfulUtil;
+import com.codimiracle.web.basic.contract.*;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;

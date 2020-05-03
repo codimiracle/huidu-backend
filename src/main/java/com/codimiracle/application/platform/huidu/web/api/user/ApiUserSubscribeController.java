@@ -22,13 +22,13 @@ package com.codimiracle.application.platform.huidu.web.api.user;/*
  * SOFTWARE.
  */
 
-import com.codimiracle.application.platform.huidu.contract.*;
-import com.codimiracle.application.platform.huidu.entity.po.Subscribe;
 import com.codimiracle.application.platform.huidu.entity.po.User;
-import com.codimiracle.application.platform.huidu.entity.vo.SubscribeVO;
 import com.codimiracle.application.platform.huidu.enumeration.SubscribeType;
-import com.codimiracle.application.platform.huidu.service.SubscribeService;
 import com.codimiracle.application.platform.huidu.util.RestfulUtil;
+import com.codimiracle.web.basic.contract.*;
+import com.codimiracle.web.notification.middleware.pojo.po.Subscription;
+import com.codimiracle.web.notification.middleware.pojo.vo.SubscriptionVO;
+import com.codimiracle.web.notification.middleware.service.SubscriptionService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,15 +41,15 @@ import java.util.Objects;
 public class ApiUserSubscribeController {
 
     @Resource
-    private SubscribeService subscribeService;
+    private SubscriptionService subscriptionService;
 
     @DeleteMapping("/{subscribe_id}/unsubscribe")
     private ApiResponse unsubscribe(@AuthenticationPrincipal User user, @PathVariable("subscribe_id") String subscribeId) {
-        Subscribe subscribe = subscribeService.findById(subscribeId);
-        if (Objects.isNull(subscribe) || !Objects.equals(subscribe.getSubscriberId(), user.getId())) {
+        Subscription subscription = subscriptionService.findById(subscribeId);
+        if (Objects.isNull(subscription) || !Objects.equals(subscription.getSubscriberId(), user.getId())) {
             return RestfulUtil.fail("找不到该订阅！");
         }
-        subscribeService.deleteByIdLogically(subscribeId);
+        subscriptionService.deleteByIdLogically(subscribeId);
         return RestfulUtil.success();
     }
 
@@ -58,7 +58,7 @@ public class ApiUserSubscribeController {
         filter = Objects.isNull(filter) ? new Filter() : filter;
         filter.put("type", new String[]{SubscribeType.BookUpdated.getType()});
         filter.put("userId", new String[]{user.getId()});
-        PageSlice<SubscribeVO> slice = subscribeService.findAllIntegrally(filter, sorter, page);
+        PageSlice<SubscriptionVO> slice = subscriptionService.findAllIntegrally(filter, sorter, page);
         return RestfulUtil.list(slice);
     }
 

@@ -22,18 +22,19 @@ package com.codimiracle.application.platform.huidu.web.api.backend;/*
  * SOFTWARE.
  */
 
-import com.codimiracle.application.platform.huidu.contract.*;
+import com.codimiracle.application.platform.huidu.converter.CommentConverter;
 import com.codimiracle.application.platform.huidu.entity.dto.BulkDeletionDTO;
 import com.codimiracle.application.platform.huidu.entity.dto.CommentDTO;
-import com.codimiracle.application.platform.huidu.entity.vo.CommentVO;
-import com.codimiracle.application.platform.huidu.entity.vt.Comment;
-import com.codimiracle.application.platform.huidu.service.CommentService;
 import com.codimiracle.application.platform.huidu.util.RestfulUtil;
+import com.codimiracle.web.basic.contract.*;
+import com.codimiracle.web.middleware.content.pojo.po.Comment;
+import com.codimiracle.web.middleware.content.pojo.vo.CommentVO;
+import com.codimiracle.web.middleware.content.service.CommentService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.util.Arrays;
 import java.util.Objects;
 
 @CrossOrigin
@@ -42,6 +43,8 @@ import java.util.Objects;
 public class ApiBackendCommentController {
     @Resource
     private CommentService commentService;
+    @Autowired
+    private CommentConverter converter;
 
     @DeleteMapping("/{id}")
     public ApiResponse delete(@PathVariable String id) {
@@ -51,13 +54,13 @@ public class ApiBackendCommentController {
 
     @DeleteMapping
     public ApiResponse deleteBulk(@Valid @RequestBody BulkDeletionDTO bulkDeletionDTO) {
-        commentService.deleteByIdsLogically(Arrays.asList(bulkDeletionDTO.getIds()));
+        //commentService.deleteByIdsLogically(Arrays.asList(bulkDeletionDTO.getIds()));
         return RestfulUtil.success();
     }
 
     @PutMapping("/{id}")
     public ApiResponse update(@PathVariable String id, @Valid @RequestBody CommentDTO commentDTO) {
-        Comment comment = Comment.from(commentDTO);
+        Comment comment = converter.convert(commentDTO);
         Objects.requireNonNull(comment);
         comment.setId(id);
         commentService.update(comment);
@@ -72,7 +75,7 @@ public class ApiBackendCommentController {
 
     @GetMapping
     public ApiResponse collection(@RequestParam("filter") Filter filter, @RequestParam("sorter") Sorter sorter, @ModelAttribute Page page) {
-        PageSlice<CommentVO> slice = commentService.findAllIntegrallyWithTargetContent(filter, sorter, page);
+        PageSlice<CommentVO> slice = commentService.findAllIntegrally(filter, sorter, page);
         return RestfulUtil.list(slice);
     }
 }

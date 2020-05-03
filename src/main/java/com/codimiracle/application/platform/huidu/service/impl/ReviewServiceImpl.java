@@ -22,16 +22,23 @@ package com.codimiracle.application.platform.huidu.service.impl;/*
  * SOFTWARE.
  */
 
-import com.codimiracle.application.platform.huidu.contract.*;
-import com.codimiracle.application.platform.huidu.entity.po.Content;
-import com.codimiracle.application.platform.huidu.entity.po.ContentArticle;
-import com.codimiracle.application.platform.huidu.entity.po.ContentReference;
-import com.codimiracle.application.platform.huidu.entity.vo.ArticleVO;
 import com.codimiracle.application.platform.huidu.entity.vo.ReviewVO;
 import com.codimiracle.application.platform.huidu.entity.vt.Review;
-import com.codimiracle.application.platform.huidu.enumeration.ContentType;
-import com.codimiracle.application.platform.huidu.service.*;
+import com.codimiracle.application.platform.huidu.service.ReviewService;
 import com.codimiracle.application.platform.huidu.util.ReferenceUtil;
+import com.codimiracle.web.basic.contract.Filter;
+import com.codimiracle.web.basic.contract.Page;
+import com.codimiracle.web.basic.contract.PageSlice;
+import com.codimiracle.web.basic.contract.Sorter;
+import com.codimiracle.web.middleware.content.pojo.po.Content;
+import com.codimiracle.web.middleware.content.pojo.po.ContentArticle;
+import com.codimiracle.web.middleware.content.pojo.po.ContentReference;
+import com.codimiracle.web.middleware.content.pojo.vo.ContentArticleVO;
+import com.codimiracle.web.middleware.content.service.ArticleService;
+import com.codimiracle.web.middleware.content.service.CommentService;
+import com.codimiracle.web.middleware.content.service.ContentService;
+import com.codimiracle.web.middleware.content.service.ReferenceService;
+import com.codimiracle.web.mybatis.contract.AbstractUnsupportedOperationService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,15 +51,15 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
-public class ReviewServiceImpl extends AbstractUnsupportedOperationServiece<String, Review> implements ReviewService {
+public class ReviewServiceImpl extends AbstractUnsupportedOperationService<String, Review> implements ReviewService {
     @Resource
     private ContentService contentService;
     @Resource
     private CommentService commentService;
     @Resource
-    private ContentArticleService contentArticleService;
+    private ArticleService articleService;
     @Resource
-    private ContentReferenceService contentReferenceService;
+    private ReferenceService referenceService;
 
     private void saveContentPart(Review review) {
         Content content = new Content();
@@ -65,14 +72,14 @@ public class ReviewServiceImpl extends AbstractUnsupportedOperationServiece<Stri
         ContentArticle article = new ContentArticle();
         BeanUtils.copyProperties(review, article);
         article.setContentId(review.getId());
-        contentArticleService.save(article);
+        articleService.save(article);
         BeanUtils.copyProperties(article, review);
     }
 
     private void saveReferences(Review review) {
         review.getReferenceList().forEach((r) -> {
             r.setContentId(review.getId());
-            contentReferenceService.save(r);
+            referenceService.save(r);
         });
     }
 
@@ -90,14 +97,14 @@ public class ReviewServiceImpl extends AbstractUnsupportedOperationServiece<Stri
 
     private void updateReferences(Review review) {
         // 找出已有引用
-        List<ContentReference> allContentReference = contentReferenceService.findByContentId(review.getId());
-        ReferenceUtil.mutateToPersistent(contentReferenceService, review.getId(), review.getReferenceList());
+        List<ContentReference> allContentReference = referenceService.findByContentId(review.getId());
+        ReferenceUtil.mutateToPersistent(referenceService, review.getId(), review.getReferenceList());
         // 新引用
         List<ContentReference> newContentReference = review.getReferenceList().stream().filter(contentReference -> Objects.isNull(contentReference.getId())).collect(Collectors.toList());
         //重用旧引用
-        Map<String, ContentReference> reusingContentReferenceMap = review.getReferenceList().stream().collect(Collectors.toMap(contentReference -> String.format("%s-%s", contentReference.getType(), contentReference.getRefId()), c -> c));
+        Map<String, ContentReference> reusingContentReferenceMap = review.getReferenceList().stream().collect(Collectors.toMap(contentReference -> String.format("%s-%s", contentReference.getReferenceTargetType(), contentReference.getReferenceTargetId()), c -> c));
         allContentReference.forEach(r -> {
-            String key = String.format("%s-%s", r.getType(), r.getRefId());
+            String key = String.format("%s-%s", r.getReferenceTargetType(), r.getReferenceTargetId());
             if (!reusingContentReferenceMap.containsKey(key)) {
                 r.setDeleted(true);
             } else {
@@ -107,10 +114,10 @@ public class ReviewServiceImpl extends AbstractUnsupportedOperationServiece<Stri
         //保存新应用
         newContentReference.forEach((r) -> {
             r.setContentId(review.getId());
-            contentReferenceService.save(r);
+            referenceService.save(r);
         });
         //更新旧引用
-        allContentReference.forEach(contentReferenceService::update);
+        allContentReference.forEach(referenceService::update);
     }
 
     @Override
@@ -120,7 +127,7 @@ public class ReviewServiceImpl extends AbstractUnsupportedOperationServiece<Stri
         contentService.update(content);
         ContentArticle article = new ContentArticle();
         BeanUtils.copyProperties(entity, article);
-        contentArticleService.update(article);
+        articleService.update(article);
         updateReferences(entity);
     }
 
@@ -128,8 +135,8 @@ public class ReviewServiceImpl extends AbstractUnsupportedOperationServiece<Stri
     public Review findById(String id) {
         Review review = new Review();
         Content content = contentService.findById(id);
-        ContentArticle article = contentArticleService.findById(id);
-        List<ContentReference> references = contentReferenceService.findByContentId(id);
+        ContentArticle article = articleService.findById(id);
+        List<ContentReference> references = referenceService.findByContentId(id);
         BeanUtils.copyProperties(content, review);
         BeanUtils.copyProperties(article, review);
         review.setReferenceList(references);
@@ -137,8 +144,8 @@ public class ReviewServiceImpl extends AbstractUnsupportedOperationServiece<Stri
     }
 
     @Override
-    public int deleteByIdLogically(String id) {
-        return contentService.deleteByIdLogically(id);
+    public void deleteByIdLogically(String id) {
+        contentService.deleteByIdLogically(id);
     }
 
     @Override
@@ -146,7 +153,7 @@ public class ReviewServiceImpl extends AbstractUnsupportedOperationServiece<Stri
         return null;
     }
 
-    private ReviewVO mutate(ArticleVO articleVO) {
+    private ReviewVO mutate(ContentArticleVO articleVO) {
         if (Objects.isNull(articleVO)) {
             return null;
         }
@@ -154,12 +161,12 @@ public class ReviewServiceImpl extends AbstractUnsupportedOperationServiece<Stri
         BeanUtils.copyProperties(articleVO, reviewVO);
         Filter filter = new Filter();
         filter.put("targetContentId", new String[]{reviewVO.getContentId()});
-        reviewVO.setHotCommentList(commentService.findHotIntegrally(filter, null, new Page(1, 1)).getList());
-        reviewVO.setReferences(contentReferenceService.findByContentIdIntegrally(articleVO.getContentId()));
+        //reviewVO.setHotCommentList(commentService.findHotIntegrally(filter, null, new Page(1, 1)).getList());
+        reviewVO.setReferenceList(referenceService.findByContentIdIntegrally(articleVO.getContentId()));
         return reviewVO;
     }
 
-    public PageSlice<ReviewVO> mutate(PageSlice<ArticleVO> slice) {
+    public PageSlice<ReviewVO> mutate(PageSlice<ContentArticleVO> slice) {
         PageSlice<ReviewVO> transformedSlice = new PageSlice<>();
         transformedSlice.setLimit(slice.getLimit());
         transformedSlice.setTotal(slice.getTotal());
@@ -170,13 +177,13 @@ public class ReviewServiceImpl extends AbstractUnsupportedOperationServiece<Stri
 
     @Override
     public ReviewVO findByIdIntegrally(String id) {
-        ArticleVO articleVO = contentArticleService.findByIdIntegrally(ContentType.Review, id);
+        ContentArticleVO articleVO = articleService.findByIdIntegrally(id);
         return mutate(articleVO);
     }
 
     @Override
     public PageSlice<ReviewVO> findAllIntegrally(Filter filter, Sorter sorter, Page page) {
-        PageSlice<ArticleVO> articleVOList = contentArticleService.findAllIntegrally(ContentType.Review, filter, sorter, page);
+        PageSlice<ContentArticleVO> articleVOList = articleService.findAllIntegrally(filter, sorter, page);
         PageSlice<ReviewVO> slice = new PageSlice<>();
         slice.setList(articleVOList.getList().stream().map(this::mutate).collect(Collectors.toList()));
         slice.setPage(articleVOList.getPage());
@@ -187,11 +194,12 @@ public class ReviewServiceImpl extends AbstractUnsupportedOperationServiece<Stri
 
     @Override
     public PageSlice<ReviewVO> findHotReviewIntegrally(Filter filter, Sorter sorter, Page page) {
-        return mutate(contentArticleService.findHotIntegrally(ContentType.Review, filter, sorter, page));
+        //return mutate(articleService.findHotIntegrally(ContentType.Review, filter, sorter, page));
+        return null;
     }
 
     @Override
     public void deleteByIdsLogically(List<String> ids) {
-        contentService.deleteByIdsLogically(ids);
+        ids.forEach(contentService::deleteByIdLogically);
     }
 }

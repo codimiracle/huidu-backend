@@ -1,6 +1,5 @@
 package com.codimiracle.application.platform.huidu.service.impl;
 
-import com.codimiracle.application.platform.huidu.contract.*;
 import com.codimiracle.application.platform.huidu.entity.po.User;
 import com.codimiracle.application.platform.huidu.entity.po.UserAccount;
 import com.codimiracle.application.platform.huidu.entity.po.UserInfo;
@@ -11,6 +10,7 @@ import com.codimiracle.application.platform.huidu.service.UserAccountService;
 import com.codimiracle.application.platform.huidu.service.UserInfoService;
 import com.codimiracle.application.platform.huidu.service.UserRoleService;
 import com.codimiracle.application.platform.huidu.service.UserService;
+import com.codimiracle.web.mybatis.contract.support.vo.AbstractService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,7 +27,7 @@ import java.util.Objects;
  */
 @Service
 @Transactional
-public class UserServiceImpl extends AbstractService<String, User> implements UserService {
+public class UserServiceImpl extends AbstractService<String, User, UserVO> implements UserService {
     private static final String DEFAULT_USER_PASSWORD = "12345678";
     @Resource
     private UserMapper userMapper;
@@ -96,23 +96,8 @@ public class UserServiceImpl extends AbstractService<String, User> implements Us
     }
 
     @Override
-    public void deleteByIdLogically(String id) {
-        userMapper.deleteByIdLogically(id);
-    }
-
-    @Override
     public void deleteByIdsLogically(List<String> ids) {
         userMapper.deleteByIdsLogically(ids);
-    }
-
-    @Override
-    public UserVO findByIdIntegrally(String id) {
-        return userMapper.selectByIdIntegrally(id);
-    }
-
-    @Override
-    public PageSlice<UserVO> findAllIntegrally(Filter filter, Sorter sorter, Page page) {
-        return extractPageSlice(userMapper.selectAllIntegrally(filter, sorter, page));
     }
 
     @Override

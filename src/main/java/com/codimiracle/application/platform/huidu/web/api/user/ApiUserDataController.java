@@ -22,13 +22,13 @@ package com.codimiracle.application.platform.huidu.web.api.user;/*
  * SOFTWARE.
  */
 
-import com.codimiracle.application.platform.huidu.contract.ApiResponse;
 import com.codimiracle.application.platform.huidu.entity.dto.ProfileDTO;
 import com.codimiracle.application.platform.huidu.entity.dto.UserDTO;
 import com.codimiracle.application.platform.huidu.entity.po.User;
 import com.codimiracle.application.platform.huidu.entity.vo.ChangePasswordDTO;
 import com.codimiracle.application.platform.huidu.service.UserService;
 import com.codimiracle.application.platform.huidu.util.RestfulUtil;
+import com.codimiracle.web.basic.contract.ApiResponse;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;

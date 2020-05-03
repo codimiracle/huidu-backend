@@ -1,13 +1,13 @@
 package com.codimiracle.application.platform.huidu.service.impl;
 
-import com.codimiracle.application.platform.huidu.contract.AbstractService;
-import com.codimiracle.application.platform.huidu.contract.ServiceException;
 import com.codimiracle.application.platform.huidu.entity.po.LogisticsInformation;
 import com.codimiracle.application.platform.huidu.entity.po.PassingPoint;
 import com.codimiracle.application.platform.huidu.entity.vo.LogisticsInformationVO;
 import com.codimiracle.application.platform.huidu.mapper.LogisticsInformationMapper;
 import com.codimiracle.application.platform.huidu.service.LogisticsInformationService;
 import com.codimiracle.application.platform.huidu.service.PassingPointService;
+import com.codimiracle.web.mybatis.contract.ServiceException;
+import com.codimiracle.web.mybatis.contract.support.vo.AbstractService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,7 +21,7 @@ import java.util.Objects;
  */
 @Service
 @Transactional
-public class LogisticsInformationServiceImpl extends AbstractService<String, LogisticsInformation> implements LogisticsInformationService {
+public class LogisticsInformationServiceImpl extends AbstractService<String, LogisticsInformation, LogisticsInformationVO> implements LogisticsInformationService {
     @Resource
     private LogisticsInformationMapper logisticsInformationMapper;
 
@@ -65,8 +65,10 @@ public class LogisticsInformationServiceImpl extends AbstractService<String, Log
         });
     }
 
-    private void mutate(LogisticsInformationVO logisticsInformationVO) {
+    @Override
+    protected LogisticsInformationVO mutate(LogisticsInformationVO logisticsInformationVO) {
         logisticsInformationVO.setPassingPoints(passingPointService.findByLogisticsInformationId(logisticsInformationVO.getId()));
+        return logisticsInformationVO;
     }
 
     @Override

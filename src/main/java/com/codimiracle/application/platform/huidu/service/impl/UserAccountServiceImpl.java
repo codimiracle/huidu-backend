@@ -1,7 +1,5 @@
 package com.codimiracle.application.platform.huidu.service.impl;
 
-import com.codimiracle.application.platform.huidu.contract.AbstractService;
-import com.codimiracle.application.platform.huidu.contract.ServiceException;
 import com.codimiracle.application.platform.huidu.entity.po.Order;
 import com.codimiracle.application.platform.huidu.entity.po.UserAccount;
 import com.codimiracle.application.platform.huidu.entity.vo.UserAccountVO;
@@ -14,6 +12,8 @@ import com.codimiracle.application.platform.huidu.service.OrderDetailsService;
 import com.codimiracle.application.platform.huidu.service.OrderService;
 import com.codimiracle.application.platform.huidu.service.UserAccountService;
 import com.codimiracle.application.platform.huidu.util.HuiduMoneyUtil;
+import com.codimiracle.web.mybatis.contract.AbstractService;
+import com.codimiracle.web.mybatis.contract.ServiceException;
 import com.google.common.collect.Interner;
 import com.google.common.collect.Interners;
 import org.apache.commons.lang3.RandomUtils;

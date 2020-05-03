@@ -1,7 +1,7 @@
 package com.codimiracle.application.platform.huidu.web.api.expose;
 
-import com.codimiracle.application.platform.huidu.contract.ApiResponse;
 import com.codimiracle.application.platform.huidu.entity.dto.SignInDTO;
+import com.codimiracle.web.basic.contract.ApiResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

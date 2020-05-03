@@ -22,10 +22,10 @@ package com.codimiracle.application.platform.huidu.web.api.expose;/*
  * SOFTWARE.
  */
 
-import com.codimiracle.application.platform.huidu.contract.ApiResponse;
 import com.codimiracle.application.platform.huidu.entity.po.User;
-import com.codimiracle.application.platform.huidu.service.ContentLikesService;
 import com.codimiracle.application.platform.huidu.util.RestfulUtil;
+import com.codimiracle.web.basic.contract.ApiResponse;
+import com.codimiracle.web.middleware.content.service.LikeService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,17 +37,17 @@ import javax.annotation.Resource;
 public class ApiContentController {
 
     @Resource
-    private ContentLikesService contentLikesService;
+    private LikeService likeService;
 
     @PostMapping("/like")
     public ApiResponse like(@AuthenticationPrincipal User user, @PathVariable("content_id") String contentId) {
-        contentLikesService.like(user.getId(), contentId);
+        likeService.like(user.getId(), contentId);
         return RestfulUtil.success();
     }
 
     @PostMapping("/unlike")
     public ApiResponse unlike(@AuthenticationPrincipal User user, @PathVariable("content_id") String contentId) {
-        contentLikesService.unlike(user.getId(), contentId);
+        likeService.dislike(user.getId(), contentId);
         return RestfulUtil.success();
     }
 }

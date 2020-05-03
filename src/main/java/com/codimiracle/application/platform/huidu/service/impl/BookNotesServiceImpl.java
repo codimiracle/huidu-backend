@@ -1,6 +1,5 @@
 package com.codimiracle.application.platform.huidu.service.impl;
 
-import com.codimiracle.application.platform.huidu.contract.*;
 import com.codimiracle.application.platform.huidu.entity.embedded.Dommark;
 import com.codimiracle.application.platform.huidu.entity.po.BookNotes;
 import com.codimiracle.application.platform.huidu.entity.vo.BookNotesVO;
@@ -8,6 +7,12 @@ import com.codimiracle.application.platform.huidu.entity.vt.BookNoteCollection;
 import com.codimiracle.application.platform.huidu.mapper.BookNotesMapper;
 import com.codimiracle.application.platform.huidu.service.BookNotesService;
 import com.codimiracle.application.platform.huidu.service.BookService;
+import com.codimiracle.web.basic.contract.Filter;
+import com.codimiracle.web.basic.contract.Page;
+import com.codimiracle.web.basic.contract.PageSlice;
+import com.codimiracle.web.basic.contract.Sorter;
+import com.codimiracle.web.mybatis.contract.ServiceException;
+import com.codimiracle.web.mybatis.contract.support.vo.AbstractService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,7 +26,7 @@ import java.util.Objects;
  */
 @Service
 @Transactional
-public class BookNotesServiceImpl extends AbstractService<String, BookNotes> implements BookNotesService {
+public class BookNotesServiceImpl extends AbstractService<String, BookNotes, BookNotesVO> implements BookNotesService {
     @Resource
     private BookNotesMapper bookNotesMapper;
 
@@ -29,19 +34,15 @@ public class BookNotesServiceImpl extends AbstractService<String, BookNotes> imp
     private BookService bookService;
 
     @Override
-    public PageSlice<BookNotesVO> findAllIntegrally(Filter filter, Sorter sorter, Page page) {
-        return extractPageSlice(bookNotesMapper.selectAllIntegrally(filter, sorter, page));
-    }
-
-    @Override
     public PageSlice<BookNoteCollection> findAllCollectionIntegrally(Filter filter, Sorter sorter, Page page) {
         PageSlice<BookNoteCollection> slice = extractPageSlice(bookNotesMapper.selectAllCollectionIntegrally(filter, sorter, page));
-        slice.getList().forEach(this::paddingAssociation);
+        slice.getList().forEach(this::mutate);
         return slice;
     }
 
-    private void paddingAssociation(BookNoteCollection bookNoteCollection) {
+    protected BookNoteCollection mutate(BookNoteCollection bookNoteCollection) {
         bookNoteCollection.setBook(bookService.findByIdIntegrally(bookNoteCollection.getBookId()));
+        return bookNoteCollection;
     }
 
     @Override

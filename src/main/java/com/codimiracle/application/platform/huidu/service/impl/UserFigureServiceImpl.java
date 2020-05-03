@@ -1,6 +1,6 @@
 package com.codimiracle.application.platform.huidu.service.impl;
 
-import com.codimiracle.application.platform.huidu.contract.*;
+import com.codimiracle.application.platform.huidu.contract.Conditioner;
 import com.codimiracle.application.platform.huidu.entity.po.FigureTag;
 import com.codimiracle.application.platform.huidu.entity.vo.CategoryVO;
 import com.codimiracle.application.platform.huidu.entity.vo.FigureTagVO;
@@ -8,6 +8,11 @@ import com.codimiracle.application.platform.huidu.entity.vo.UserProtectedVO;
 import com.codimiracle.application.platform.huidu.mapper.UserFigureMapper;
 import com.codimiracle.application.platform.huidu.service.TagService;
 import com.codimiracle.application.platform.huidu.service.UserFigureService;
+import com.codimiracle.web.basic.contract.Filter;
+import com.codimiracle.web.basic.contract.Page;
+import com.codimiracle.web.basic.contract.PageSlice;
+import com.codimiracle.web.basic.contract.Sorter;
+import com.codimiracle.web.mybatis.contract.support.vo.AbstractService;
 import org.apache.ibatis.exceptions.TooManyResultsException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,7 +28,7 @@ import java.util.Objects;
  */
 @Service
 @Transactional
-public class UserFigureServiceImpl extends AbstractService<String, FigureTag> implements UserFigureService {
+public class UserFigureServiceImpl extends AbstractService<String, FigureTag, FigureTagVO> implements UserFigureService {
     @Resource
     private UserFigureMapper userFigureMapper;
 
@@ -48,16 +53,6 @@ public class UserFigureServiceImpl extends AbstractService<String, FigureTag> im
             }
         }));
         super.save(models);
-    }
-
-    @Override
-    public PageSlice<FigureTagVO> findAllTagIntegrally(Filter filter, Sorter sorter, Page page) {
-        return extractPageSlice(userFigureMapper.selectAllTagIntegrally(filter, sorter, page));
-    }
-
-    @Override
-    public void deleteByIdLogically(String figureTagId) {
-        userFigureMapper.deleteByIdLogically(figureTagId);
     }
 
     @Override

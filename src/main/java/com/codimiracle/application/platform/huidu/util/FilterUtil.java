@@ -1,6 +1,6 @@
 package com.codimiracle.application.platform.huidu.util;
 
-import com.codimiracle.application.platform.huidu.contract.Filter;
+import com.codimiracle.web.basic.contract.Filter;
 
 import java.util.Objects;
 

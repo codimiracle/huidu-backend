@@ -1,6 +1,5 @@
 package com.codimiracle.application.platform.huidu.web.api.base;
 
-import com.codimiracle.application.platform.huidu.contract.ApiResponse;
 import com.codimiracle.application.platform.huidu.entity.dto.AudioBookDTO;
 import com.codimiracle.application.platform.huidu.entity.dto.ElectronicBookDTO;
 import com.codimiracle.application.platform.huidu.entity.dto.PaperBookDTO;
@@ -10,6 +9,7 @@ import com.codimiracle.application.platform.huidu.entity.vo.BookVO;
 import com.codimiracle.application.platform.huidu.enumeration.BookType;
 import com.codimiracle.application.platform.huidu.service.BookService;
 import com.codimiracle.application.platform.huidu.service.UserService;
+import com.codimiracle.web.basic.contract.ApiResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;

@@ -1,8 +1,5 @@
 package com.codimiracle.application.platform.huidu.web.api.backend;
 
-import com.codimiracle.application.platform.huidu.contract.ApiResponse;
-import com.codimiracle.application.platform.huidu.contract.Page;
-import com.codimiracle.application.platform.huidu.contract.PageSlice;
 import com.codimiracle.application.platform.huidu.entity.vo.BookCategoryCountVO;
 import com.codimiracle.application.platform.huidu.entity.vo.PaperBookSalesVO;
 import com.codimiracle.application.platform.huidu.entity.vo.UserBookPreferenceVO;
@@ -10,6 +7,9 @@ import com.codimiracle.application.platform.huidu.entity.vo.UserProtectedVO;
 import com.codimiracle.application.platform.huidu.service.StatisticsService;
 import com.codimiracle.application.platform.huidu.service.UserTokenService;
 import com.codimiracle.application.platform.huidu.util.RestfulUtil;
+import com.codimiracle.web.basic.contract.ApiResponse;
+import com.codimiracle.web.basic.contract.Page;
+import com.codimiracle.web.basic.contract.PageSlice;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

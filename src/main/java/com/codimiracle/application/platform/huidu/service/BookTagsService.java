@@ -1,8 +1,8 @@
 package com.codimiracle.application.platform.huidu.service;
 
-import com.codimiracle.application.platform.huidu.contract.Service;
 import com.codimiracle.application.platform.huidu.entity.po.BookTags;
 import com.codimiracle.application.platform.huidu.entity.vo.TagVO;
+import com.codimiracle.web.mybatis.contract.Service;
 
 import java.util.List;
 

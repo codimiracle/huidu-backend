@@ -1,12 +1,12 @@
 package com.codimiracle.application.platform.huidu.web.api.user;
 
-import com.codimiracle.application.platform.huidu.contract.*;
 import com.codimiracle.application.platform.huidu.entity.dto.BulkOperationDTO;
-import com.codimiracle.application.platform.huidu.entity.po.Notification;
 import com.codimiracle.application.platform.huidu.entity.po.User;
-import com.codimiracle.application.platform.huidu.entity.vo.NotificationVO;
-import com.codimiracle.application.platform.huidu.service.NotificationService;
 import com.codimiracle.application.platform.huidu.util.RestfulUtil;
+import com.codimiracle.web.basic.contract.*;
+import com.codimiracle.web.notification.middleware.pojo.po.Notification;
+import com.codimiracle.web.notification.middleware.pojo.vo.NotificationVO;
+import com.codimiracle.web.notification.middleware.service.NotificationService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,13 +36,13 @@ public class ApiUserNotificationController {
         if (Objects.isNull(notification) || !Objects.equals(notification.getReceiverId(), user.getId())) {
             return RestfulUtil.fail("没有找到对应的通知！");
         }
-        notificationService.markAsRead(id);
+        //notificationService.markAsRead(id);
         return RestfulUtil.success();
     }
 
     @PostMapping("/mark-as-read-bulk")
     public ApiResponse markAsReadBulk(@AuthenticationPrincipal User user, @RequestBody BulkOperationDTO bulkOperationDTO) {
-        notificationService.markAsReadBulk(user.getId(), Arrays.asList(bulkOperationDTO.getIds()));
+        //notificationService.markAsReadBulk(user.getId(), Arrays.asList(bulkOperationDTO.getIds()));
         return RestfulUtil.success();
     }
 

@@ -1,11 +1,9 @@
 package com.codimiracle.application.platform.huidu.web.api.base;
 
-import com.codimiracle.application.platform.huidu.contract.*;
 import com.codimiracle.application.platform.huidu.entity.dto.BookDTO;
 import com.codimiracle.application.platform.huidu.entity.dto.BulkDeletionDTO;
 import com.codimiracle.application.platform.huidu.entity.po.Book;
 import com.codimiracle.application.platform.huidu.entity.po.Category;
-import com.codimiracle.application.platform.huidu.entity.po.Content;
 import com.codimiracle.application.platform.huidu.entity.po.User;
 import com.codimiracle.application.platform.huidu.entity.vo.BookVO;
 import com.codimiracle.application.platform.huidu.entity.vt.AudioCatalogs;
@@ -14,6 +12,9 @@ import com.codimiracle.application.platform.huidu.enumeration.*;
 import com.codimiracle.application.platform.huidu.service.*;
 import com.codimiracle.application.platform.huidu.util.RestfulUtil;
 import com.codimiracle.application.platform.huidu.util.TagUtil;
+import com.codimiracle.web.basic.contract.*;
+import com.codimiracle.web.middleware.content.pojo.po.Content;
+import com.codimiracle.web.middleware.content.service.ContentService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -48,9 +49,9 @@ public class BookController {
         Book book = Book.from(bookDTO);
         Content content = new Content();
         content.setOwnerId(user.getId());
-        content.setCreateTime(new Date());
-        content.setUpdateTime(content.getCreateTime());
-        content.setType(ContentType.Book);
+        content.setCreatedAt(new Date());
+        content.setUpdatedAt(content.getCreatedAt());
+        content.setType(ContentType.Book.toString());
         book.setContent(content);
         Category category = book.getCategory();
         if (Objects.nonNull(category)) {

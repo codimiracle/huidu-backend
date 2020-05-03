@@ -22,14 +22,17 @@ package com.codimiracle.application.platform.huidu.service;/*
  * SOFTWARE.
  */
 
-import com.codimiracle.application.platform.huidu.contract.*;
 import com.codimiracle.application.platform.huidu.entity.vo.TopicVO;
 import com.codimiracle.application.platform.huidu.entity.vt.Topic;
+import com.codimiracle.web.basic.contract.Filter;
+import com.codimiracle.web.basic.contract.Page;
+import com.codimiracle.web.basic.contract.PageSlice;
+import com.codimiracle.web.basic.contract.Sorter;
+import com.codimiracle.web.mybatis.contract.Service;
 
 import java.util.List;
 
 public interface TopicService extends Service<String, Topic> {
-    int deleteByIdLogically(String id);
 
     TopicVO findByIdIntegrally(String id);
 

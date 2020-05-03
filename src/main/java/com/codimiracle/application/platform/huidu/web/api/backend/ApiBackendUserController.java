@@ -1,6 +1,5 @@
 package com.codimiracle.application.platform.huidu.web.api.backend;
 
-import com.codimiracle.application.platform.huidu.contract.*;
 import com.codimiracle.application.platform.huidu.entity.dto.BulkDeletionDTO;
 import com.codimiracle.application.platform.huidu.entity.dto.UserDTO;
 import com.codimiracle.application.platform.huidu.entity.dto.UserResetPasswordDTO;
@@ -8,6 +7,7 @@ import com.codimiracle.application.platform.huidu.entity.po.User;
 import com.codimiracle.application.platform.huidu.entity.vo.UserVO;
 import com.codimiracle.application.platform.huidu.service.UserService;
 import com.codimiracle.application.platform.huidu.util.RestfulUtil;
+import com.codimiracle.web.basic.contract.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;

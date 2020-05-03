@@ -22,10 +22,6 @@ package com.codimiracle.application.platform.huidu.web.api.user;/*
  * SOFTWARE.
  */
 
-import com.codimiracle.application.platform.huidu.contract.ApiResponse;
-import com.codimiracle.application.platform.huidu.contract.Filter;
-import com.codimiracle.application.platform.huidu.contract.Page;
-import com.codimiracle.application.platform.huidu.contract.Sorter;
 import com.codimiracle.application.platform.huidu.entity.dto.TopicDTO;
 import com.codimiracle.application.platform.huidu.entity.po.User;
 import com.codimiracle.application.platform.huidu.entity.vo.TopicVO;
@@ -33,6 +29,10 @@ import com.codimiracle.application.platform.huidu.entity.vt.Topic;
 import com.codimiracle.application.platform.huidu.enumeration.ContentStatus;
 import com.codimiracle.application.platform.huidu.service.TopicService;
 import com.codimiracle.application.platform.huidu.util.RestfulUtil;
+import com.codimiracle.web.basic.contract.ApiResponse;
+import com.codimiracle.web.basic.contract.Filter;
+import com.codimiracle.web.basic.contract.Page;
+import com.codimiracle.web.basic.contract.Sorter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -92,7 +92,7 @@ public class ApiUserTopicController {
     @GetMapping("/{id}")
     public ApiResponse entity(@AuthenticationPrincipal User user, @PathVariable("id") String id) {
         TopicVO topicVO = topicService.findByIdIntegrally(id);
-        if (Objects.isNull(topicVO) || !Objects.equals(topicVO.getOwner().getId(), user.getId())) {
+        if (Objects.isNull(topicVO) || !Objects.equals(topicVO.getOwner().getUserId(), user.getId())) {
             return RestfulUtil.fail("找不到对应的话题！");
         }
         return RestfulUtil.entity(topicVO);

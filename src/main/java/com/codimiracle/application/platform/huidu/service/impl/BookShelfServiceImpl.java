@@ -1,14 +1,16 @@
 package com.codimiracle.application.platform.huidu.service.impl;
 
-import com.codimiracle.application.platform.huidu.contract.AbstractService;
 import com.codimiracle.application.platform.huidu.entity.po.BookShelf;
 import com.codimiracle.application.platform.huidu.entity.po.BookShelfCell;
+import com.codimiracle.application.platform.huidu.entity.vo.BookShelfVO;
+import com.codimiracle.application.platform.huidu.enumeration.ContentType;
 import com.codimiracle.application.platform.huidu.enumeration.SubscribeType;
 import com.codimiracle.application.platform.huidu.mapper.BookShelfMapper;
 import com.codimiracle.application.platform.huidu.service.BookShelfCellService;
 import com.codimiracle.application.platform.huidu.service.BookShelfService;
 import com.codimiracle.application.platform.huidu.service.HistoryService;
-import com.codimiracle.application.platform.huidu.service.SubscribeService;
+import com.codimiracle.web.mybatis.contract.support.vo.AbstractService;
+import com.codimiracle.web.notification.middleware.template.SubscriptionTemplate;
 import com.google.common.collect.Interner;
 import com.google.common.collect.Interners;
 import org.springframework.stereotype.Service;
@@ -24,14 +26,14 @@ import java.util.Objects;
  */
 @Service
 @Transactional
-public class BookShelfServiceImpl extends AbstractService<String, BookShelf> implements BookShelfService {
+public class BookShelfServiceImpl extends AbstractService<String, BookShelf, BookShelfVO> implements BookShelfService {
     Interner<String> bookJoinLock = Interners.newWeakInterner();
     @Resource
     private BookShelfMapper bookShelfMapper;
     @Resource
     private HistoryService historyService;
     @Resource
-    private SubscribeService subscribeService;
+    private SubscriptionTemplate subscriptionTemplate;
     @Resource
     private BookShelfCellService bookShelfCellService;
 
@@ -58,7 +60,7 @@ public class BookShelfServiceImpl extends AbstractService<String, BookShelf> imp
                 bookShelfCellService.save(cell);
 
                 //订阅图书更新
-                subscribeService.subscribe(userId, bookId, SubscribeType.BookUpdated);
+                subscriptionTemplate.subscribe(userId, SubscribeType.BookUpdated.toString(), bookId, ContentType.Book.getType());
             }
             //已经放到书架
         }

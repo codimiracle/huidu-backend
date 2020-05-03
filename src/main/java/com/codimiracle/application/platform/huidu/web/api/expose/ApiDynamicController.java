@@ -22,12 +22,12 @@ package com.codimiracle.application.platform.huidu.web.api.expose;/*
  * SOFTWARE.
  */
 
-import com.codimiracle.application.platform.huidu.contract.*;
-import com.codimiracle.application.platform.huidu.entity.vo.ContentVO;
 import com.codimiracle.application.platform.huidu.enumeration.ContentStatus;
 import com.codimiracle.application.platform.huidu.enumeration.ContentType;
-import com.codimiracle.application.platform.huidu.service.ContentService;
 import com.codimiracle.application.platform.huidu.util.RestfulUtil;
+import com.codimiracle.web.basic.contract.*;
+import com.codimiracle.web.middleware.content.pojo.vo.ContentVO;
+import com.codimiracle.web.middleware.content.service.ContentService;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;

@@ -1,9 +1,9 @@
 package com.codimiracle.application.platform.huidu.service;
 
-import com.codimiracle.application.platform.huidu.contract.*;
 import com.codimiracle.application.platform.huidu.entity.po.User;
 import com.codimiracle.application.platform.huidu.entity.vo.UserProtectedVO;
 import com.codimiracle.application.platform.huidu.entity.vo.UserVO;
+import com.codimiracle.web.mybatis.contract.support.vo.Service;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
@@ -13,15 +13,9 @@ import java.util.List;
 /**
  * @author Codimiracle
  */
-public interface UserService extends Service<String, User>, UserDetailsService {
-
-    void deleteByIdLogically(String id);
+public interface UserService extends Service<String, User, UserVO>, UserDetailsService {
 
     void deleteByIdsLogically(List<String> ids);
-
-    UserVO findByIdIntegrally(String id);
-
-    PageSlice<UserVO> findAllIntegrally(Filter filter, Sorter sorter, Page page);
 
     UserProtectedVO findByIdProtectly(String userId);
 
