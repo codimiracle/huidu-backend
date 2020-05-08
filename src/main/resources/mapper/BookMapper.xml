@@ -21,8 +21,7 @@
         <result column="commodity_id" jdbcType="INTEGER" property="commodityId"/>
         <result column="deleted" jdbcType="BIT" property="deleted"/>
     </resultMap>
-    <resultMap id="IntegratedResultMap" type="com.codimiracle.application.platform.huidu.entity.vo.BookVO"
-               extends="com.codimiracle.application.platform.huidu.mapper.ContentMapper.IntegratedResultMap">
+    <resultMap id="IntegratedResultMap" type="com.codimiracle.application.platform.huidu.entity.vo.BookVO">
         <id column="book_id" jdbcType="INTEGER" property="id"/>
         <result column="book_title" jdbcType="VARCHAR" property="title"/>
         <result column="book_description" jdbcType="VARCHAR" property="description"/>
@@ -106,12 +105,6 @@
         LEFT JOIN content ct ON ct.id = b.content_id
         WHERE b.deleted = 0
     </sql>
-    <update id="deleteByIdLogically">
-        UPDATE book
-        SET deleted = 1
-        WHERE id = #{id}
-    </update>
-
     <update id="deleteByIdsLogically">
         UPDATE book
         SET deleted = 1
@@ -133,10 +126,14 @@
         AND cr.type = 'book' AND cr.ref_id = #{bookId}
     </select>
     <select id="selectByIdIntegrally" resultMap="IntegratedResultMap">
+        <include refid="select_statement_without_type"/>
+        AND b.id = #{id}
+    </select>
+    <select id="selectByIdWithTypeIntegrally" resultMap="IntegratedResultMap">
         <include refid="select_statement"/>
         AND b.id = #{id}
     </select>
-    <select id="selectAllIntegrally" resultMap="IntegratedResultMap">
+    <select id="selectByTypeIntegrally" resultMap="IntegratedResultMap">
         <include refid="select_statement"/>
         <if test="filter != null">
             <if test="filter.rate != null and filter.rate.length gt 0">
@@ -146,7 +143,9 @@
                 AND ct.owner_id = #{filter.ownerId[0]}
             </if>
             <if test="filter.keyword != null and filter.keyword.length gt 0">
-                AND b.title LIKE concat('%', #{filter.keyword[0]}, '%') OR bm.name LIKE concat('%', #{filter.keyword[0]}, '%')
+                AND b.title LIKE concat('%', #{filter.keyword[0]}, '%') OR bm.name LIKE concat('%',
+                #{filter.keyword[0]},
+                '%')
             </if>
             <if test="filter.title != null and filter.title.length gt 0">
                 AND b.title LIKE concat('%', #{filter.title[0]}, '%')
@@ -168,7 +167,49 @@
             </if>
             <if test="filter.status != null and filter.status.length gt 0">
                 AND b.status IN
-                <foreach collection="filter.status" item="item" open="(" separator="," close=")" >#{item}</foreach>
+                <foreach collection="filter.status" item="item" open="(" separator="," close=")">#{item}</foreach>
+            </if>
+            <if test="filter.commodityStatus != null and filter.commodityStatus.length gt 0">
+                AND c.status IN
+                <foreach collection="filter.commodityStatus" item="item" open="(" close=")" separator=",">#{item}
+                </foreach>
+            </if>
+        </if>
+    </select>
+    <select id="selectAllIntegrally" resultMap="IntegratedResultMap">
+        <include refid="select_statement_without_type"/>
+        <if test="filter != null">
+            <if test="filter.rate != null and filter.rate.length gt 0">
+                AND ct.rate &gt;= #{filter.rate[0]}
+            </if>
+            <if test="filter.ownerId != null and filter.ownerId.length gt 0">
+                AND ct.owner_id = #{filter.ownerId[0]}
+            </if>
+            <if test="filter.keyword != null and filter.keyword.length gt 0">
+                AND b.title LIKE concat('%', #{filter.keyword[0]}, '%') OR bm.name LIKE concat('%',
+                #{filter.keyword[0]}, '%')
+            </if>
+            <if test="filter.title != null and filter.title.length gt 0">
+                AND b.title LIKE concat('%', #{filter.title[0]}, '%')
+            </if>
+            <if test="filter.metadataName != null and filter.metadataName.length gt 0">
+                AND bm.name LIKE concat('%', #{filter.metadataName[0]}, '%')
+            </if>
+            <if test="filter.metadataAuthor != null and filter.metadataAuthor.length gt 0">
+                AND bm.author LIKE concat('%', #{filter.metadataAuthor[0]}, '%')
+            </if>
+            <if test="filter.publishYear != null and filter.publishYear.length gt 0">
+                AND b.publish_year = #{filter.publishYear[0]}
+            </if>
+            <if test="filter.categoryId != null and filter.categoryId.length gt 0">
+                AND b.category_id = #{filter.categoryId[0]}
+            </if>
+            <if test="filter.tagId != null and filter.tagId.length gt 0">
+                AND b.id IN (SELECT bt.book_id FROM book_tags bt WHERE bt.tag_id = #{filter.tagId[0]})
+            </if>
+            <if test="filter.status != null and filter.status.length gt 0">
+                AND b.status IN
+                <foreach collection="filter.status" item="item" open="(" separator="," close=")">#{item}</foreach>
             </if>
             <if test="filter.commodityStatus != null and filter.commodityStatus.length gt 0">
                 AND c.status IN
@@ -254,14 +295,17 @@
     <select id="selectAllUsingUserFigureByUserIdIntegrally" resultMap="IntegratedResultMap">
         <include refid="select_statement_without_type"/>
         AND b.id IN (
-            SELECT bt.book_id FROM book_tags bt LEFT JOIN user_figure uf ON bt.tag_id = uf.tag_id <if test="userId != null">WHERE uf.user_id = #{userId}</if> ORDER BY avg(uf.score) DESC
+        SELECT bt.book_id FROM book_tags bt LEFT JOIN user_figure uf ON bt.tag_id = uf.tag_id <if test="userId != null">
+        WHERE uf.user_id = #{userId}
+    </if> ORDER BY avg(uf.score) DESC
         )
         <if test="filter != null">
             <if test="filter.type != null and filter.type.length gt 0">
                 AND b.type = #{filter.type[0]}
             </if>
             <if test="filter.status != null and filter.status.length gt 0">
-                AND b.status IN <foreach collection="filter.status" open="(" close=")"  separator="," item="item">#{item}</foreach>
+                AND b.status IN
+                <foreach collection="filter.status" open="(" close=")" separator="," item="item">#{item}</foreach>
             </if>
         </if>
         <if test="sorter != null">
@@ -277,34 +321,37 @@
         </if>
     </select>
     <select id="selectAllUsingUserFigureByAvgIntegrally" resultMap="IntegratedResultMap">
-        <include refid="select_statement_without_type" />
+        <include refid="select_statement_without_type"/>
         AND b.id IN (
-            SELECT bt.book_id FROM book_tags bt WHERE bt.tag_id IN (
-                SELECT uf.tag_id FROM user_figure uf GROUP BY tag_id ORDER BY avg(uf.score) DESC
-            )
+        SELECT bt.book_id FROM book_tags bt WHERE bt.tag_id IN (
+        SELECT uf.tag_id FROM user_figure uf GROUP BY tag_id ORDER BY avg(uf.score) DESC
+        )
         )
         <if test="filter != null">
             <if test="filter.type != null and filter.type.length gt 0">
                 AND b.type = #{filter.type[0]}
             </if>
             <if test="filter.status != null and filter.status.length gt 0">
-                AND b.status IN <foreach collection="filter.status" open="(" close=")" separator="," item="item">#{item}</foreach>
+                AND b.status IN
+                <foreach collection="filter.status" open="(" close=")" separator="," item="item">#{item}</foreach>
             </if>
         </if>
     </select>
     <select id="selectAllUsingUserFigureByTagId" resultMap="IntegratedResultMap">
         <include refid="select_statement_without_type"/>
         AND b.id IN (
-            SELECT bt.book_id FROM book_tags bt WHERE bt.tag_id IN (
-                SELECT uf.tag_id from user_figure uf INNER JOIN user_figure uft ON uft.user_id = uf.user_id WHERE uft.tag_id = 15 GROUP BY uf.tag_id ORDER By avg(uf.score) DESC
-            )
+        SELECT bt.book_id FROM book_tags bt WHERE bt.tag_id IN (
+        SELECT uf.tag_id from user_figure uf INNER JOIN user_figure uft ON uft.user_id = uf.user_id WHERE uft.tag_id =
+        15 GROUP BY uf.tag_id ORDER By avg(uf.score) DESC
+        )
         )
         <if test="filter != null">
             <if test="filter.type != null and filter.type.length gt 0">
                 AND b.type = #{filter.type[0]}
             </if>
             <if test="filter.status != null and filter.status.length gt 0">
-                AND b.status IN <foreach collection="filter.status" open="(" close=")" separator="," item="item">#{item}</foreach>
+                AND b.status IN
+                <foreach collection="filter.status" open="(" close=")" separator="," item="item">#{item}</foreach>
             </if>
         </if>
     </select>
@@ -312,18 +359,19 @@
     <select id="selectAllUsingUserFigureByCategoryId" resultMap="IntegratedResultMap">
         <include refid="select_statement_without_type"/>
         AND b.id IN (
-            SELECT bt.book_id FROM book_tags bt WHERE bt.tag_id IN (
-                SELECT uf.tag_id FROM user_figure uf WHERE uf.tag_id IN (
-                    SELECT ct.tag_id FROM category_tags ct WHERE ct.category_id = #{categoryId}
-                )  <if test="userId != null">AND uf.user_id = #{userId}</if> GROUP By uf.tag_id ORDER BY avg(uf.score) DESC
-            )
+        SELECT bt.book_id FROM book_tags bt WHERE bt.tag_id IN (
+        SELECT uf.tag_id FROM user_figure uf WHERE uf.tag_id IN (
+        SELECT ct.tag_id FROM category_tags ct WHERE ct.category_id = #{categoryId}
+        )  <if test="userId != null">AND uf.user_id = #{userId}</if> GROUP By uf.tag_id ORDER BY avg(uf.score) DESC
+        )
         )
         <if test="filter != null">
             <if test="filter.type != null and filter.type.length gt 0">
                 AND b.type = #{filter.type[0]}
             </if>
             <if test="filter.status != null and filter.status.length gt 0">
-                AND b.status IN <foreach collection="filter.status" open="(" close=")" separator="," item="item">#{item}</foreach>
+                AND b.status IN
+                <foreach collection="filter.status" open="(" close=")" separator="," item="item">#{item}</foreach>
             </if>
         </if>
     </select>
@@ -331,16 +379,17 @@
         <include refid="select_statement_without_type"/>
         AND b.id IN (
         SELECT bt.book_id FROM book_tags bt WHERE bt.tag_id IN (
-            SELECT uf.tag_id FROM user_figure uf WHERE uf.tag_id IN (
-                SELECT btx.tag_id FROM book_tags btx WHERE btx.book_id = #{bookId}
-            ) <if test="userId != null">AND uf.user_id = #{userId}</if> GROUP By uf.tag_id ORDER BY avg(uf.score) DESC
+        SELECT uf.tag_id FROM user_figure uf WHERE uf.tag_id IN (
+        SELECT btx.tag_id FROM book_tags btx WHERE btx.book_id = #{bookId}
+        ) <if test="userId != null">AND uf.user_id = #{userId}</if> GROUP By uf.tag_id ORDER BY avg(uf.score) DESC
         )
         <if test="filter != null">
             <if test="filter.type != null and filter.type.length gt 0">
                 AND b.type = #{filter.type[0]}
             </if>
             <if test="filter.status != null and filter.status.length gt 0">
-                AND b.status IN <foreach collection="filter.status" open="(" close=")" separator="," item="item">#{item}</foreach>
+                AND b.status IN
+                <foreach collection="filter.status" open="(" close=")" separator="," item="item">#{item}</foreach>
             </if>
         </if>
     </select>
@@ -348,15 +397,16 @@
     <select id="selectAllUsingUserFigureByBookType" resultMap="IntegratedResultMap">
         <include refid="select_statement"/>
         AND b.id IN (
-            SELECT bt.book_id FROM book_tags bt WHERE bt.deleted = 0 AND bt.tag_id IN (<if test="userId != null">
-                <include
-                        refid="com.codimiracle.application.platform.huidu.mapper.UserFigureMapper.maybelike_tag_id_for_user"/>
-            </if>
-            <if test="userId == null">
-                <include
-                        refid="com.codimiracle.application.platform.huidu.mapper.UserFigureMapper.maybelike_tag_id_for_anonymous"/>
-            </if>
-            )
+        SELECT bt.book_id FROM book_tags bt WHERE bt.deleted = 0 AND bt.tag_id IN (
+        <if test="userId != null">
+            <include
+                    refid="com.codimiracle.application.platform.huidu.mapper.UserFigureMapper.maybelike_tag_id_for_user"/>
+        </if>
+        <if test="userId == null">
+            <include
+                    refid="com.codimiracle.application.platform.huidu.mapper.UserFigureMapper.maybelike_tag_id_for_anonymous"/>
+        </if>
+        )
         )
         <if test="filter != null">
             <if test="filter.status != null and filter.status.length gt 0">
@@ -367,24 +417,26 @@
     </select>
     <sql id="today_reading_tags">
         SELECT
-            btx.tag_id
+        btx.tag_id
         FROM
-            book_tags btx LEFT JOIN history h ON btx.book_id = h.book_id WHERE DATE(h.read_time) = DATE(NOW()) GROUP BY btx.tag_id
+        book_tags btx LEFT JOIN history h ON btx.book_id = h.book_id WHERE DATE(h.read_time) = DATE(NOW()) GROUP BY
+        btx.tag_id
     </sql>
     <sql id="today_reading_tags_for_any_user">
         SELECT
-            uf.tag_id
+        uf.tag_id
         FROM
-            user_figure uf
-        WHERE uf.tag_id IN (<include refid="today_reading_tags" />)
-        <if test="userId != null">AND uf.user_id = #{userId}</if> GROUP By uf.tag_id ORDER BY avg(uf.score) DESC
+        user_figure uf
+        WHERE uf.tag_id IN (<include refid="today_reading_tags"/>)
+        <if test="userId != null">AND uf.user_id = #{userId}</if>
+        GROUP By uf.tag_id ORDER BY avg(uf.score) DESC
     </sql>
     <select id="selectAllUsingUserFigureByHistoryToday" resultMap="IntegratedResultMap">
         <include refid="select_statement_without_type"/>
         AND b.id IN (
-            SELECT bt.book_id FROM book_tags bt WHERE bt.tag_id IN (
-                <include refid="today_reading_tags_for_any_user" />
-            )
+        SELECT bt.book_id FROM book_tags bt WHERE bt.tag_id IN (
+        <include refid="today_reading_tags_for_any_user"/>
+        )
         )
         <if test="filter != null">
             <if test="filter.status != null and filter.status.length gt 0">

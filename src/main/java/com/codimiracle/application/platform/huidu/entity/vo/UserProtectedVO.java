@@ -22,16 +22,34 @@ package com.codimiracle.application.platform.huidu.entity.vo;/*
  * SOFTWARE.
  */
 
+import com.codimiracle.web.middleware.content.pojo.eo.MentionUser;
+import com.codimiracle.web.middleware.content.pojo.eo.SocialUser;
 import lombok.Data;
 
 /**
  * 受保护的用户值对象
+ *
  * @author Codimiracle
  */
 @Data
-public class UserProtectedVO {
+public class UserProtectedVO implements MentionUser, SocialUser {
     private String id;
     private String avatar;
     private String username;
     private String nickname;
+
+    @Override
+    public void setMentionUserId(String userId) {
+        this.id = userId;
+    }
+
+    @Override
+    public String getMentionUserId() {
+        return this.id;
+    }
+
+    @Override
+    public String getUserId() {
+        return id;
+    }
 }

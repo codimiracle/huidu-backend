@@ -22,9 +22,6 @@
         <association property="commodity"
                      resultMap="com.codimiracle.application.platform.huidu.mapper.CommodityMapper.IntegratedResultMap"/>
     </resultMap>
-    <update id="deleteByIdLogically">
-        UPDATE user_cart uc SET uc.deleted = 1 WHERE uc.id = #{id}
-    </update>
     <update id="settleByIdLogically">
         UPDATE user_cart uc SET uc.deleted = 1, uc.settled = 1 WHERE uc.id = #{id}
     </update>

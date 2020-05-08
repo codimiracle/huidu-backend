@@ -172,7 +172,7 @@ public class BookServiceImpl extends AbstractService<String, Book, BookVO> imple
 
     @Override
     public BookVO findPublishByIdIntegrally(BookType type, String id) {
-        BookVO bookVO = findByIdIntegrally(type, id);
+        BookVO bookVO = findByIdWithTypeIntegrally(type, id);
         if (Objects.equals(bookVO.getStatus(), BookStatus.Serializing.getStatus()) || Objects.equals(bookVO.getStatus(), BookStatus.Ended.getStatus()) || Objects.equals(bookVO.getStatus(), BookStatus.Paused.getStatus())) {
             return bookVO;
         }
@@ -180,20 +180,15 @@ public class BookServiceImpl extends AbstractService<String, Book, BookVO> imple
     }
 
     @Override
-    public BookVO findByIdIntegrally(BookType type, String id) {
-        BookVO bookVO = bookMapper.selectByIdIntegrally(type, id);
+    public BookVO findByIdWithTypeIntegrally(BookType type, String id) {
+        BookVO bookVO = bookMapper.selectByIdWithTypeIntegrally(type, id);
         mutate(bookVO);
         return bookVO;
     }
 
     @Override
-    public BookVO findByIdIntegrally(String id) {
-        return findByIdIntegrally(null, id);
-    }
-
-    @Override
-    public PageSlice<BookVO> findAllIntegrally(BookType type, Filter filter, Sorter sorter, Page page) {
-        PageSlice<BookVO> slice = extractPageSlice(bookMapper.selectAllIntegrally(type, filter, sorter, page));
+    public PageSlice<BookVO> findByTypeIntegrally(BookType type, Filter filter, Sorter sorter, Page page) {
+        PageSlice<BookVO> slice = extractPageSlice(bookMapper.selectByTypeIntegrally(type, filter, sorter, page));
         List<BookVO> list = slice.getList();
         list.forEach(this::mutate);
         return slice;
@@ -205,7 +200,7 @@ public class BookServiceImpl extends AbstractService<String, Book, BookVO> imple
         if (Objects.nonNull(book)) {
             // 同时删除响应的内容
             contentService.deleteByIdLogically(book.getContentId());
-            bookMapper.deleteByIdLogically(id);
+            super.deleteByIdLogically(id);
         }
     }
 
@@ -261,7 +256,7 @@ public class BookServiceImpl extends AbstractService<String, Book, BookVO> imple
     public PageSlice<BookVO> findAllHotIntegrally(BookType type, Filter filter, Sorter sorter, Page page) {
         filter = ensurePublish(filter);
         sorter = orderByHotDegree(sorter);
-        return findAllIntegrally(type, filter, sorter, page);
+        return findByTypeIntegrally(type, filter, sorter, page);
     }
 
     @Override

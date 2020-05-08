@@ -10,6 +10,7 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
+@org.apache.ibatis.annotations.Mapper
 public interface BookShelfCellMapper extends Mapper<BookShelfCell, BookShelfCellVO> {
     List<BookShelfCellVO> findAllIntegrally(@Param("filter") Filter filter, @Param("sorter") Sorter sorter, @Param("page") Page page);
 }

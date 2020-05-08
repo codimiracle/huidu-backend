@@ -22,6 +22,7 @@ package com.codimiracle.application.platform.huidu.aspect;/*
  * SOFTWARE.
  */
 
+import com.codimiracle.application.platform.huidu.annotation.Operation;
 import com.codimiracle.application.platform.huidu.entity.po.User;
 import com.codimiracle.application.platform.huidu.service.OperationService;
 import lombok.extern.slf4j.Slf4j;
@@ -44,8 +45,8 @@ public class OperationMonitor {
     public void entityOperationMethod() {
     }
 
-    @Around(value = "entityOperationMethod()")
-    public Object operating(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
+    @Around(value = "entityOperationMethod() && args(operation)")
+    public Object operating(ProceedingJoinPoint proceedingJoinPoint, Operation operateion) throws Throwable {
         if (Objects.equals(proceedingJoinPoint.getTarget(), operationService)) {
             return proceedingJoinPoint.proceed();
         }

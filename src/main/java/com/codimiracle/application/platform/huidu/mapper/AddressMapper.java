@@ -11,10 +11,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
+@org.apache.ibatis.annotations.Mapper
 public interface AddressMapper extends Mapper<Address, AddressVO> {
     AddressVO selectByIdIntegrally(String id);
-
-    List<AddressVO> selectAllIntegrally(@Param("filter") Filter filter, @RequestParam("sorter") Sorter sorter, @RequestParam("page") Page page);
 
     void deleteByIdLogically(String id);
 

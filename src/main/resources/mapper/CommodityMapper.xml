@@ -37,11 +37,6 @@
         <result column="commodity_prices" jdbcType="VARCHAR" property="prices"/>
         <result column="commodity_status" jdbcType="VARCHAR" property="status"/>
     </resultMap>
-    <update id="deleteByIdLogically">
-        UPDATE commodity
-        SET deleted = 1
-        WHERE commodity.id = #{id}
-    </update>
     <update id="deleteByIdsLogically">
         UPDATE commodity
         SET deleted = 1

@@ -5,6 +5,7 @@ import com.codimiracle.application.platform.huidu.entity.vo.LogisticsInformation
 import com.codimiracle.web.mybatis.contract.support.vo.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+@org.apache.ibatis.annotations.Mapper
 public interface LogisticsInformationMapper extends Mapper<LogisticsInformation, LogisticsInformationVO> {
     LogisticsInformationVO selectByIdIntegrally(@Param("id") String id);
 

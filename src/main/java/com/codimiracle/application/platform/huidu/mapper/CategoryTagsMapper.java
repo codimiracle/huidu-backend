@@ -7,6 +7,7 @@ import com.codimiracle.web.mybatis.contract.Mapper;
 
 import java.util.List;
 
+@org.apache.ibatis.annotations.Mapper
 public interface CategoryTagsMapper extends Mapper<CategoryTags> {
     List<CategoryTags> selectByCategoryId(String categoryId);
 

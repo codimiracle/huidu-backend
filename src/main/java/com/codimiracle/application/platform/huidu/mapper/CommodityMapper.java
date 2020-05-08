@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
+@org.apache.ibatis.annotations.Mapper
 public interface CommodityMapper extends Mapper<Commodity, CommodityVO> {
     CommodityVO selectByIdIntegrally(String id);
 

@@ -12,6 +12,7 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
+@org.apache.ibatis.annotations.Mapper
 public interface BookAudioEpisodeMapper extends Mapper<BookAudioEpisode, BookAudioEpisodeVO> {
     List<BookAudioEpisodeVO> selectAllIntegrally(@Param("bookId") String bookId, @Param("filter") Filter filter, @Param("sorter") Sorter sorter, @Param("page") Page page);
 

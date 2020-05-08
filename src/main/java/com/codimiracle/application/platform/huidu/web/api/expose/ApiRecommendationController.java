@@ -43,7 +43,7 @@ public class ApiRecommendationController {
         sorter = Objects.isNull(sorter) ? new Sorter() : sorter;
         sorter.setField("reads");
         sorter.setOrder("descend");
-        PageSlice<BookVO> slice = bookService.findAllIntegrally(BookType.valueOfCode(bookType), filter, sorter, page);
+        PageSlice<BookVO> slice = bookService.findByTypeIntegrally(BookType.valueOfCode(bookType), filter, sorter, page);
         return RestfulUtil.list(slice);
     }
 
@@ -101,14 +101,14 @@ public class ApiRecommendationController {
         discoverVO.setMaybeLikes(bookService.findAllUsingUserFigureByAvgIntegrally(null, null, firstPage).getList());
         Filter thisYears = new Filter();
         thisYears.put("years", new String[]{DateFormatUtils.format(new Date(), "yyyy")});
-        discoverVO.setNewBooks(bookService.findAllIntegrally(null, thisYears, null, firstPage).getList());
+        discoverVO.setNewBooks(bookService.findByTypeIntegrally(null, thisYears, null, firstPage).getList());
         Sorter sorter = new Sorter();
         sorter.setField("sales");
         sorter.setOrder("descend");
-        discoverVO.setSalesBooks(bookService.findAllIntegrally(BookType.PaperBook, null, sorter, firstPage).getList());
+        discoverVO.setSalesBooks(bookService.findByTypeIntegrally(BookType.PaperBook, null, sorter, firstPage).getList());
         Filter fiveStar = new Filter();
         fiveStar.put("rate", new String[]{"4.0"});
-        discoverVO.setStarsBooks(bookService.findAllIntegrally(null, fiveStar, sorter, firstPage).getList());
+        discoverVO.setStarsBooks(bookService.findByTypeIntegrally(null, fiveStar, sorter, firstPage).getList());
         discoverVO.setTodayBooks(bookService.findAllUsingUserFigureByHistoryToday(Objects.nonNull(user) ? user.getId() : null, null, null, firstPage).getList());
         return RestfulUtil.success(discoverVO);
     }

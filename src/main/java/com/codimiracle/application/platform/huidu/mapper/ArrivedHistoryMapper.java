@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+@org.apache.ibatis.annotations.Mapper
 public interface ArrivedHistoryMapper extends Mapper<ArrivedHistory, ArrivedHistoryVO> {
     ArrivedHistory selectLastArrivedHistory(@Param("signerId") String signerId, @Param("signingDate") Date signingDate);
 

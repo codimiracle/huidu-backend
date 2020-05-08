@@ -13,6 +13,7 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
+@org.apache.ibatis.annotations.Mapper
 public interface CategoryMapper extends Mapper<Category, CategoryVO> {
     CategoryVO selectByIdIntegrally(@Param("id") String id);
 

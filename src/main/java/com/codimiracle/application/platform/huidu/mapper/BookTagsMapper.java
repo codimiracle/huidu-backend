@@ -6,6 +6,7 @@ import com.codimiracle.web.mybatis.contract.Mapper;
 
 import java.util.List;
 
+@org.apache.ibatis.annotations.Mapper
 public interface BookTagsMapper extends Mapper<BookTags> {
     void deleteByLogically(String id);
 

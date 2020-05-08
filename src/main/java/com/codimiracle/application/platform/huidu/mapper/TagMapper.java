@@ -5,12 +5,13 @@ import com.codimiracle.application.platform.huidu.entity.vo.TagVO;
 import com.codimiracle.web.basic.contract.Filter;
 import com.codimiracle.web.basic.contract.Page;
 import com.codimiracle.web.basic.contract.Sorter;
-import com.codimiracle.web.mybatis.contract.Mapper;
+import com.codimiracle.web.mybatis.contract.support.vo.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
-public interface TagMapper extends Mapper<Tag> {
+@org.apache.ibatis.annotations.Mapper
+public interface TagMapper extends Mapper<Tag, TagVO> {
     TagVO selectByIdIntegrally(String id);
 
     List<TagVO> selectByCategoryIdIntegrally(String categoryId);

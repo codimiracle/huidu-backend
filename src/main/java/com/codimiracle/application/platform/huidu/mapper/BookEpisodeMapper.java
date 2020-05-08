@@ -12,6 +12,7 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
+@org.apache.ibatis.annotations.Mapper
 public interface BookEpisodeMapper extends Mapper<BookEpisode, BookEpisodeVO> {
     BookEpisodeVO selectByIdIntegrally(String id);
 

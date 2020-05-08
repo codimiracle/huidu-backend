@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Param;
 import java.util.Date;
 import java.util.List;
 
+@org.apache.ibatis.annotations.Mapper
 public interface StatisticsMapper {
     List<PaperBookSalesVO> findPaperBookSalesBetween(Date start, Date end);
 

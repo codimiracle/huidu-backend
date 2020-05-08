@@ -70,7 +70,7 @@ public class BookController {
             book.setTags(TagUtil.mutateToPersistent(tagService, tagNames));
         }
         bookService.save(book);
-        return RestfulUtil.entity(bookService.findByIdIntegrally(book.getType(), book.getId()));
+        return RestfulUtil.entity(bookService.findByIdWithTypeIntegrally(book.getType(), book.getId()));
     }
 
     public ApiResponse delete(@PathVariable String id) {
@@ -102,7 +102,7 @@ public class BookController {
         }
         book.setId(id);
         bookService.update(book);
-        return RestfulUtil.entity(bookService.findByIdIntegrally(book.getType(), id));
+        return RestfulUtil.entity(bookService.findByIdWithTypeIntegrally(book.getType(), id));
     }
 
     public ApiResponse entity(User user, BookType type, String id, boolean details) {
@@ -113,7 +113,7 @@ public class BookController {
     }
 
     public ApiResponse entity(BookType type, String id) {
-        BookVO bookVO = bookService.findByIdIntegrally(type, id);
+        BookVO bookVO = bookService.findByIdWithTypeIntegrally(type, id);
         return RestfulUtil.entity(bookVO);
     }
 
@@ -128,7 +128,7 @@ public class BookController {
     }
 
     public ApiResponse collection(BookType type, Filter filter, Sorter sorter, Page page) {
-        PageSlice<BookVO> slice = bookService.findAllIntegrally(type, filter, sorter, page);
+        PageSlice<BookVO> slice = bookService.findByTypeIntegrally(type, filter, sorter, page);
         return RestfulUtil.list(slice);
     }
 

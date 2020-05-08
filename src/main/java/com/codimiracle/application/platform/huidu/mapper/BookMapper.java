@@ -11,12 +11,10 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
+@org.apache.ibatis.annotations.Mapper
 public interface BookMapper extends Mapper<Book,BookVO> {
-    BookVO selectByIdIntegrally(@Param("type") BookType type, @Param("id") String id);
-
-    List<BookVO> selectAllIntegrally(@Param("type") BookType type, @Param("filter") Filter filter, @Param("sorter") Sorter sorter, @Param("page") Page page);
-
-    void deleteByIdLogically(String id);
+    BookVO selectByIdWithTypeIntegrally(@Param("type") BookType type, @Param("id") String id);
+    List<BookVO> selectByTypeIntegrally(@Param("type") BookType type, @Param("filter") Filter filter, @Param("sorter") Sorter sorter, @Param("page") Page page);
 
     void deleteByIdsLogically(List<String> ids);
 

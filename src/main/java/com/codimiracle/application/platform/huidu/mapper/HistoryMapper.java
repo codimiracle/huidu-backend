@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.Date;
 import java.util.List;
 
+@org.apache.ibatis.annotations.Mapper
 public interface HistoryMapper extends Mapper<History, HistoryVO> {
     HistoryVO selectLastReadByUserIdAndBookIdIntegrally(@Param("userId") String userId, @Param("bookId") String bookId);
 

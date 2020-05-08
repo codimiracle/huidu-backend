@@ -10,6 +10,7 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
+@org.apache.ibatis.annotations.Mapper
 public interface BookMetadataMapper extends Mapper<BookMetadata, BookMetadataVO> {
     BookMetadataVO selectByIdIntegrally(String id);
 

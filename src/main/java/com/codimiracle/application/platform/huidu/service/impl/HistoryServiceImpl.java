@@ -54,7 +54,7 @@ public class HistoryServiceImpl extends AbstractService<String, History, History
     @Override
     protected HistoryVO mutate(HistoryVO historyVO) {
         if (Objects.nonNull(historyVO)) {
-            historyVO.setBook(bookService.findByIdIntegrally(null, historyVO.getBookId()));
+            historyVO.setBook(bookService.findByIdWithTypeIntegrally(null, historyVO.getBookId()));
             if (Objects.nonNull(historyVO.getEpisodeId())) {
                 historyVO.setEpisode(bookEpisodeService.findByIdIntegrally(historyVO.getEpisodeId()));
             }
@@ -81,7 +81,7 @@ public class HistoryServiceImpl extends AbstractService<String, History, History
         }
         historyVO = new HistoryVO();
         historyVO.setBookId(bookId);
-        BookVO bookVO = bookService.findByIdIntegrally(null, bookId);
+        BookVO bookVO = bookService.findByIdWithTypeIntegrally(null, bookId);
         historyVO.setBook(bookVO);
         BookEpisodeVO bookEpisodeVO = null;
         BookAudioEpisodeVO bookAudioEpisodeVO = null;

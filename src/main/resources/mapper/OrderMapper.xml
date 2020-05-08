@@ -24,6 +24,7 @@
         <result column="status" jdbcType="VARCHAR" property="status"/>
         <result column="logistics_information_id" jdbcType="VARCHAR" property="logisticsInformationId"/>
     </resultMap>
+
     <resultMap id="IntegratedResultMap" type="com.codimiracle.application.platform.huidu.entity.vo.OrderVO">
         <result column="order_number" jdbcType="CHAR" property="orderNumber"/>
         <result column="order_type" jdbcType="VARCHAR" property="type"/>
@@ -43,6 +44,7 @@
         <association property="logisticsInformation"
                      resultMap="com.codimiracle.application.platform.huidu.mapper.LogisticsInformationMapper.IntegratedResultMap"/>
     </resultMap>
+
     <sql id="select_statement">
         SELECT o.order_number,
         o.owner_id user_id,

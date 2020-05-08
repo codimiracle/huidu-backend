@@ -23,13 +23,9 @@ public interface BookService extends Service<String, Book, BookVO> {
 
     BookVO findPublishByIdIntegrally(BookType type, String id);
 
-    BookVO findByIdIntegrally(BookType type, String id);
+    BookVO findByIdWithTypeIntegrally(BookType type, String id);
 
-    BookVO findByIdIntegrally(String id);
-
-    PageSlice<BookVO> findAllIntegrally(BookType type, Filter filter, Sorter sorter, Page page);
-
-    void deleteByIdLogically(String id);
+    PageSlice<BookVO> findByTypeIntegrally(BookType type, Filter filter, Sorter sorter, Page page);
 
     void deleteByIdsLogically(List<String> ids);
 

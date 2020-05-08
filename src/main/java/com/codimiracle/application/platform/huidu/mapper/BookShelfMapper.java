@@ -6,6 +6,7 @@ import com.codimiracle.web.mybatis.contract.support.vo.Mapper;
 
 import java.util.List;
 
+@org.apache.ibatis.annotations.Mapper
 public interface BookShelfMapper extends Mapper<BookShelf, BookShelfVO> {
     List<BookShelf> selectByUserId(String userId);
 

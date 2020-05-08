@@ -32,7 +32,7 @@ public class BookShelfCellServiceImpl extends AbstractService<String, BookShelfC
 
     protected BookShelfCellVO mutate(BookShelfCellVO bookShelfCellVO) {
         if (Objects.nonNull(bookShelfCellVO)) {
-            bookShelfCellVO.setBook(bookService.findByIdIntegrally(null, bookShelfCellVO.getBookId()));
+            bookShelfCellVO.setBook(bookService.findByIdWithTypeIntegrally(null, bookShelfCellVO.getBookId()));
             String ownerId = bookShelfCellVO.getShelf().getOwnerId();
             HistoryVO historyVO = historyService.findLastReadByUserIdAndBookIdIntegrallyOrFirstEpisode(ownerId, bookShelfCellVO.getBookId());
             bookShelfCellVO.setProgress(historyService.findReadingProgressByUserIdAndBookId(bookShelfCellVO.getShelf().getOwnerId(), bookShelfCellVO.getBookId()));

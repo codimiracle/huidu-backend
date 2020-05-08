@@ -35,7 +35,7 @@ public class ApiSearchController {
             } else {
                 filter.put("metadataName", new String[]{keyword});
             }
-            PageSlice<BookVO> slice = bookService.findAllIntegrally(BookType.valueOfCode(type), filter, sorter, page);
+            PageSlice<BookVO> slice = bookService.findByTypeIntegrally(BookType.valueOfCode(type), filter, sorter, page);
             return RestfulUtil.list(slice);
         } else {
             filter = Objects.isNull(filter) ? new Filter() : filter;
