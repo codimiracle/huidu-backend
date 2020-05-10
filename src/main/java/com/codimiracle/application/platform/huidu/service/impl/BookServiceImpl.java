@@ -1,10 +1,10 @@
 package com.codimiracle.application.platform.huidu.service.impl;
 
 import com.codimiracle.application.platform.huidu.entity.po.Book;
-import com.codimiracle.application.platform.huidu.entity.po.BookTags;
 import com.codimiracle.application.platform.huidu.entity.po.Tag;
 import com.codimiracle.application.platform.huidu.entity.po.User;
 import com.codimiracle.application.platform.huidu.entity.vo.BookVO;
+import com.codimiracle.application.platform.huidu.entity.vo.TagVO;
 import com.codimiracle.application.platform.huidu.enumeration.BookStatus;
 import com.codimiracle.application.platform.huidu.enumeration.BookType;
 import com.codimiracle.application.platform.huidu.mapper.BookMapper;
@@ -16,6 +16,7 @@ import com.codimiracle.web.basic.contract.Sorter;
 import com.codimiracle.web.middleware.content.pojo.po.Content;
 import com.codimiracle.web.middleware.content.pojo.po.ContentExamination;
 import com.codimiracle.web.middleware.content.service.ContentService;
+import com.codimiracle.web.middleware.content.service.ContentTagsService;
 import com.codimiracle.web.middleware.content.service.ExaminationService;
 import com.codimiracle.web.mybatis.contract.ServiceException;
 import com.codimiracle.web.mybatis.contract.support.vo.AbstractService;
@@ -45,9 +46,9 @@ public class BookServiceImpl extends AbstractService<String, Book, BookVO> imple
     @Resource
     private ContentService contentService;
     @Resource
-    private BookTagsService bookTagsService;
-    @Resource
     private TagService tagService;
+    @Resource
+    private ContentTagsService contentTagsService;
     @Resource
     private UserCartService userCartService;
     @Resource
@@ -73,9 +74,6 @@ public class BookServiceImpl extends AbstractService<String, Book, BookVO> imple
         contentService.save(content);
         model.setContentId(content.getId());
         super.save(model);
-        if (Objects.nonNull(model.getTags())) {
-            persistentTags(model);
-        }
     }
 
     private void examinate(String id, String reason, String userId, BookStatus status) {
@@ -98,16 +96,6 @@ public class BookServiceImpl extends AbstractService<String, Book, BookVO> imple
     }
 
     @Override
-    public void passExamination(String id, String reason, String userId) {
-        examinate(id, reason, userId, BookStatus.Serializing);
-    }
-
-    @Override
-    public void rejectExamination(String id, String reason, String userId) {
-        examinate(id, reason, userId, BookStatus.Rejected);
-    }
-
-    @Override
     public void update(Book model) {
         Optional.ofNullable(model.getCategory()).ifPresent((category -> {
             categoryService.save(category);
@@ -120,31 +108,10 @@ public class BookServiceImpl extends AbstractService<String, Book, BookVO> imple
             commodityService.update(commodity);
         }));
 
-        if (Objects.nonNull(model.getTags())) {
-            persistentTags(model);
-        }
         Content content = new Content();
         content.setId(model.getId());
         contentService.update(content);
         super.update(model);
-    }
-
-    private void persistentTags(Book model) {
-        List<BookTags> allBookTags = bookTagsService.findByBookId(model.getId());
-        List<Tag> newTags = model.getTags().stream().filter((t) -> Objects.isNull(t.getId())).collect(Collectors.toList());
-        newTags.forEach(tagService::save);
-        Map<String, Tag> tagsMap = model.getTags().stream().collect(Collectors.toMap(Tag::getId, (tag) -> tag));
-        allBookTags.forEach((bookTags -> {
-            if (tagsMap.containsKey(bookTags.getTagId())) {
-                bookTags.setDeleted(false);
-            } else {
-                bookTags.setDeleted(true);
-            }
-            tagsMap.remove(bookTags.getTagId());
-        }));
-        allBookTags.forEach(bookTagsService::update);
-        List<BookTags> bookTagsList = tagsMap.values().stream().map((t) -> BookTags.valueOf(model, t)).collect(Collectors.toList());
-        bookTagsList.forEach(bookTagsService::save);
     }
 
     protected BookVO mutate(BookVO bookVO) {
@@ -165,7 +132,7 @@ public class BookServiceImpl extends AbstractService<String, Book, BookVO> imple
             }
             bookVO.setExamination(examinationService.findLastByContentIdIntegrally(bookVO.getContentId()));
             bookVO.setReviewRate(avgReviewStars(bookVO.getId()));
-            bookVO.setTags(bookTagsService.findByBookIdItegrally(bookVO.getId()));
+            bookVO.setTagList(contentTagsService.findTagByContentId(bookVO.getId()));
         }
         return bookVO;
     }
@@ -253,13 +220,6 @@ public class BookServiceImpl extends AbstractService<String, Book, BookVO> imple
     }
 
     @Override
-    public PageSlice<BookVO> findAllHotIntegrally(BookType type, Filter filter, Sorter sorter, Page page) {
-        filter = ensurePublish(filter);
-        sorter = orderByHotDegree(sorter);
-        return findByTypeIntegrally(type, filter, sorter, page);
-    }
-
-    @Override
     public PageSlice<BookVO> findAllUsingUserFigureByUserIdIntegrally(String userId, Filter filter, Sorter sorter, Page page) {
         filter = ensurePublish(filter);
         return extractPageSlice(bookMapper.selectAllUsingUserFigureByUserIdIntegrally(userId, filter, sorter, page));
@@ -324,5 +284,10 @@ public class BookServiceImpl extends AbstractService<String, Book, BookVO> imple
     @Override
     public void decrementEpisodes(String bookId) {
         bookMapper.incrementEpisodes(bookId);
+    }
+
+    @Override
+    public String findContentIdByBookId(String bookId) {
+        return bookMapper.findContentIdByBookId(bookId);
     }
 }

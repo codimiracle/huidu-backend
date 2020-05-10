@@ -17,10 +17,6 @@ import java.util.List;
  */
 public interface BookService extends Service<String, Book, BookVO> {
 
-    void passExamination(String id, String reason, String userId);
-
-    void rejectExamination(String id, String reason, String userId);
-
     BookVO findPublishByIdIntegrally(BookType type, String id);
 
     BookVO findByIdWithTypeIntegrally(BookType type, String id);
@@ -40,8 +36,6 @@ public interface BookService extends Service<String, Book, BookVO> {
     void playsIncrement(String id);
 
     BookVO findByContentIdIntegrally(String contentId);
-
-    PageSlice<BookVO> findAllHotIntegrally(BookType type, Filter filter, Sorter sorter, Page page);
 
     PageSlice<BookVO> findAllUsingUserFigureByUserIdIntegrally(String id, Filter filter, Sorter sorter, Page page);
 
@@ -66,4 +60,6 @@ public interface BookService extends Service<String, Book, BookVO> {
     void incrementEpisodes(String bookId);
 
     void decrementEpisodes(String bookId);
+
+    String findContentIdByBookId(String bookId);
 }

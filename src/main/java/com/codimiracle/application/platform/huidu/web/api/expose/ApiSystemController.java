@@ -64,6 +64,9 @@ import static com.codimiracle.application.platform.huidu.enumeration.Settings.*;
 @RequestMapping("/api/system")
 public class ApiSystemController {
     @Resource
+    private PopularService popularService;
+
+    @Resource
     private SettingsService settingsService;
 
     @Resource
@@ -190,8 +193,8 @@ public class ApiSystemController {
         realtimeVO.setSections(categoryService.findByIdsIntegrally(collectionIds));
         HotCommunity hotCommunity = new HotCommunity();
         realtimeVO.setCommunity(hotCommunity);
-        hotCommunity.setHotTopics(topicService.findHotIntegrally(null, null, new Page()).getList());
-        hotCommunity.setHotReviews(reviewService.findHotReviewIntegrally(null, null, new Page()).getList());
+        hotCommunity.setHotTopics(popularService.findPopularTopicIntegrally(null, null, new Page()).getList());
+        hotCommunity.setHotReviews(popularService.findPopularReviewIntegrally( null, null, new Page()).getList());
         //hotCommunity.setFocus(referenceService.findCommunityFocusIntegrally(null, null, new Page()).getList());
         PersonalRecommendation personalRecommendation = new PersonalRecommendation();
         realtimeVO.setRecommendations(personalRecommendation);

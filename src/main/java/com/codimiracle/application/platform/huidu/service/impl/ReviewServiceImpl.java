@@ -148,11 +148,6 @@ public class ReviewServiceImpl extends AbstractUnsupportedOperationService<Strin
         contentService.deleteByIdLogically(id);
     }
 
-    @Override
-    public PageSlice<ReviewVO> findHotIntegrally(Filter filter, Sorter sorter, Page page) {
-        return null;
-    }
-
     private ReviewVO mutate(ContentArticleVO articleVO) {
         if (Objects.isNull(articleVO)) {
             return null;
@@ -190,12 +185,6 @@ public class ReviewServiceImpl extends AbstractUnsupportedOperationService<Strin
         slice.setLimit(articleVOList.getLimit());
         slice.setTotal(articleVOList.getTotal());
         return slice;
-    }
-
-    @Override
-    public PageSlice<ReviewVO> findHotReviewIntegrally(Filter filter, Sorter sorter, Page page) {
-        //return mutate(articleService.findHotIntegrally(ContentType.Review, filter, sorter, page));
-        return null;
     }
 
     @Override

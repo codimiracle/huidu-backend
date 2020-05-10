@@ -51,4 +51,5 @@ public interface BookMapper extends Mapper<Book,BookVO> {
 
     void decrementEpisodes(String bookId);
 
+    String findContentIdByBookId(String bookId);
 }

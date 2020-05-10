@@ -1,10 +1,11 @@
 package com.codimiracle.application.platform.huidu.service.impl;
 
-import com.codimiracle.application.platform.huidu.entity.po.BookTags;
 import com.codimiracle.application.platform.huidu.entity.po.FigureTag;
-import com.codimiracle.application.platform.huidu.service.BookTagsService;
+import com.codimiracle.application.platform.huidu.service.BookService;
 import com.codimiracle.application.platform.huidu.service.BuryingPointService;
 import com.codimiracle.application.platform.huidu.service.UserFigureService;
+import com.codimiracle.web.middleware.content.pojo.po.ContentTag;
+import com.codimiracle.web.middleware.content.service.ContentTagsService;
 import com.google.common.collect.Interner;
 import com.google.common.collect.Interners;
 import org.springframework.stereotype.Service;
@@ -23,9 +24,11 @@ public class BuryingPointServiceImpl implements BuryingPointService {
     private static final float READING_ACCESS_WEIGHT = 0.5f;
     Interner<String> figureUpdatingLock = Interners.newWeakInterner();
     @Resource
-    private UserFigureService userFigureService;
+    private ContentTagsService contentTagsService;
     @Resource
-    private BookTagsService bookTagsService;
+    private BookService bookService;
+    @Resource
+    private UserFigureService userFigureService;
 
     private void forTagRaw(String userId, String tagId, float weight) {
         String lock = figureUpdatingLock.intern(String.format("user-%s-figure-tag-%s", userId, tagId));
@@ -67,7 +70,8 @@ public class BuryingPointServiceImpl implements BuryingPointService {
     }
 
     private void forBook(String userId, String bookId, float weight) {
-        List<BookTags> bookTagList = bookTagsService.findByBookId(bookId);
+        String contentId = bookService.findContentIdByBookId(bookId);
+        List<ContentTag> bookTagList = contentTagsService.findByContentId(contentId);
         bookTagList.forEach((bookTags) -> {
             forTagRaw(userId, bookTags.getTagId(), weight);
         });

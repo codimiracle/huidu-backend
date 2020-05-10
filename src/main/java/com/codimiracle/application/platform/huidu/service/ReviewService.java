@@ -35,11 +35,7 @@ import java.util.List;
 public interface ReviewService extends Service<String, Review, ReviewVO> {
     ReviewVO findByIdIntegrally(String id);
 
-    PageSlice<ReviewVO> findHotIntegrally(Filter filter, Sorter sorter, Page page);
-
     PageSlice<ReviewVO> findAllIntegrally(Filter filter, Sorter sorter, Page page);
-
-    PageSlice<ReviewVO> findHotReviewIntegrally(Filter filter, Sorter sorter, Page page);
 
     void deleteByIdsLogically(List<String> ids);
 }

@@ -8,6 +8,7 @@ import com.codimiracle.application.platform.huidu.enumeration.BookType;
 import com.codimiracle.application.platform.huidu.enumeration.CategoryType;
 import com.codimiracle.application.platform.huidu.service.BookService;
 import com.codimiracle.application.platform.huidu.service.CategoryService;
+import com.codimiracle.application.platform.huidu.service.PopularService;
 import com.codimiracle.application.platform.huidu.service.UserFigureService;
 import com.codimiracle.application.platform.huidu.util.RestfulUtil;
 import com.codimiracle.web.basic.contract.*;
@@ -29,6 +30,9 @@ public class ApiRecommendationController {
 
     @Resource
     private BookService bookService;
+
+    @Resource
+    private PopularService popularService;
 
     @Resource
     private CategoryService categoryService;
@@ -97,7 +101,7 @@ public class ApiRecommendationController {
         newCollection.setField("id");
         newCollection.setOrder("descend");
         discoverVO.setCategories(categoryService.findAllIntegrally(CategoryType.Collection, null, newCollection, firstPage).getList());
-        discoverVO.setHotBooks(bookService.findAllHotIntegrally(null, null, null, firstPage).getList());
+        discoverVO.setHotBooks(popularService.findPopularBooksIntegrally(null, null, firstPage).getList());
         discoverVO.setMaybeLikes(bookService.findAllUsingUserFigureByAvgIntegrally(null, null, firstPage).getList());
         Filter thisYears = new Filter();
         thisYears.put("years", new String[]{DateFormatUtils.format(new Date(), "yyyy")});

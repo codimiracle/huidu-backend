@@ -10,6 +10,7 @@ import com.codimiracle.application.platform.huidu.entity.vt.AudioCatalogs;
 import com.codimiracle.application.platform.huidu.entity.vt.Catalogs;
 import com.codimiracle.application.platform.huidu.enumeration.*;
 import com.codimiracle.application.platform.huidu.service.*;
+import com.codimiracle.application.platform.huidu.util.FilterUtil;
 import com.codimiracle.application.platform.huidu.util.RestfulUtil;
 import com.codimiracle.application.platform.huidu.util.TagUtil;
 import com.codimiracle.web.basic.contract.*;
@@ -30,6 +31,9 @@ import java.util.*;
 public class BookController {
     @Resource
     private BookService bookService;
+
+    @Resource
+    private PopularService popularService;
 
     @Resource
     private BookEpisodeService bookEpisodeService;
@@ -163,7 +167,9 @@ public class BookController {
     }
 
     public ApiResponse hotCollection(BookType type, Filter filter, Sorter sorter, Page page) {
-        return RestfulUtil.list(bookService.findAllHotIntegrally(type, filter, sorter, page));
+        filter = FilterUtil.ensureNotNull(filter);
+        filter.put("type", new String[] {type.getType()});
+        return RestfulUtil.list(popularService.findPopularBooksIntegrally(filter, sorter, page));
     }
 
     public ApiResponse reviewStars(String bookId) {

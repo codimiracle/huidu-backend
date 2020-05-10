@@ -1,4 +1,5 @@
-package com.codimiracle.application.platform.huidu.service;/*
+package com.codimiracle.application.platform.huidu.service;
+/*
  * MIT License
  *
  * Copyright (c) 2020 Codimiracle
@@ -28,18 +29,11 @@ import com.codimiracle.web.basic.contract.Filter;
 import com.codimiracle.web.basic.contract.Page;
 import com.codimiracle.web.basic.contract.PageSlice;
 import com.codimiracle.web.basic.contract.Sorter;
-import com.codimiracle.web.mybatis.contract.Service;
+import com.codimiracle.web.mybatis.contract.support.vo.Service;
 
 import java.util.List;
 
-public interface TopicService extends Service<String, Topic> {
-
-    TopicVO findByIdIntegrally(String id);
-
-    PageSlice<TopicVO> findAllIntegrally(Filter filter, Sorter sorter, Page page);
-
-    PageSlice<TopicVO> findHotIntegrally(Filter filter, Sorter sorter, Page page);
-
+public interface TopicService extends Service<String, Topic, TopicVO> {
     PageSlice<TopicVO> findFocusTopicByReferenceIdIntegrally(String bookId, Filter filter, Sorter sorter, Page page);
 
     void deleteByIdsLogically(List<String> ids);

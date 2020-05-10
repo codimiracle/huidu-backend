@@ -59,11 +59,11 @@
         ct.id content_id,
         ct.owner_id owner_id,
         ct.comments content_comments,
-        ct.rate content_rate,
+        0 content_rate,
         ct.likes content_likes,
         ct.reposts content_reposts,
-        ct.create_time content_create_time,
-        ct.update_time content_update_time,
+        ct.created_at content_create_time,
+        ct.updated_at content_update_time,
         bm.id book_metadata_id,
         bm.name book_metadata_name,
         bm.cover book_metadata_cover,
@@ -122,8 +122,8 @@
         WHERE b.id = #{id}
     </update>
     <select id="avgReviewRate" resultType="java.lang.Float">
-        SELECT avg(rate) FROM content c LEFT JOIN content_reference cr ON c.id = cr.content_id WHERE c.type = 'review'
-        AND cr.type = 'book' AND cr.ref_id = #{bookId}
+        SELECT avg(rate) FROM content_rate crate LEFT JOIN content c on c.id = crate.content_id LEFT JOIN content_reference cr ON c.id = cr.content_id WHERE c.type = 'review'
+        AND cr.reference_target_type = 'book' AND cr.reference_target_id = #{bookId}
     </select>
     <select id="selectByIdIntegrally" resultMap="IntegratedResultMap">
         <include refid="select_statement_without_type"/>
@@ -447,6 +447,9 @@
     </select>
     <select id="selectMetadataIdByBookId" resultType="java.lang.String">
         SELECT b.metadata_id FROM book b WHERE b.id = #{bookId}
+    </select>
+    <select id="findContentIdByBookId" resultType="java.lang.String">
+        SELECT b.content_id FROM book b WHERE b.id = #{bookId}
     </select>
     <update id="incrementEpisodes">
         UPDATE book b SET b.episodes = b.episodes + 1 WHERE b.id = #{bookId}

@@ -37,7 +37,7 @@ import com.codimiracle.web.middleware.content.pojo.vo.ContentArticleVO;
 import com.codimiracle.web.middleware.content.service.ArticleService;
 import com.codimiracle.web.middleware.content.service.ContentService;
 import com.codimiracle.web.middleware.content.service.ReferenceService;
-import com.codimiracle.web.mybatis.contract.AbstractUnsupportedOperationService;
+import com.codimiracle.web.mybatis.contract.support.vo.AbstractUnsupportedOperationService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,7 +50,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
-public class TopicServiceImpl extends AbstractUnsupportedOperationService<String, Topic> implements TopicService {
+public class TopicServiceImpl extends AbstractUnsupportedOperationService<String, Topic, TopicVO> implements TopicService {
     @Resource
     ContentService contentService;
     @Resource
@@ -170,12 +170,6 @@ public class TopicServiceImpl extends AbstractUnsupportedOperationService<String
     public PageSlice<TopicVO> findAllIntegrally(Filter filter, Sorter sorter, Page page) {
 //        PageSlice<ContentArticleVO> slice = contentArticleService.findAllIntegrally(ContentType.Topic, filter, sorter, page);
 //        return mutate(slice);
-        return null;
-    }
-
-    @Override
-    public PageSlice<TopicVO> findHotIntegrally(Filter filter, Sorter sorter, Page page) {
-        //return mutate(contentArticleService.findHotIntegrally(ContentType.Topic, filter, sorter, page));
         return null;
     }
 

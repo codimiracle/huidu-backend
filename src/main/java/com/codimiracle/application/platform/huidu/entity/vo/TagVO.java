@@ -22,13 +22,19 @@ package com.codimiracle.application.platform.huidu.entity.vo;/*
  * SOFTWARE.
  */
 
+import com.codimiracle.web.middleware.content.pojo.eo.Tag;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
-public class TagVO {
+public class TagVO implements Tag {
     private String id;
     private String name;
     private List<CategoryVO> categories;
+
+    @Override
+    public String getTagId() {
+        return this.id;
+    }
 }

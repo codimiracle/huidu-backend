@@ -48,7 +48,6 @@ public class BookVO extends ContentVO {
     private BookMetadataVO metadata;
     private String categoryId;
     private CategoryVO category;
-    private List<TagVO> tags;
     private Integer plays;
     private Integer reads;
     private ContentExaminationVO examination;

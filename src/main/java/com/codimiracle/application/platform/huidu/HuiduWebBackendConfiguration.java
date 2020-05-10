@@ -1,11 +1,11 @@
 package com.codimiracle.application.platform.huidu;
 
 import com.codimiracle.web.mybatis.contract.Paginator;
-import org.mybatis.spring.annotation.MapperScan;
 import org.mybatis.spring.annotation.MapperScans;
 import org.springframework.context.annotation.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import tk.mybatis.spring.annotation.MapperScan;
 
 @Configuration
 @EnableAspectJAutoProxy
@@ -15,11 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
         @ComponentScan(basePackages = "com.codimiracle.web.middleware.content"),
         @ComponentScan(basePackages = "com.codimiracle.web.notification.middleware")
 })
-@MapperScans({
-        @MapperScan("com.codimiracle.web.middleware.content.mapper"),
-        @MapperScan("com.codimiracle.web.notification.middleware.mapper"),
-        @MapperScan("com.codimiracle.application.platform.huidu.mapper")
-})
+@MapperScan({"com.codimiracle.web.middleware.content.mapper","com.codimiracle.web.notification.middleware.mapper","com.codimiracle.application.platform.huidu.mapper"})
 //@EnableElasticsearchRepositories(basePackages = "com.codimiracle.application.platform.huidu.elasticsearch.repository")
 public class HuiduWebBackendConfiguration {
 
