@@ -2,9 +2,11 @@ package com.codimiracle.application.platform.huidu.entity.po;
 
 import com.codimiracle.application.platform.huidu.entity.dto.OrderDetailsDTO;
 import com.codimiracle.application.platform.huidu.enumeration.CommodityType;
+import com.codimiracle.application.platform.huidu.typehandler.MoneyTypeHandler;
 import lombok.Data;
 import org.joda.money.Money;
 import org.springframework.beans.BeanUtils;
+import tk.mybatis.mapper.annotation.ColumnType;
 
 import javax.persistence.*;
 import java.util.Objects;
@@ -60,6 +62,7 @@ public class OrderDetails {
      * 购买项价格
      */
     @Column(name = "commodity_prices")
+    @ColumnType(typeHandler = MoneyTypeHandler.class)
     private Money commodityPrices;
 
     /**
@@ -70,6 +73,7 @@ public class OrderDetails {
     /**
      * 小计
      */
+    @ColumnType(typeHandler = MoneyTypeHandler.class)
     private Money prices;
 
     @Transient

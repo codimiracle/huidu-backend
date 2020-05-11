@@ -4,10 +4,12 @@ import com.codimiracle.application.platform.huidu.entity.dto.OrderringDTO;
 import com.codimiracle.application.platform.huidu.enumeration.OrderStatus;
 import com.codimiracle.application.platform.huidu.enumeration.OrderType;
 import com.codimiracle.application.platform.huidu.enumeration.PaymentType;
+import com.codimiracle.application.platform.huidu.typehandler.MoneyTypeHandler;
 import com.codimiracle.application.platform.huidu.util.HuiduMoneyUtil;
 import lombok.Data;
 import org.joda.money.Money;
 import org.springframework.beans.BeanUtils;
+import tk.mybatis.mapper.annotation.ColumnType;
 
 import javax.persistence.Column;
 import javax.persistence.Id;
@@ -90,12 +92,14 @@ public class Order {
      * 总金额
      */
     @Column(name = "total_money")
+    @ColumnType(typeHandler = MoneyTypeHandler.class)
     private Money totalMoney;
 
     /**
      * 运费
      */
     @Column(name = "shipment_money")
+    @ColumnType(typeHandler = MoneyTypeHandler.class)
     private Money shipmentMoney;
 
     /**

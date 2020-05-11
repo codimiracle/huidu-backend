@@ -1,8 +1,10 @@
 package com.codimiracle.application.platform.huidu.entity.po;
 
 import com.codimiracle.application.platform.huidu.entity.dto.UserRoleDTO;
+import com.codimiracle.application.platform.huidu.typehandler.ListTypeHandler;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
+import tk.mybatis.mapper.annotation.ColumnType;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -29,6 +31,7 @@ public class UserRole {
     /**
      * 权限标识
      */
+    @ColumnType(typeHandler = ListTypeHandler.class)
     private List<String> authorities;
 
     private boolean deleted;

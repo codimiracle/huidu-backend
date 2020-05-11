@@ -4,6 +4,7 @@ import com.codimiracle.application.platform.huidu.entity.dto.ActivityDTO;
 import com.codimiracle.application.platform.huidu.enumeration.ActivityStatus;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
+import tk.mybatis.mapper.annotation.ColumnType;
 
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;

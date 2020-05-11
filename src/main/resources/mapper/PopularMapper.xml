@@ -19,7 +19,7 @@
         FROM book b
         LEFT JOIN content c ON b.content_id = c.id
         WHERE b.deleted = 0
-        AND
+
     </select>
     <select id="selectPopularTopicsIntegrally"
             resultMap="com.codimiracle.web.middleware.content.mapper.ArticleMapper.ValueResultMap">

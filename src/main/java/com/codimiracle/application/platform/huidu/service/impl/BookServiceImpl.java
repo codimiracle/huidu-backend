@@ -20,6 +20,7 @@ import com.codimiracle.web.middleware.content.service.ContentTagsService;
 import com.codimiracle.web.middleware.content.service.ExaminationService;
 import com.codimiracle.web.mybatis.contract.ServiceException;
 import com.codimiracle.web.mybatis.contract.support.vo.AbstractService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -110,6 +111,7 @@ public class BookServiceImpl extends AbstractService<String, Book, BookVO> imple
 
         Content content = new Content();
         content.setId(model.getId());
+        BeanUtils.copyProperties(model, content);
         contentService.update(content);
         super.update(model);
     }
@@ -203,7 +205,7 @@ public class BookServiceImpl extends AbstractService<String, Book, BookVO> imple
 
     @Override
     public BookVO findByContentIdIntegrally(String contentId) {
-        return bookMapper.selectByContentIdIntegrally(contentId);
+        return mutate(bookMapper.selectByContentIdIntegrally(contentId));
     }
 
     private Filter ensurePublish(Filter filter) {

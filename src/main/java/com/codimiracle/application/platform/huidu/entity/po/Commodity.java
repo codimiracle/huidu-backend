@@ -3,10 +3,12 @@ package com.codimiracle.application.platform.huidu.entity.po;
 import com.codimiracle.application.platform.huidu.entity.dto.CommodityDTO;
 import com.codimiracle.application.platform.huidu.enumeration.CommodityStatus;
 import com.codimiracle.application.platform.huidu.enumeration.CommodityType;
+import com.codimiracle.application.platform.huidu.typehandler.MoneyTypeHandler;
 import lombok.Data;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.springframework.beans.BeanUtils;
+import tk.mybatis.mapper.annotation.ColumnType;
 
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
@@ -72,6 +74,7 @@ public class Commodity {
     /**
      * 运费
      */
+    @ColumnType(typeHandler = MoneyTypeHandler.class)
     private Money shipment;
 
     /**
@@ -79,6 +82,7 @@ public class Commodity {
      */
     private String extra;
 
+    @ColumnType(typeHandler = MoneyTypeHandler.class)
     private Money prices;
 
     private CommodityStatus status;

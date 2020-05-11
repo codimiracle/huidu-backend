@@ -3,9 +3,13 @@ package com.codimiracle.application.platform.huidu.entity.po;
 import com.codimiracle.application.platform.huidu.entity.dto.BookDTO;
 import com.codimiracle.application.platform.huidu.enumeration.BookStatus;
 import com.codimiracle.application.platform.huidu.enumeration.BookType;
+import com.codimiracle.application.platform.huidu.typehandler.EnumTypeHandler;
 import com.codimiracle.web.middleware.content.pojo.po.Content;
+import com.codimiracle.web.mybatis.contract.annotation.LogicDelete;
 import lombok.Data;
+import org.apache.ibatis.type.TypeHandler;
 import org.springframework.beans.BeanUtils;
+import tk.mybatis.mapper.annotation.ColumnType;
 
 import javax.persistence.*;
 import java.util.List;
@@ -42,9 +46,6 @@ public class Book {
 
     @Column(name = "content_id")
     private String contentId;
-
-    @Transient
-    private Content content;
     /**
      * 书籍元数据id
      */
@@ -59,9 +60,6 @@ public class Book {
      */
     @Column(name = "category_id")
     private String categoryId;
-
-    @Transient
-    private Category category;
 
     private String money;
 
@@ -89,6 +87,13 @@ public class Book {
     @Column(name = "commodity_id")
     private String commodityId;
 
+
+    @Transient
+    private Category category;
+
+    @Transient
+    private Content content;
+
     @Transient
     private Commodity commodity;
 
@@ -98,6 +103,7 @@ public class Book {
     /**
      * 删除标识
      */
+    @LogicDelete
     private Boolean deleted;
 
     public static Book from(BookDTO bookDTO) {

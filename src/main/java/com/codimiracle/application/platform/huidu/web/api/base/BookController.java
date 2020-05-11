@@ -57,6 +57,7 @@ public class BookController {
         content.setUpdatedAt(content.getCreatedAt());
         content.setType(ContentType.Book.toString());
         book.setContent(content);
+
         Category category = book.getCategory();
         if (Objects.nonNull(category)) {
             if (Objects.isNull(bookDTO.getCategory().getTags())) {
