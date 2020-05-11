@@ -40,6 +40,7 @@ import java.util.stream.Collectors;
 
 @Data
 public class Topic {
+    public static final String CONTENT_TYPE = "topic";
     /**
      * 内容id
      */

@@ -14,8 +14,6 @@ import java.util.List;
 
 @org.apache.ibatis.annotations.Mapper
 public interface UserFigureMapper extends Mapper<FigureTag, FigureTagVO> {
-    List<FigureTagVO> selectAllTagIntegrally(@Param("filter") Filter filter, @Param("sorter") Sorter sorter, @Param("page") Page page);
-
     List<UserProtectedVO> selectSimilarUserByUserIdProtectly(@Param("userId") String userId, @Param("filter") Filter filter, @Param("sorter") Sorter sorter, @Param("page") Page page);
 
     List<CategoryVO> selectSimilarCategoryByUserIdIntegrally(String userId);

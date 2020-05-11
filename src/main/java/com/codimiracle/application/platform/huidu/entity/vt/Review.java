@@ -40,6 +40,7 @@ import java.util.stream.Collectors;
 
 @Data
 public class Review {
+    public static final String CONTENT_TYPE = "review";
     /**
      * 内容id
      */

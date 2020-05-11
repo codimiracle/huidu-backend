@@ -51,7 +51,7 @@
         <include refid="select_statement"/>
         AND a.id = #{id}
     </select>
-    <select id="findAllIntegrally" resultMap="IntegratedResultMap">
+    <select id="selectAllIntegrally" resultMap="IntegratedResultMap">
         <include refid="select_statement"/>
         <if test="filter != null">
             <if test="filter.status != null and filter.status.length gt 0">

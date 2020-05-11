@@ -10,11 +10,11 @@ import com.codimiracle.web.basic.contract.Filter;
 import com.codimiracle.web.basic.contract.Page;
 import com.codimiracle.web.basic.contract.PageSlice;
 import com.codimiracle.web.basic.contract.Sorter;
+import com.codimiracle.web.middleware.content.pojo.vo.CommentVO;
 import com.codimiracle.web.middleware.content.pojo.vo.ContentArticleVO;
 import com.codimiracle.web.middleware.content.service.ArticleService;
-import com.codimiracle.web.middleware.content.service.impl.ArticleServiceImpl;
+import com.codimiracle.web.middleware.content.service.CommentService;
 import com.codimiracle.web.mybatis.contract.PageSliceExtractor;
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +30,8 @@ public class PopularArticleServiceImpl extends PageSliceExtractor implements Pop
 
     @Resource
     private ArticleService articleService;
+    @Resource
+    private CommentService commentService;
     @Resource
     private TopicService topicService;
     @Resource
@@ -67,5 +69,18 @@ public class PopularArticleServiceImpl extends PageSliceExtractor implements Pop
             return reviewService.findByIdIntegrally(contentArticleVO.getContentId());
         }).collect(Collectors.toList()));
         return slice;
+    }
+
+    private PageSlice<CommentVO> mappingToCommentVO(PageSlice<ContentArticleVO> articlePageSlice) {
+        PageSlice<CommentVO> pageSlice = new PageSlice<>();
+        pageSlice.setList(articlePageSlice.getList().stream().map(contentArticleVO -> {
+            return commentService.findByIdIntegrally(contentArticleVO.getContentId());
+        }).collect(Collectors.toList()));
+        return pageSlice;
+    }
+
+    @Override
+    public PageSlice<CommentVO> findPopularCommentIntegrally(Filter filter, Sorter sorter, Page page) {
+        return mappingToCommentVO(popularMapper.selectPopularCommentIntegrally(filter, sorter, page));
     }
 }

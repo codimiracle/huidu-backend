@@ -8,4 +8,10 @@ public class FilterUtil {
     public static Filter ensureNotNull(Filter filter) {
         return Objects.isNull(filter) ? new Filter() : filter;
     }
+
+    public static Filter equals(Filter filter, String field, String value) {
+        filter = ensureNotNull(filter);
+        filter.put(field, new String[]{value});
+        return filter;
+    }
 }

@@ -195,7 +195,7 @@ public class ApiSystemController {
         realtimeVO.setCommunity(hotCommunity);
         hotCommunity.setHotTopics(popularService.findPopularTopicIntegrally(null, null, new Page()).getList());
         hotCommunity.setHotReviews(popularService.findPopularReviewIntegrally( null, null, new Page()).getList());
-        //hotCommunity.setFocus(referenceService.findCommunityFocusIntegrally(null, null, new Page()).getList());
+        hotCommunity.setFocus(popularService.findCommunityFocus(null, null, new Page()).getList());
         PersonalRecommendation personalRecommendation = new PersonalRecommendation();
         realtimeVO.setRecommendations(personalRecommendation);
         List<CategoryVO> similarCategories;

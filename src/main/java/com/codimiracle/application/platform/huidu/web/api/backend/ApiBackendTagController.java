@@ -85,7 +85,7 @@ public class ApiBackendTagController {
         if (Objects.nonNull(tag)) {
             return RestfulUtil.success();
         } else {
-            return RestfulUtil.fontFound();
+            return RestfulUtil.notFound();
         }
     }
 

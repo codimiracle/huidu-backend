@@ -9,7 +9,7 @@ import javax.persistence.Id;
 
 @Data
 @NoArgsConstructor
-public class Tag {
+public class Tag implements com.codimiracle.web.middleware.content.pojo.eo.Tag {
     /**
      * 标签名称
      */
@@ -25,5 +25,10 @@ public class Tag {
 
     public Tag(String name) {
         this.name = name;
+    }
+
+    @Override
+    public String getTagId() {
+        return this.id;
     }
 }

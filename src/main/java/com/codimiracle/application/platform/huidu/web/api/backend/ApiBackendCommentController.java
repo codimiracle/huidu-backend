@@ -22,6 +22,7 @@ package com.codimiracle.application.platform.huidu.web.api.backend;/*
  * SOFTWARE.
  */
 
+import com.codimiracle.application.platform.huidu.adapter.CommentAdapter;
 import com.codimiracle.application.platform.huidu.converter.CommentConverter;
 import com.codimiracle.application.platform.huidu.entity.dto.BulkDeletionDTO;
 import com.codimiracle.application.platform.huidu.entity.dto.CommentDTO;
@@ -36,6 +37,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @CrossOrigin
 @RestController
@@ -64,18 +66,28 @@ public class ApiBackendCommentController {
         Objects.requireNonNull(comment);
         comment.setId(id);
         commentService.update(comment);
-        return RestfulUtil.entity(commentService.findByIdIntegrally(id));
+        CommentVO commentVO = commentService.findByIdIntegrally(id);
+
+        return RestfulUtil.entity(commentVO);
     }
 
     @GetMapping("/{id}")
     public ApiResponse entity(@PathVariable String id) {
         CommentVO commentVO = commentService.findByIdIntegrally(id);
-        return RestfulUtil.success(commentVO);
+        if (Objects.nonNull(commentVO)) {
+            return RestfulUtil.entity(new CommentAdapter(commentVO));
+        }
+        return RestfulUtil.notFound();
     }
 
     @GetMapping
     public ApiResponse collection(@RequestParam("filter") Filter filter, @RequestParam("sorter") Sorter sorter, @ModelAttribute Page page) {
         PageSlice<CommentVO> slice = commentService.findAllIntegrally(filter, sorter, page);
-        return RestfulUtil.list(slice);
+        PageSlice<CommentAdapter> adaptedPageSlice = new PageSlice<>();
+        adaptedPageSlice.setList(slice.getList().stream().map((commentVO -> new CommentAdapter(commentVO))).collect(Collectors.toList()));
+        adaptedPageSlice.setTotal(slice.getTotal());
+        adaptedPageSlice.setPage(slice.getPage());
+        adaptedPageSlice.setLimit(slice.getLimit());
+        return RestfulUtil.list(adaptedPageSlice);
     }
 }

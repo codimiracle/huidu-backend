@@ -27,9 +27,6 @@
         LEFT JOIN tag t ON uf.tag_id = t.id
         WHERE uf.deleted = 0 AND t.deleted = 0
     </sql>
-    <update id="deleteByIdLogically">
-        UPDATE user_figure uf SET uf.deleted = 1, uf.score = 0 WHERE uf.id = #{figureId}
-    </update>
     <update id="incrementScoreBy">
         UPDATE user_figure uf SET uf.score = uf.score + #{weight} WHERE uf.id = #{figureTagId}
     </update>
@@ -37,7 +34,7 @@
         UPDATE user_figure uf SET uf.deleted = 1 WHERE uf.id IN
         <foreach collection="ids" item="item" open="(" close=")" separator=",">#{item}</foreach>
     </update>
-    <select id="selectAllTagIntegrally" resultMap="IntegratedResultMap">
+    <select id="selectAllIntegrally" resultMap="IntegratedResultMap">
         <include refid="select_statement"/>
         <if test="filter != null">
             <if test="filter.userId != null and filter.userId.length gt 0">

@@ -17,8 +17,6 @@ import java.util.List;
  */
 public interface UserFigureService extends Service<String, FigureTag, FigureTagVO> {
 
-    void deleteByIdLogically(String figureTagId);
-
     PageSlice<UserProtectedVO> findSimilarUserByUserIdProtectly(String userId, Filter filter, Sorter sorter, Page page);
 
     List<CategoryVO> findSimilarCategoryByUserIdIntegrally(String id);

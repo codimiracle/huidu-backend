@@ -4,7 +4,6 @@ import com.codimiracle.application.platform.huidu.entity.po.Book;
 import com.codimiracle.application.platform.huidu.entity.po.Tag;
 import com.codimiracle.application.platform.huidu.entity.po.User;
 import com.codimiracle.application.platform.huidu.entity.vo.BookVO;
-import com.codimiracle.application.platform.huidu.entity.vo.TagVO;
 import com.codimiracle.application.platform.huidu.enumeration.BookStatus;
 import com.codimiracle.application.platform.huidu.enumeration.BookType;
 import com.codimiracle.application.platform.huidu.mapper.BookMapper;
@@ -14,11 +13,9 @@ import com.codimiracle.web.basic.contract.Page;
 import com.codimiracle.web.basic.contract.PageSlice;
 import com.codimiracle.web.basic.contract.Sorter;
 import com.codimiracle.web.middleware.content.pojo.po.Content;
-import com.codimiracle.web.middleware.content.pojo.po.ContentExamination;
 import com.codimiracle.web.middleware.content.service.ContentService;
 import com.codimiracle.web.middleware.content.service.ContentTagsService;
 import com.codimiracle.web.middleware.content.service.ExaminationService;
-import com.codimiracle.web.mybatis.contract.ServiceException;
 import com.codimiracle.web.mybatis.contract.support.vo.AbstractService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -71,25 +68,17 @@ public class BookServiceImpl extends AbstractService<String, Book, BookVO> imple
             categoryService.save(category);
             model.setCategoryId(category.getId());
         });
+
+        List<Tag> newTags = model.getTags().stream().filter(tag -> Objects.isNull(tag.getId())).collect(Collectors.toList());
+        if (!newTags.isEmpty()) {
+            tagService.save(newTags);
+        }
         Content content = model.getContent();
+        content.setTagList(new ArrayList<>(model.getTags()));
+
         contentService.save(content);
         model.setContentId(content.getId());
         super.save(model);
-    }
-
-    private void examinate(String id, String reason, String userId, BookStatus status) {
-        Book book = findByContentId(id);
-        if (!Objects.equals(book.getStatus(), BookStatus.Examining)) {
-            throw new ServiceException("无法审查该内容！");
-        }
-        ContentExamination examination = new ContentExamination();
-        examination.setFromStatus(book.getStatus().toString());
-        examination.setToStatus(status.getStatus());
-        examination.setTargetContentId(id);
-        examination.setReason(reason);
-        examination.setExaminerId(userId);
-        examination.setExaminedAt(new Date());
-        examinationService.save(examination);
     }
 
     private Book findByContentId(String id) {
@@ -110,12 +99,21 @@ public class BookServiceImpl extends AbstractService<String, Book, BookVO> imple
         }));
 
         Content content = new Content();
-        content.setId(model.getId());
         BeanUtils.copyProperties(model, content);
+        if (Objects.nonNull(model.getTags()) && !model.getTags().isEmpty()) {
+            List<Tag> newTags = model.getTags().stream().filter(tag -> Objects.isNull(tag.getId())).collect(Collectors.toList());
+            if (!newTags.isEmpty()) {
+                tagService.save(newTags);
+            }
+            content.setTagList(new ArrayList<>(model.getTags()));
+        }
+        content.setId(findContentIdByBookId(model.getId()));
+        content.setUpdatedAt(new Date());
         contentService.update(content);
         super.update(model);
     }
 
+    @Override
     protected BookVO mutate(BookVO bookVO) {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (Objects.nonNull(bookVO)) {
@@ -134,7 +132,7 @@ public class BookServiceImpl extends AbstractService<String, Book, BookVO> imple
             }
             bookVO.setExamination(examinationService.findLastByContentIdIntegrally(bookVO.getContentId()));
             bookVO.setReviewRate(avgReviewStars(bookVO.getId()));
-            bookVO.setTagList(contentTagsService.findTagByContentId(bookVO.getId()));
+            bookVO.setTagList(contentTagsService.findTagByContentId(bookVO.getContentId()));
         }
         return bookVO;
     }
@@ -290,6 +288,6 @@ public class BookServiceImpl extends AbstractService<String, Book, BookVO> imple
 
     @Override
     public String findContentIdByBookId(String bookId) {
-        return bookMapper.findContentIdByBookId(bookId);
+        return bookMapper.selectContentIdByBookId(bookId);
     }
 }

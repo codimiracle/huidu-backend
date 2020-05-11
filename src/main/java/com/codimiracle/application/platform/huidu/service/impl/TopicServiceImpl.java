@@ -25,6 +25,7 @@ package com.codimiracle.application.platform.huidu.service.impl;/*
 import com.codimiracle.application.platform.huidu.entity.vo.TopicVO;
 import com.codimiracle.application.platform.huidu.entity.vt.Topic;
 import com.codimiracle.application.platform.huidu.service.TopicService;
+import com.codimiracle.application.platform.huidu.util.FilterUtil;
 import com.codimiracle.application.platform.huidu.util.ReferenceUtil;
 import com.codimiracle.web.basic.contract.Filter;
 import com.codimiracle.web.basic.contract.Page;
@@ -54,9 +55,9 @@ public class TopicServiceImpl extends AbstractUnsupportedOperationService<String
     @Resource
     ContentService contentService;
     @Resource
-    ArticleService contentArticleService;
+    ArticleService articleService;
     @Resource
-    ReferenceService contentReferenceService;
+    ReferenceService referenceService;
 
     private void saveContentPart(Topic topic) {
         Content content = new Content();
@@ -69,14 +70,14 @@ public class TopicServiceImpl extends AbstractUnsupportedOperationService<String
         ContentArticle article = new ContentArticle();
         BeanUtils.copyProperties(topic, article);
         article.setContentId(topic.getId());
-        contentArticleService.save(article);
+        articleService.save(article);
         BeanUtils.copyProperties(article, topic);
     }
 
     private void saveReference(Topic topic) {
         topic.getReferenceList().forEach((r) -> {
             r.setContentId(topic.getId());
-            contentReferenceService.save(r);
+            referenceService.save(r);
         });
     }
 
@@ -94,8 +95,8 @@ public class TopicServiceImpl extends AbstractUnsupportedOperationService<String
 
     private void updateReferences(Topic topic) {
         // 找出已有引用
-        List<ContentReference> allContentReference = contentReferenceService.findByContentId(topic.getId());
-        ReferenceUtil.mutateToPersistent(contentReferenceService, topic.getId(), topic.getReferenceList());
+        List<ContentReference> allContentReference = referenceService.findByContentId(topic.getId());
+        ReferenceUtil.mutateToPersistent(referenceService, topic.getId(), topic.getReferenceList());
         // 新引用
         List<ContentReference> newContentReference = topic.getReferenceList().stream().filter(contentReference -> Objects.isNull(contentReference.getId())).collect(Collectors.toList());
         //重用旧引用
@@ -111,10 +112,10 @@ public class TopicServiceImpl extends AbstractUnsupportedOperationService<String
         //保存新引用
         newContentReference.forEach((r) -> {
             r.setContentId(topic.getId());
-            contentReferenceService.save(r);
+            referenceService.save(r);
         });
         //更新旧引用
-        allContentReference.forEach(contentReferenceService::update);
+        allContentReference.forEach(referenceService::update);
     }
 
     @Override
@@ -124,7 +125,7 @@ public class TopicServiceImpl extends AbstractUnsupportedOperationService<String
         contentService.update(content);
         ContentArticle article = new ContentArticle();
         BeanUtils.copyProperties(entity, article);
-        contentArticleService.update(article);
+        articleService.update(article);
         updateReferences(entity);
     }
 
@@ -132,8 +133,8 @@ public class TopicServiceImpl extends AbstractUnsupportedOperationService<String
     public Topic findById(String id) {
         Topic topic = new Topic();
         Content content = contentService.findById(id);
-        ContentArticle article = contentArticleService.findById(id);
-        List<ContentReference> references = contentReferenceService.findByContentId(id);
+        ContentArticle article = articleService.findById(id);
+        List<ContentReference> references = referenceService.findByContentId(id);
         BeanUtils.copyProperties(content, topic);
         BeanUtils.copyProperties(article, topic);
         topic.setReferenceList(references);
@@ -146,7 +147,6 @@ public class TopicServiceImpl extends AbstractUnsupportedOperationService<String
         }
         TopicVO topicVO = new TopicVO();
         BeanUtils.copyProperties(articleVO, topicVO);
-        topicVO.setReferenceList(contentReferenceService.findByContentIdIntegrally(articleVO.getContentId()));
         return topicVO;
     }
 
@@ -161,16 +161,14 @@ public class TopicServiceImpl extends AbstractUnsupportedOperationService<String
 
     @Override
     public TopicVO findByIdIntegrally(String id) {
-//        ContentArticleVO articleVO = contentArticleService.findByIdIntegrally(ContentType.Topic, id);
-//        return mutate(articleVO);
-        return null;
+        return mutate(articleService.findByIdIntegrally(id));
     }
 
     @Override
     public PageSlice<TopicVO> findAllIntegrally(Filter filter, Sorter sorter, Page page) {
-//        PageSlice<ContentArticleVO> slice = contentArticleService.findAllIntegrally(ContentType.Topic, filter, sorter, page);
-//        return mutate(slice);
-        return null;
+        filter = FilterUtil.equals(filter, "type", Topic.CONTENT_TYPE);
+        PageSlice<ContentArticleVO> articlesPageSlice = articleService.findAllIntegrally(filter, sorter, page);
+        return mutate(articlesPageSlice);
     }
 
     @Override

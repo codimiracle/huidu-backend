@@ -14,6 +14,7 @@ import com.codimiracle.application.platform.huidu.util.FilterUtil;
 import com.codimiracle.application.platform.huidu.util.RestfulUtil;
 import com.codimiracle.application.platform.huidu.util.TagUtil;
 import com.codimiracle.web.basic.contract.*;
+import com.codimiracle.web.middleware.content.pojo.eo.Tag;
 import com.codimiracle.web.middleware.content.pojo.po.Content;
 import com.codimiracle.web.middleware.content.service.ContentService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author Codimiracle
@@ -51,12 +53,6 @@ public class BookController {
     @PostMapping
     public ApiResponse create(@AuthenticationPrincipal User user, BookDTO bookDTO) {
         Book book = Book.from(bookDTO);
-        Content content = new Content();
-        content.setOwnerId(user.getId());
-        content.setCreatedAt(new Date());
-        content.setUpdatedAt(content.getCreatedAt());
-        content.setType(ContentType.Book.toString());
-        book.setContent(content);
 
         Category category = book.getCategory();
         if (Objects.nonNull(category)) {
@@ -74,6 +70,14 @@ public class BookController {
             tagNames.addAll(Arrays.asList(bookDTO.getTags()));
             book.setTags(TagUtil.mutateToPersistent(tagService, tagNames));
         }
+
+        Content content = new Content();
+        content.setOwnerId(user.getId());
+        content.setCreatedAt(new Date());
+        content.setUpdatedAt(content.getCreatedAt());
+        content.setType(ContentType.Book.toString());
+        book.setContent(content);
+
         bookService.save(book);
         return RestfulUtil.entity(bookService.findByIdWithTypeIntegrally(book.getType(), book.getId()));
     }

@@ -19,7 +19,5 @@ public interface ActivityMapper extends Mapper<Activity, ActivityVO> {
 
     ActivityVO findByIdIntegrally(String id);
 
-    List<ActivityVO> findAllIntegrally(@Param("filter") Filter filter, @Param("sorter") Sorter sorter, @Param("page") Page page);
-
     List<ActivityVO> selectByStatusIntegrally(@Param("status") ActivityStatus status, @Param("number") Integer number);
 }

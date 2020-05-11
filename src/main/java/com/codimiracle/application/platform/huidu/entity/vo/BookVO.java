@@ -22,6 +22,7 @@ package com.codimiracle.application.platform.huidu.entity.vo;/*
  * SOFTWARE.
  */
 
+import com.codimiracle.web.middleware.content.pojo.eo.Tag;
 import com.codimiracle.web.middleware.content.pojo.vo.ContentExaminationVO;
 import com.codimiracle.web.middleware.content.pojo.vo.ContentRateVO;
 import com.codimiracle.web.middleware.content.pojo.vo.ContentVO;
@@ -54,6 +55,11 @@ public class BookVO extends ContentVO {
     private Float reviewRate;
     private boolean joinedCart;
     private boolean joinedShelf;
+
+    // compat with frontend.
+    public List<Tag> getTags() {
+        return this.getTagList();
+    }
 
     public float getAvgRate() {
         float rate = Optional.ofNullable(getRate()).map(ContentRateVO::getRate).orElse(0.0f);

@@ -33,7 +33,7 @@ public class RestfulUtil {
         return new ApiResponse<>(code, message, null);
     }
 
-    public static ApiResponse fontFound() {
+    public static ApiResponse notFound() {
         return new ApiResponse<>(404, "没有找到对应资源！", null);
     }
 }

@@ -1,5 +1,6 @@
 package com.codimiracle.application.platform.huidu.service.impl;
 
+import com.codimiracle.application.platform.huidu.entity.embedded.CommunityFocus;
 import com.codimiracle.application.platform.huidu.entity.vo.BookVO;
 import com.codimiracle.application.platform.huidu.entity.vo.ReviewVO;
 import com.codimiracle.application.platform.huidu.entity.vo.TopicVO;
@@ -10,6 +11,7 @@ import com.codimiracle.web.basic.contract.Filter;
 import com.codimiracle.web.basic.contract.Page;
 import com.codimiracle.web.basic.contract.PageSlice;
 import com.codimiracle.web.basic.contract.Sorter;
+import com.codimiracle.web.middleware.content.pojo.vo.CommentVO;
 import com.codimiracle.web.mybatis.contract.AbstractUnsupportedOperationService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,5 +40,15 @@ public class PopularServiceImpl extends AbstractUnsupportedOperationService<Stri
     @Override
     public PageSlice<ReviewVO> findPopularReviewIntegrally(Filter filter, Sorter sorter, Page page) {
         return popularArticleService.findPopularReviewIntegrally(filter, sorter, page);
+    }
+
+    @Override
+    public PageSlice<CommentVO> findPopularCommentIntegrally(Filter filter, Sorter sorter, Page page) {
+        return popularArticleService.findPopularCommentIntegrally(filter, sorter, page);
+    }
+
+    @Override
+    public PageSlice<CommunityFocus> findCommunityFocus(Filter filter, Sorter sorter, Page page) {
+        return new PageSlice<>();
     }
 }

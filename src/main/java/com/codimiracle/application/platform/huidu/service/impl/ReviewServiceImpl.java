@@ -24,7 +24,9 @@ package com.codimiracle.application.platform.huidu.service.impl;/*
 
 import com.codimiracle.application.platform.huidu.entity.vo.ReviewVO;
 import com.codimiracle.application.platform.huidu.entity.vt.Review;
+import com.codimiracle.application.platform.huidu.service.PopularService;
 import com.codimiracle.application.platform.huidu.service.ReviewService;
+import com.codimiracle.application.platform.huidu.util.FilterUtil;
 import com.codimiracle.application.platform.huidu.util.ReferenceUtil;
 import com.codimiracle.web.basic.contract.Filter;
 import com.codimiracle.web.basic.contract.Page;
@@ -60,6 +62,8 @@ public class ReviewServiceImpl extends AbstractUnsupportedOperationService<Strin
     private ArticleService articleService;
     @Resource
     private ReferenceService referenceService;
+    @Resource
+    private PopularService popularService;
 
     private void saveContentPart(Review review) {
         Content content = new Content();
@@ -154,10 +158,7 @@ public class ReviewServiceImpl extends AbstractUnsupportedOperationService<Strin
         }
         ReviewVO reviewVO = new ReviewVO();
         BeanUtils.copyProperties(articleVO, reviewVO);
-        Filter filter = new Filter();
-        filter.put("targetContentId", new String[]{reviewVO.getContentId()});
-        //reviewVO.setHotCommentList(commentService.findHotIntegrally(filter, null, new Page(1, 1)).getList());
-        reviewVO.setReferenceList(referenceService.findByContentIdIntegrally(articleVO.getContentId()));
+        reviewVO.setHotCommentList(popularService.findPopularCommentIntegrally(null, null, new Page()).getList());
         return reviewVO;
     }
 
@@ -178,13 +179,9 @@ public class ReviewServiceImpl extends AbstractUnsupportedOperationService<Strin
 
     @Override
     public PageSlice<ReviewVO> findAllIntegrally(Filter filter, Sorter sorter, Page page) {
-        PageSlice<ContentArticleVO> articleVOList = articleService.findAllIntegrally(filter, sorter, page);
-        PageSlice<ReviewVO> slice = new PageSlice<>();
-        slice.setList(articleVOList.getList().stream().map(this::mutate).collect(Collectors.toList()));
-        slice.setPage(articleVOList.getPage());
-        slice.setLimit(articleVOList.getLimit());
-        slice.setTotal(articleVOList.getTotal());
-        return slice;
+        filter = FilterUtil.equals(filter, "type", Review.CONTENT_TYPE);
+        PageSlice<ContentArticleVO> slice = articleService.findAllIntegrally(filter, sorter, page);
+        return mutate(slice);
     }
 
     @Override

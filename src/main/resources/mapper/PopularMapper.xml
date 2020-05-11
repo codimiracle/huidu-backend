@@ -24,9 +24,15 @@
     <select id="selectPopularTopicsIntegrally"
             resultMap="com.codimiracle.web.middleware.content.mapper.ArticleMapper.ValueResultMap">
         <include refid="com.codimiracle.web.middleware.content.mapper.ArticleMapper.select_statement" />
+        AND c.type = "topic"
     </select>
     <select id="selectPopularReviewsIntegrally"
             resultMap="com.codimiracle.web.middleware.content.mapper.ArticleMapper.ValueResultMap">
         <include refid="com.codimiracle.web.middleware.content.mapper.ArticleMapper.select_statement" />
+        AND c.type = "review"
+    </select>
+    <select id="selectPopularCommentIntegrally" resultMap="com.codimiracle.web.middleware.content.mapper.ArticleMapper.ValueResultMap">
+        <include refid="com.codimiracle.web.middleware.content.mapper.ArticleMapper.select_statement" />
+        AND c.type = "comment"
     </select>
 </mapper>

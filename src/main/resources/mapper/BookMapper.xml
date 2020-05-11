@@ -35,6 +35,7 @@
         <result column="book_metadata_id" jdbcType="INTEGER" property="metadataId"/>
         <result column="book_reads" jdbcType="INTEGER" property="reads"/>
         <result column="book_plays" jdbcType="INTEGER" property="plays"/>
+        <result column="content_id" property="contentId" />
         <result column="commodity_id" jdbcType="INTEGER" property="commodityId"/>
         <result column="owner_id" jdbcType="INTEGER" property="ownerId"/>
         <result column="category_id" jdbcType="INTEGER" property="categoryId"/>
@@ -56,7 +57,7 @@
         b.money book_money,
         b.reads book_reads,
         b.plays book_plays,
-        ct.id content_id,
+        b.content_id content_id,
         ct.owner_id owner_id,
         ct.comments content_comments,
         0 content_rate,
@@ -448,7 +449,7 @@
     <select id="selectMetadataIdByBookId" resultType="java.lang.String">
         SELECT b.metadata_id FROM book b WHERE b.id = #{bookId}
     </select>
-    <select id="findContentIdByBookId" resultType="java.lang.String">
+    <select id="selectContentIdByBookId" resultType="java.lang.String">
         SELECT b.content_id FROM book b WHERE b.id = #{bookId}
     </select>
     <update id="incrementEpisodes">
